@@ -933,6 +933,10 @@ namespace MagicalGirlLux
                 && LuxEGameObject.Position.CountEnemiesInRange(300) >= 1)
                 E.Cast();
 
+            if (LuxEGameObject != null
+                && target.HasBuffOfType(BuffType.Slow))
+                E.Cast();
+
             if (LuxEGameObject != null)
                 return;
 
