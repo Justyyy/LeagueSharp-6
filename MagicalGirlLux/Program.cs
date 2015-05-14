@@ -75,7 +75,7 @@ namespace MagicalGirlLux
             combo.SubMenu("[Q] Settings").AddItem(new MenuItem("UseQ", "Use Q - Light Binding").SetValue(true));
             combo.SubMenu("[Q] Settings").AddItem(new MenuItem("AutoQ", "Auto Q on CC'd targets").SetValue(true));
 
-            combo.SubMenu("[W] Settings").AddItem(new MenuItem("UseW", "W IS CURRENTLY NOT SUPPORTED! USE ORACLE.").SetValue(true));
+            combo.SubMenu("[W] Settings").AddItem(new MenuItem("UseW", "Use W - Super Magical Barrier").SetValue(true));
             combo.SubMenu("[W] Settings").AddItem(new MenuItem("UseWP", "W on HP Percentage").SetValue(true));
             combo.SubMenu("[W] Settings").AddItem(new MenuItem("UseWHP", "Player HP%").SetValue(new Slider(80, 100, 1)));
             combo.SubMenu("[W] Settings").AddItem(new MenuItem("UseWA", "Use W on Allies").SetValue(true));
