@@ -8,7 +8,7 @@ using LeagueSharp;
 using LeagueSharp.Common;
 using SharpDX;
 
-namespace MagicalGirLux
+namespace MagicalGirlLux
 {
     internal class Program
     {
@@ -139,7 +139,7 @@ namespace MagicalGirLux
 
             Config.AddToMainMenu();
 
-            Game.OnUpdate += Game_OnGameUpdate;
+            Game.OnUpdate += Game_OnUpdate;
             GameObject.OnDelete += LuxEgone;
             GameObject.OnCreate += GameObject_OnCreate;
             Drawing.OnDraw += OnDraw;
@@ -914,7 +914,7 @@ namespace MagicalGirLux
                 player.Spellbook.CastSpell(Ignite, target);
         }
 
-        private static void Game_OnGameUpdate(EventArgs args)
+        private static void Game_OnUpdate(EventArgs args)
         {
            switch (Orbwalker.ActiveMode)
             {
@@ -930,30 +930,25 @@ namespace MagicalGirLux
                     Jungleclear();
                     break;
             }
-            if (Config.Item("jungleks").GetValue<KeyBind>().Active)
-            {
+
+            if (Config.Item("jungleks").GetValue<KeyBind>().Active)            
                 Junglesteal();
-            }
-            if (E.IsReady())
-            {
+            
+            if (E.IsReady())            
                 Edetonate();
-            }
-            if (Config.Item("SmartKS").GetValue<bool>())
-            {
+            
+            if (Config.Item("SmartKS").GetValue<bool>())           
                 Killsteal();
-            }
-            if (Config.Item("autoharass").GetValue<KeyBind>().Active)
-            {
+            
+            if (Config.Item("autoharass").GetValue<KeyBind>().Active)            
                 Harass();
-            }
-            if (Config.Item("semir").GetValue<KeyBind>().Active)
-            {
+            
+            if (Config.Item("semir").GetValue<KeyBind>().Active)           
                 forceR();
-            }
-            if (Config.Item("AutoQ").GetValue<KeyBind>().Active)
-            {
+            
+            if (Config.Item("AutoQ").GetValue<KeyBind>().Active)            
                 Autospells();           
-            }
+            
         }
     }
 }
