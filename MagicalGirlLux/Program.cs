@@ -828,15 +828,22 @@ namespace MagicalGirlLux
             if (player.HasBuff("Recall") || player.InFountain() || player.IsDead)
                 return;
 
-
-            if (Config.Item("UseWP").GetValue<bool>()
-                && (player.HealthPercent <= Config.Item("UseWHP").GetValue<Slider>().Value
-                && W.IsReady() && player.Position.CountEnemiesInRange(W.Range) >= 1
-                && Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo) ||
-                player.HasBuffOfType(BuffType.Poison)
-                || player.HasBuffOfType(BuffType.Snare))
+            foreach (var enemy in
+                ObjectManager.Get<Obj_AI_Hero>()
+                    .Where(x => x.IsValidTarget(R.Range))
+                    .Where(x => !x.IsZombie)
+                    .Where(x => !x.IsDead))
             {
-                W.Cast(player);
+
+                if (Config.Item("UseWP").GetValue<bool>()
+                    && (player.HealthPercent <= Config.Item("UseWHP").GetValue<Slider>().Value
+                        && W.IsReady() && player.Position.CountEnemiesInRange(W.Range) >= 1
+                        && Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo && enemy.IsFacing(player)) ||
+                    player.HasBuffOfType(BuffType.Poison)
+                    || player.HasBuffOfType(BuffType.Snare))
+                {
+                    W.Cast(player);
+                }
             }
 
             foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(h => h.IsAlly && !h.IsMe))
