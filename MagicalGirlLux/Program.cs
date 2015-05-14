@@ -179,12 +179,12 @@ namespace MagicalGirlLux
             }
             if (target.HasBuff("luxilluminatingfraulein"))
             {
-                damage += aa + 10 + (8*player.Level) + player.FlatMagicDamageMod*0.2 - target.FlatMagicReduction;
+                damage += aa + 10 + (8 * player.Level) + player.FlatMagicDamageMod * 0.2 - target.FlatMagicReduction;
             }
             if (player.HasBuff("lichbane"))
             {
                 damage += player.CalcDamage(target, Damage.DamageType.Magical,
-                    (player.BaseAttackDamage*0.75) + ((player.BaseAbilityDamage + player.FlatMagicDamageMod)*0.5));
+                    (player.BaseAttackDamage * 0.75) + ((player.BaseAbilityDamage + player.FlatMagicDamageMod) * 0.5));
             }
             if (R.IsReady() && Config.Item("UseR").GetValue<bool>()) // rdamage
             {
@@ -195,7 +195,7 @@ namespace MagicalGirlLux
             {
                 damage += Q.GetDamage(target);
             }
-            return (int) damage;
+            return (int)damage;
         }
 
         private static void Autospells()
@@ -205,13 +205,14 @@ namespace MagicalGirlLux
                 return;
             if (target.IsInvulnerable)
                 return;
-            if (Q.IsReady() && target.IsValidTarget(Q.Range) && Q.GetPrediction(target).Hitchance >= HitChance.VeryHigh)
+            if (Q.IsReady() && target.IsValidTarget(Q.Range) && Q.GetPrediction(target).Hitchance >= HitChance.VeryHigh
+                && target.Distance(Q.GetPrediction(target).CastPosition) <= 600)
             {
-                if (target.HasBuffOfType(BuffType.Snare) 
-                    || target.HasBuffOfType(BuffType.Suppression) 
-                    ||target.HasBuffOfType(BuffType.Taunt) 
-                    || target.HasBuffOfType(BuffType.Stun) 
-                    || target.HasBuffOfType(BuffType.Charm) 
+                if (target.HasBuffOfType(BuffType.Snare)
+                    || target.HasBuffOfType(BuffType.Suppression)
+                    || target.HasBuffOfType(BuffType.Taunt)
+                    || target.HasBuffOfType(BuffType.Stun)
+                    || target.HasBuffOfType(BuffType.Charm)
                     || target.HasBuffOfType(BuffType.Fear))
 
                     Q.Cast(target, Config.Item("packetcast").GetValue<bool>());
@@ -245,13 +246,14 @@ namespace MagicalGirlLux
                 LuxEGameObject = null;
         }
 
-        private static void GameObject_OnCreate(GameObject sender, EventArgs args) //Credits to Chewymoon
+        private static void GameObject_OnCreate(GameObject sender, EventArgs args)
+        //I found this on pornhub trust me, no copy pasterino. //Credits to Chewymoon
         {
             if (sender.Name.Contains("LuxLightstrike_tar_green"))
 
                 LuxEGameObject = sender;
-        
-        }       
+
+        }
         private static void OnDraw(EventArgs args)
         {
             var pos = Drawing.WorldToScreen(ObjectManager.Player.Position);
@@ -291,11 +293,9 @@ namespace MagicalGirlLux
 
                     var rpredl = R.GetPrediction(target).CastPosition;
                     var rdmg = R.GetDamage(target);
-                    var rpdmg = R.GetDamage(target) + 10 + (8*player.Level) + player.FlatMagicDamageMod*0.2;
+                    var rpdmg = R.GetDamage(target) + 10 + (8 * player.Level) + player.FlatMagicDamageMod * 0.2;
                     var rpred = R.GetPrediction(target);
                     var rdraw = new Geometry.Polygon.Line(player.Position, rpredl, R.Range);
-
-                    //DEBUG PREDICTION LINES
 
                     if (Config.Item("RLine").GetValue<Circle>().Active
                         && target.IsValidTarget(R.Range)
@@ -346,7 +346,7 @@ namespace MagicalGirlLux
                 return;
             var harassmana = Config.Item("harassmana").GetValue<Slider>().Value;
             var qpred = Q.GetPrediction(target, Config.Item("packetcast").GetValue<bool>());
-            var qcollision = Q.GetCollision(player.ServerPosition.To2D(), new List<Vector2> {qpred.CastPosition.To2D()});
+            var qcollision = Q.GetCollision(player.ServerPosition.To2D(), new List<Vector2> { qpred.CastPosition.To2D() });
             var minioncol = qcollision.Where(x => !(x is Obj_AI_Hero)).Count(x => x.IsMinion);
 
             if (E.IsReady() && target.IsValidTarget(R.Range) && Config.Item("Eharass").GetValue<bool>() &&
@@ -356,15 +356,18 @@ namespace MagicalGirlLux
             if (target.IsValidTarget(Q.Range)
                 && minioncol <= 1
                 && Config.Item("Qharass").GetValue<bool>()
-                && qpred.Hitchance >= HitChance.VeryHigh && player.ManaPercent >= harassmana 
+                && qpred.Hitchance >= HitChance.VeryHigh && player.ManaPercent >= harassmana
+                && target.Distance(Q.GetPrediction(target).CastPosition) <= 600
                 && target.HasBuffOfType(BuffType.Slow) || target.IsValidTarget(Q.Range)
                 && minioncol <= 1
                 && Config.Item("Qharass").GetValue<bool>()
-                && qpred.Hitchance >= HitChance.VeryHigh && player.ManaPercent >= harassmana 
+                && qpred.Hitchance >= HitChance.VeryHigh && player.ManaPercent >= harassmana
+                && target.Distance(Q.GetPrediction(target).CastPosition) <= 600
                 && target.HasBuffOfType(BuffType.Stun) || target.IsValidTarget(Q.Range)
                 && minioncol <= 1
                 && Config.Item("Qharass").GetValue<bool>()
-                && qpred.Hitchance >= HitChance.VeryHigh && player.ManaPercent >= harassmana 
+                && qpred.Hitchance >= HitChance.VeryHigh && player.ManaPercent >= harassmana
+                && target.Distance(Q.GetPrediction(target).CastPosition) <= 600
                 && target.HasBuffOfType(BuffType.Snare))
 
                 Q.Cast(target, Config.Item("packetcast").GetValue<bool>());
@@ -375,7 +378,8 @@ namespace MagicalGirlLux
             if (target.IsValidTarget(Q.Range)
                 && minioncol <= 1
                 && Config.Item("Qharass").GetValue<bool>()
-                && qpred.Hitchance >= HitChance.VeryHigh && player.ManaPercent >= harassmana) 
+                && qpred.Hitchance >= HitChance.VeryHigh && player.ManaPercent >= harassmana
+                && target.Distance(Q.GetPrediction(target).CastPosition) <= 600)
                 Q.Cast(target, Config.Item("packetcast").GetValue<bool>());
         }
 
@@ -383,7 +387,7 @@ namespace MagicalGirlLux
         {
             if (Ignite == SpellSlot.Unknown || player.Spellbook.CanUseSpell(Ignite) != SpellState.Ready)
                 return 0f;
-            return (float) player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite);
+            return (float)player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite);
         }
 
         private static void Killsteal()
@@ -398,14 +402,14 @@ namespace MagicalGirlLux
                 var edmg = E.GetDamage(enemy);
                 var qdmg = Q.GetDamage(enemy);
                 var rdmg = R.GetDamage(enemy);
-                
-                var rpdmg = R.GetDamage(enemy) + 10 + (8*player.Level) + player.FlatMagicDamageMod*0.2;
+
+                var rpdmg = R.GetDamage(enemy) + 10 + (8 * player.Level) + player.FlatMagicDamageMod * 0.2;
                 var rpred = R.GetPrediction(enemy);
                 var qpred = Q.GetPrediction(enemy);
                 var epred = E.GetPrediction(enemy);
-                
+
                 var qcollision = Q.GetCollision(player.ServerPosition.To2D(),
-                new List<Vector2> {qpred.CastPosition.To2D()});
+                new List<Vector2> { qpred.CastPosition.To2D() });
                 var minioncol = qcollision.Where(x => !(x is Obj_AI_Hero)).Count(x => x.IsMinion);
 
                 if (player.Distance(enemy.Position) <= 600 && IgniteDamage(enemy) >= enemy.Health &&
@@ -414,19 +418,22 @@ namespace MagicalGirlLux
                     player.Spellbook.CastSpell(Ignite, enemy);
 
 
-                if (enemy.Health < edmg && E.IsReady() && epred.Hitchance >= HitChance.VeryHigh)
+                if (enemy.Health < edmg && E.IsReady() && epred.Hitchance >= HitChance.VeryHigh && enemy.Distance(epred.CastPosition) <= E.Width - 30)
+                    E.Cast(epred.CastPosition, Config.Item("packetcast").GetValue<bool>());
+                else if (enemy.Health < edmg && E.IsReady() && epred.Hitchance >= HitChance.VeryHigh && enemy.Distance(epred.CastPosition) <= E.Width + 200 && !enemy.IsFacing(player))
                     E.Cast(epred.CastPosition, Config.Item("packetcast").GetValue<bool>());
 
-                if (enemy.Health < qdmg && qpred.Hitchance >= HitChance.VeryHigh && minioncol <= 1 && Q.IsReady() &&
+                if (enemy.Health < qdmg && qpred.Hitchance >= HitChance.VeryHigh && minioncol <= 1 && Q.IsReady()
+                    && enemy.Distance(qpred.CastPosition) <= 600 &&
                     Config.Item("KSQ").GetValue<bool>())
                     Q.Cast(enemy, Config.Item("packetcast").GetValue<bool>());
 
-                var ripdmg = R.GetDamage(enemy) + 10 + (8*player.Level) + player.FlatMagicDamageMod*0.2 +
+                var ripdmg = R.GetDamage(enemy) + 10 + (8 * player.Level) + player.FlatMagicDamageMod * 0.2 +
                              IgniteDamage(enemy);
-                var passivedmg = 10 + (8*player.Level) + player.FlatMagicDamageMod*0.2 - enemy.FlatMagicReduction;
+                var passivedmg = 10 + (8 * player.Level) + player.FlatMagicDamageMod * 0.2 - enemy.FlatMagicReduction;
                 var passiveaa = player.GetAutoAttackDamage(player) + passivedmg;
                 var lichdmg = player.CalcDamage(enemy, Damage.DamageType.Magical,
-                    (player.BaseAttackDamage*0.75) + ((player.BaseAbilityDamage + player.FlatMagicDamageMod)*0.5));
+                    (player.BaseAttackDamage * 0.75) + ((player.BaseAbilityDamage + player.FlatMagicDamageMod) * 0.5));
 
                 if (enemy.IsValidTarget(Q.Range) && Q.GetPrediction(enemy).Hitchance >= HitChance.VeryHigh && Q.IsReady() &&
                     E.IsReady() && enemy.Health < E.GetDamage(enemy) + Q.GetDamage(enemy))
@@ -448,7 +455,7 @@ namespace MagicalGirlLux
                     player.Distance(enemy.Position) < E.Range - 200 && Q.GetDamage(enemy) > enemy.Health && Q.IsReady() &&
                     Q.GetPrediction(enemy).Hitchance >= HitChance.VeryHigh ||
                     player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(player) &&
-                    player.GetAutoAttackDamage(enemy)*2 > enemy.Health)
+                    player.GetAutoAttackDamage(enemy) * 2 > enemy.Health)
                     return;
 
                 if (LuxEGameObject != null && enemy.Distance(LuxEGameObject.Position) <= E.Width &&
@@ -506,7 +513,7 @@ namespace MagicalGirlLux
                     LuxEGameObject != null && enemy.Distance(LuxEGameObject.Position) <= E.Width &&
                     enemy.Health < E.GetDamage(enemy) ||
                     player.Distance(enemy.Position) < 600 && Q.GetDamage(enemy) > enemy.Health && Q.IsReady() ||
-                    player.Distance(enemy.Position) < 600 && enemy.Health < player.GetAutoAttackDamage(enemy)*2)
+                    player.Distance(enemy.Position) < 600 && enemy.Health < player.GetAutoAttackDamage(enemy) * 2)
                     return;
 
                 if (player.Distance(enemy.Position) <= 600 && ripdmg >= enemy.Health &&
@@ -534,39 +541,39 @@ namespace MagicalGirlLux
 
             if (Config.Item("Red").GetValue<bool>())//
             {
-            var redBuff =
-                ObjectManager.Get<Obj_AI_Minion>()
-                    .Where(x => x.BaseSkinName == "SRU_Red")
-                    .Where(x => player.GetSpellDamage(x, SpellSlot.R) > x.Health)
-                    .FirstOrDefault(x => (x.IsAlly) || (x.IsEnemy));
+                var redBuff =
+                    ObjectManager.Get<Obj_AI_Minion>()
+                        .Where(x => x.BaseSkinName == "SRU_Red")
+                        .Where(x => player.GetSpellDamage(x, SpellSlot.R) > x.Health)
+                        .FirstOrDefault(x => (x.IsAlly) || (x.IsEnemy));
 
-            if (redBuff != null)
-                R.Cast(redBuff, Config.Item("packetcast").GetValue<bool>());
+                if (redBuff != null)
+                    R.Cast(redBuff, Config.Item("packetcast").GetValue<bool>());
             }
-            
+
             if (Config.Item("Baron").GetValue<bool>())//
             {
-            var Baron =
-                ObjectManager.Get<Obj_AI_Minion>()
-                    .Where(x => x.BaseSkinName == "SRU_Baron")
-                    .Where(x => player.GetSpellDamage(x, SpellSlot.R) > x.Health)
-                    .FirstOrDefault(x => (x.IsAlly) || (x.IsEnemy));
+                var Baron =
+                    ObjectManager.Get<Obj_AI_Minion>()
+                        .Where(x => x.BaseSkinName == "SRU_Baron")
+                        .Where(x => player.GetSpellDamage(x, SpellSlot.R) > x.Health)
+                        .FirstOrDefault(x => (x.IsAlly) || (x.IsEnemy));
 
-            if (Baron != null)
-                R.Cast(Baron, Config.Item("packetcast").GetValue<bool>());
-                }
+                if (Baron != null)
+                    R.Cast(Baron, Config.Item("packetcast").GetValue<bool>());
+            }
 
-                if (Config.Item("Dragon").GetValue<bool>()) //
-                {
-                    var Dragon =
-                        ObjectManager.Get<Obj_AI_Minion>()
-                            .Where(x => x.BaseSkinName == "SRU_Dragon")
-                            .Where(x => player.GetSpellDamage(x, SpellSlot.R) > x.Health)
-                            .FirstOrDefault(x => (x.IsAlly) || (x.IsEnemy));
+            if (Config.Item("Dragon").GetValue<bool>()) //
+            {
+                var Dragon =
+                    ObjectManager.Get<Obj_AI_Minion>()
+                        .Where(x => x.BaseSkinName == "SRU_Dragon")
+                        .Where(x => player.GetSpellDamage(x, SpellSlot.R) > x.Health)
+                        .FirstOrDefault(x => (x.IsAlly) || (x.IsEnemy));
 
-                    if (Dragon != null)
-                        R.Cast(Dragon, Config.Item("packetcast").GetValue<bool>());
-                }
+                if (Dragon != null)
+                    R.Cast(Dragon, Config.Item("packetcast").GetValue<bool>());
+            }
         }
 
 
@@ -578,7 +585,7 @@ namespace MagicalGirlLux
             var allMinionsE = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, E.Range + E.Width,
                 MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
 
-            var Qfarmpos = Q.GetLineFarmLocation(allMinionsQ, Q.Width);
+            var Qfarmpos = W.GetLineFarmLocation(allMinionsQ, Q.Width);
             var Efarmpos = E.GetCircularFarmLocation(allMinionsE, E.Width);
             if (Qfarmpos.MinionsHit >= 1 && Config.Item("jungleQ").GetValue<bool>() &&
                 player.ManaPercent >= junglem)
@@ -599,7 +606,7 @@ namespace MagicalGirlLux
             var allMinionsQ = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, Q.Range + Q.Width);
             var allMinionsE = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, E.Range + E.Width);
 
-            var Qfarmpos = Q.GetLineFarmLocation(allMinionsQ, Q.Width);
+            var Qfarmpos = W.GetLineFarmLocation(allMinionsQ, Q.Width);
             var Efarmpos = E.GetCircularFarmLocation(allMinionsE, E.Width);
             if (Qfarmpos.MinionsHit >= 1 && Config.Item("laneQ").GetValue<bool>() && player.ManaPercent >= lanem)
             {
@@ -641,15 +648,15 @@ namespace MagicalGirlLux
             var shield = target.AttackShield - target.MagicShield;
 
             var rdmg = R.GetDamage(target);
-            var rpdmg = R.GetDamage(target) + 10 + (8*player.Level) + player.FlatMagicDamageMod*0.2;
+            var rpdmg = R.GetDamage(target) + 10 + (8 * player.Level) + player.FlatMagicDamageMod * 0.2;
             var rpred = R.GetPrediction(target);
-            var ripdmg = R.GetDamage(target) + 10 + (8*player.Level) + player.FlatMagicDamageMod*0.2 +
+            var ripdmg = R.GetDamage(target) + 10 + (8 * player.Level) + player.FlatMagicDamageMod * 0.2 +
                          IgniteDamage(target);
             var lichdmg = player.CalcDamage(target, Damage.DamageType.Magical,
-                (player.BaseAttackDamage*0.75) + ((player.BaseAbilityDamage + player.FlatMagicDamageMod)*0.5));
+                (player.BaseAttackDamage * 0.75) + ((player.BaseAbilityDamage + player.FlatMagicDamageMod) * 0.5));
 
             var cdmg = R.GetDamage(target) + E.GetDamage(target);
-            var passivedmg = 10 + (8*player.Level) + player.FlatMagicDamageMod*0.2 - target.FlatMagicReduction;
+            var passivedmg = 10 + (8 * player.Level) + player.FlatMagicDamageMod * 0.2 - target.FlatMagicReduction;
             var passiveaa = player.GetAutoAttackDamage(player) + passivedmg;
 
             if (target.IsInvulnerable)
@@ -658,7 +665,7 @@ namespace MagicalGirlLux
             if (target.HasBuff("caitlynaceinthehole"))
                 return;
 
-            
+
 
             if (target.Health <= passiveaa && target.HasBuff("luxilluminatingfraulein") &&
                 player.Distance(target.Position) <= Orbwalking.GetRealAutoAttackRange(player))
@@ -675,25 +682,25 @@ namespace MagicalGirlLux
             if (LuxEGameObject != null && target.IsValidTarget(R.Range) &&
                 target.Position.Distance(LuxEGameObject.Position) <= E.Width && R.IsReady() //EPR combo
                 && target.IsValidTarget(R.Range) && rpred.Hitchance >= HitChance.VeryHigh &&
-                target.Health < cdmg + (passivedmg*1) && target.HasBuff("LuxLightBindingMis")
+                target.Health < cdmg + (passivedmg * 1) && target.HasBuff("LuxLightBindingMis")
                 ||
                 LuxEGameObject != null && target.IsValidTarget(R.Range) &&
                 target.Position.Distance(LuxEGameObject.Position) <= E.Width && R.IsReady() && Ignite.IsReady()
-                    //ERQPI combo
+                //ERQPI combo
                 && target.IsValidTarget(R.Range) && rpred.Hitchance >= HitChance.VeryHigh &&
-                target.Health < cdmg + (passivedmg*1) + IgniteDamage(target) && target.HasBuff("LuxLightBindingMis")
+                target.Health < cdmg + (passivedmg * 1) + IgniteDamage(target) && target.HasBuff("LuxLightBindingMis")
                 ||
                 LuxEGameObject != null && target.IsValidTarget(R.Range) && player.HasBuff("lichbane") &&
                 player.Distance(target.Position) <= Orbwalking.GetRealAutoAttackRange(player) && //ERPB combo
                 target.Position.Distance(LuxEGameObject.Position) <= E.Width && R.IsReady()
                 && target.IsValidTarget(R.Range) && rpred.Hitchance >= HitChance.VeryHigh &&
-                target.Health < cdmg + (passivedmg*1) + lichdmg && target.HasBuff("LuxLightBindingMis")
+                target.Health < cdmg + (passivedmg * 1) + lichdmg && target.HasBuff("LuxLightBindingMis")
                 ||
                 LuxEGameObject != null && target.IsValidTarget(R.Range) && player.HasBuff("lichbane") &&
                 player.Distance(target.Position) <= Orbwalking.GetRealAutoAttackRange(player) && //ERLIP combo
                 target.Position.Distance(LuxEGameObject.Position) <= E.Width && R.IsReady() && Ignite.IsReady()
                 && target.IsValidTarget(R.Range) && rpred.Hitchance >= HitChance.VeryHigh &&
-                target.Health < cdmg + (passivedmg*1) + IgniteDamage(target) + lichdmg &&
+                target.Health < cdmg + (passivedmg * 1) + IgniteDamage(target) + lichdmg &&
                 target.HasBuff("LuxLightBindingMis"))
                 R.Cast(target, Config.Item("packetcast").GetValue<bool>());
 
@@ -722,7 +729,7 @@ namespace MagicalGirlLux
                 player.Distance(target.Position) < E.Range - 200 && Q.GetDamage(target) > target.Health && Q.IsReady() &&
                 Q.GetPrediction(target).Hitchance >= HitChance.VeryHigh ||
                 player.Distance(target.Position) < Orbwalking.GetRealAutoAttackRange(player) &&
-                player.GetAutoAttackDamage(target)*2 > target.Health)
+                player.GetAutoAttackDamage(target) * 2 > target.Health)
                 return;
 
             if (LuxEGameObject != null && target.Distance(LuxEGameObject.Position) <= E.Width &&
@@ -748,8 +755,8 @@ namespace MagicalGirlLux
 
                 R.CastIfWillHit(target, Config.Item("RA").GetValue<Slider>().Value, Config.Item("packetcast").GetValue<bool>());
 
-                if (target.Health < rdmg - 100 + (3 * player.Level) && target.Position.CountAlliesInRange(650) >= 1)
-                    return;
+            if (target.Health < rdmg - 100 + (3 * player.Level) && target.Position.CountAlliesInRange(650) >= 1)
+                return;
 
             if (target.IsValidTarget(R.Range)
                 && rpred.Hitchance >= HitChance.VeryHigh
@@ -782,12 +789,65 @@ namespace MagicalGirlLux
                 LuxEGameObject != null && target.Distance(LuxEGameObject.Position) <= E.Width &&
                 target.Health < E.GetDamage(target) ||
                 player.Distance(target.Position) < 600 && Q.GetDamage(target) > target.Health && Q.IsReady() ||
-                player.Distance(target.Position) < 600 && target.Health < player.GetAutoAttackDamage(target)*2)
+                player.Distance(target.Position) < 600 && target.Health < player.GetAutoAttackDamage(target) * 2)
                 return;
 
             if (player.Distance(target.Position) <= 600 && ripdmg >= target.Health &&
                 Config.Item("UseIgnite").GetValue<bool>() && R.IsReady() && Ignite.IsReady())
                 player.Spellbook.CastSpell(Ignite, target);
+        }
+
+        private static void Wlogic()
+        {
+            if (player.HasBuff("zedulttargetmark")
+            || player.HasBuff("soulshackles")
+            || player.HasBuff("summonerdot")
+            || player.HasBuff("vladimirhemoplage")
+            || player.HasBuff("fallenonetarget")
+            || player.HasBuff("caitlynaceinthehole")
+            || player.HasBuff("fizzmarinerdoombomb")
+            || player.HasBuff("leblancsoulshackle")
+            || player.HasBuff("mordekaiserchildrenofthegrave"))
+
+                W.Cast(player, Config.Item("packetcast").GetValue<bool>());
+
+            if (player.HasBuff("Recall") || player.InFountain() || player.IsDead)
+                return;
+
+
+            if (Config.Item("UseWP").GetValue<bool>()
+                && (player.HealthPercent <= Config.Item("UseWHP").GetValue<Slider>().Value
+                && W.IsReady() && player.Position.CountEnemiesInRange(W.Range) >= 1
+                && Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo) ||
+                player.HasBuffOfType(BuffType.Poison)
+                || player.HasBuffOfType(BuffType.Snare))
+                W.Cast(player, Config.Item("packetcast").GetValue<bool>());
+
+            foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(h => h.IsAlly && !h.IsMe))
+            {
+                var wpred = W.GetPrediction(hero);
+                if (player.Distance(hero.Position) > W.Range) return;
+                if (Config.Item("UseWA").GetValue<bool>() &&
+                    (hero.HealthPercent <= Config.Item("UseWAHP").GetValue<Slider>().Value && W.IsReady() &&
+                     hero.Distance(player.ServerPosition) <= W.Range && wpred.Hitchance >= HitChance.VeryHigh) &&
+                    hero.Position.CountEnemiesInRange(W.Range) >= 1
+                    || hero.HasBuffOfType(BuffType.Poison)
+                    || hero.HasBuffOfType(BuffType.Snare))
+                    W.Cast(hero, Config.Item("packetcast").GetValue<bool>());
+
+                if (hero.HasBuff("zedulttargetmark")
+                    || hero.HasBuff("summonerdot")
+                    || hero.HasBuff("soulshackles")
+                    || hero.HasBuff("vladimirhemoplage")
+                    || hero.HasBuff("fallenonetarget")
+                    || hero.HasBuff("caitlynaceinthehole")
+                    || hero.HasBuff("fizzmarinerdoombomb")
+                    || hero.HasBuff("leblancsoulshackle")
+                    || hero.HasBuff("mordekaiserchildrenofthegrave"))
+
+                    W.Cast(hero, Config.Item("packetcast").GetValue<bool>());
+            }
+
         }
 
 
@@ -815,6 +875,7 @@ namespace MagicalGirlLux
             if (LuxEGameObject != null && LuxEGameObject.Position.CountEnemiesInRange(E.Width) >= 1)
                 E.Cast();
         }
+
         private static void Elogic()
         {
             var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
@@ -840,7 +901,9 @@ namespace MagicalGirlLux
             if (LuxEGameObject != null)
                 return;
 
-            if (player.ManaPercent >= emana && epred.Hitchance >= HitChance.VeryHigh)
+            if (player.ManaPercent >= emana && epred.Hitchance >= HitChance.VeryHigh && target.Distance(epred.CastPosition) <= E.Width - 30)
+                E.Cast(epred.CastPosition, Config.Item("packetcast").GetValue<bool>());
+            else if (player.ManaPercent >= emana && epred.Hitchance >= HitChance.VeryHigh && target.Distance(epred.CastPosition) <= E.Width + 200 && !target.IsFacing(player))
                 E.Cast(epred.CastPosition, Config.Item("packetcast").GetValue<bool>());
         }
 
@@ -857,19 +920,19 @@ namespace MagicalGirlLux
                 return;
 
             var qpred = Q.GetPrediction(target, Config.Item("packetcast").GetValue<bool>());
-            var qcollision = Q.GetCollision(player.ServerPosition.To2D(), new List<Vector2> {qpred.CastPosition.To2D()});
+            var qcollision = Q.GetCollision(player.ServerPosition.To2D(), new List<Vector2> { qpred.CastPosition.To2D() });
             var minioncol = qcollision.Where(x => !(x is Obj_AI_Hero)).Count(x => x.IsMinion);
             var lichdmg = player.CalcDamage(target, Damage.DamageType.Magical,
-                (player.BaseAttackDamage*0.75) + ((player.BaseAbilityDamage + player.FlatMagicDamageMod)*0.5));
+                (player.BaseAttackDamage * 0.75) + ((player.BaseAbilityDamage + player.FlatMagicDamageMod) * 0.5));
 
             if (target.IsValidTarget(Q.Range)
                 && minioncol <= 1
                 && Q.IsReady()
                 && qpred.Hitchance >= HitChance.VeryHigh && player.ManaPercent >= qmana &&
-                Config.Item("UseQ").GetValue<bool>())
+                Config.Item("UseQ").GetValue<bool>() && target.Distance(Q.GetPrediction(target).CastPosition) <= 600)
                 Q.Cast(target, Config.Item("packetcast").GetValue<bool>());
 
-            var passivedmg = 10 + (8*player.Level) + player.FlatMagicDamageMod*0.2 - target.FlatMagicReduction;
+            var passivedmg = 10 + (8 * player.Level) + player.FlatMagicDamageMod * 0.2 - target.FlatMagicReduction;
             var passiveaa = player.GetAutoAttackDamage(player) + passivedmg;
 
             if (E.IsReady() && Config.Item("UseE").GetValue<bool>() && target.IsValidTarget(E.Range))
@@ -881,20 +944,20 @@ namespace MagicalGirlLux
                 player.Spellbook.CastSpell(Ignite, target);
 
             if (player.Distance(target.Position) <= 600 && IgniteDamage(target) + E.GetDamage(target) >= target.Health &&
-            player.HealthPercent <= 25 && E.IsReady() &&
+            player.HealthPercent <= 25 && E.IsReady() && LuxEGameObject == null &&
             Config.Item("UseIgnite").GetValue<bool>())
-            player.Spellbook.CastSpell(Ignite, target);
+                player.Spellbook.CastSpell(Ignite, target);
 
 
             if (player.Distance(target.Position) <= 600 && IgniteDamage(target) + E.GetDamage(target) >= target.Health &&
             player.HealthPercent <= 25 && E.IsReady() && LuxEGameObject != null && target.Distance(LuxEGameObject.Position) <= LuxEGameObject.BoundingRadius &&
             Config.Item("UseIgnite").GetValue<bool>())
-            player.Spellbook.CastSpell(Ignite, target);
+                player.Spellbook.CastSpell(Ignite, target);
 
             if (player.Distance(target.Position) <= 600 && IgniteDamage(target) + E.GetDamage(target) >= target.Health &&
             player.HealthPercent <= 25 && Q.IsReady() && Q.GetPrediction(target).Hitchance >= HitChance.High &&
             Config.Item("UseIgnite").GetValue<bool>())
-            player.Spellbook.CastSpell(Ignite, target);
+                player.Spellbook.CastSpell(Ignite, target);
 
 
 
@@ -913,7 +976,6 @@ namespace MagicalGirlLux
                 Config.Item("UseIgnite").GetValue<bool>())
                 player.Spellbook.CastSpell(Ignite, target);
         }
-
 
         private static void Game_OnGameUpdate(EventArgs args)
         {
@@ -959,7 +1021,7 @@ namespace MagicalGirlLux
             }
             if (Config.Item("UseW").GetValue<bool>() && player.ManaPercent >= wmana)
             {
-                ;
+                Wlogic();
             }
         }
     }
