@@ -224,8 +224,7 @@ namespace MagicalGirlLux
                 return;
             if (target.IsInvulnerable)
                 return;
-            if (Q.IsReady() && target.IsValidTarget(Q.Range) && Q.GetPrediction(target).Hitchance >= HitChance.VeryHigh
-                && target.Distance(Q.GetPrediction(target).CastPosition) <= 600)
+            if (Q.IsReady() && target.IsValidTarget(Q.Range) && Q.GetPrediction(target).Hitchance >= HitChance.VeryHigh)
             {
                 if (target.HasBuffOfType(BuffType.Snare)
                     || target.HasBuffOfType(BuffType.Suppression)
@@ -376,17 +375,14 @@ namespace MagicalGirlLux
                 && minioncol <= 1
                 && Config.Item("Qharass").GetValue<bool>()
                 && qpred.Hitchance >= HitChance.VeryHigh && player.ManaPercent >= harassmana
-                && target.Distance(Q.GetPrediction(target).CastPosition) <= 600
                 && target.HasBuffOfType(BuffType.Slow) || target.IsValidTarget(Q.Range)
                 && minioncol <= 1
                 && Config.Item("Qharass").GetValue<bool>()
                 && qpred.Hitchance >= HitChance.VeryHigh && player.ManaPercent >= harassmana
-                && target.Distance(Q.GetPrediction(target).CastPosition) <= 600
                 && target.HasBuffOfType(BuffType.Stun) || target.IsValidTarget(Q.Range)
                 && minioncol <= 1
                 && Config.Item("Qharass").GetValue<bool>()
                 && qpred.Hitchance >= HitChance.VeryHigh && player.ManaPercent >= harassmana
-                && target.Distance(Q.GetPrediction(target).CastPosition) <= 600
                 && target.HasBuffOfType(BuffType.Snare))
 
                 Q.Cast(target, Config.Item("packetcast").GetValue<bool>());
@@ -397,8 +393,7 @@ namespace MagicalGirlLux
             if (target.IsValidTarget(Q.Range)
                 && minioncol <= 1
                 && Config.Item("Qharass").GetValue<bool>()
-                && qpred.Hitchance >= HitChance.VeryHigh && player.ManaPercent >= harassmana
-                && target.Distance(Q.GetPrediction(target).CastPosition) <= 600)
+                && qpred.Hitchance >= HitChance.VeryHigh && player.ManaPercent >= harassmana)
                 Q.Cast(target, Config.Item("packetcast").GetValue<bool>());
         }
 
@@ -437,13 +432,12 @@ namespace MagicalGirlLux
                     player.Spellbook.CastSpell(Ignite, enemy);
 
 
-                if (enemy.Health < edmg && E.IsReady() && epred.Hitchance >= HitChance.VeryHigh && enemy.Distance(epred.CastPosition) <= E.Width - 30)
+                if (enemy.Health < edmg && E.IsReady() && epred.Hitchance >= HitChance.VeryHigh)
                     E.Cast(epred.CastPosition, Config.Item("packetcast").GetValue<bool>());
-                else if (enemy.Health < edmg && E.IsReady() && epred.Hitchance >= HitChance.VeryHigh && enemy.Distance(epred.CastPosition) <= E.Width + 200 && !enemy.IsFacing(player))
+                else if (enemy.Health < edmg && E.IsReady() && epred.Hitchance >= HitChance.VeryHigh)
                     E.Cast(epred.CastPosition, Config.Item("packetcast").GetValue<bool>());
 
-                if (enemy.Health < qdmg && qpred.Hitchance >= HitChance.VeryHigh && minioncol <= 1 && Q.IsReady()
-                    && enemy.Distance(qpred.CastPosition) <= 600 &&
+                if (enemy.Health < qdmg && qpred.Hitchance >= HitChance.VeryHigh && minioncol <= 1 && Q.IsReady() &&
                     Config.Item("KSQ").GetValue<bool>())
                     Q.Cast(enemy, Config.Item("packetcast").GetValue<bool>());
 
@@ -920,9 +914,9 @@ namespace MagicalGirlLux
             if (LuxEGameObject != null)
                 return;
 
-            if (player.ManaPercent >= emana && epred.Hitchance >= HitChance.VeryHigh && target.Distance(epred.CastPosition) <= E.Width - 30)
+            if (player.ManaPercent >= emana && epred.Hitchance >= HitChance.VeryHigh)
                 E.Cast(epred.CastPosition, Config.Item("packetcast").GetValue<bool>());
-            else if (player.ManaPercent >= emana && epred.Hitchance >= HitChance.VeryHigh && target.Distance(epred.CastPosition) <= E.Width + 200 && !target.IsFacing(player))
+            else if (player.ManaPercent >= emana && epred.Hitchance >= HitChance.VeryHigh)
                 E.Cast(epred.CastPosition, Config.Item("packetcast").GetValue<bool>());
         }
 
@@ -948,7 +942,7 @@ namespace MagicalGirlLux
                 && minioncol <= 1
                 && Q.IsReady()
                 && qpred.Hitchance >= HitChance.VeryHigh && player.ManaPercent >= qmana &&
-                Config.Item("UseQ").GetValue<bool>() && target.Distance(Q.GetPrediction(target).CastPosition) <= 600)
+                Config.Item("UseQ").GetValue<bool>())
                 Q.Cast(target, Config.Item("packetcast").GetValue<bool>());
 
             var passivedmg = 10 + (8 * player.Level) + player.FlatMagicDamageMod * 0.2 - target.FlatMagicReduction;
