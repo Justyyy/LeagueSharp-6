@@ -828,6 +828,16 @@ namespace MagicalGirlLux
             if (player.HasBuff("Recall") || player.InFountain() || player.IsDead)
                 return;
 
+            if (Config.Item("UseWP").GetValue<bool>()
+                && (player.HealthPercent <= 25
+                && W.IsReady() && player.Position.CountEnemiesInRange(W.Range) >= 1
+                && Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo ||
+                player.HasBuffOfType(BuffType.Poison)
+                || player.HasBuffOfType(BuffType.Snare)))
+            {
+                W.Cast(player);
+            }
+
             foreach (var enemy in
                 ObjectManager.Get<Obj_AI_Hero>()
                     .Where(x => x.IsValidTarget(R.Range))
@@ -873,6 +883,7 @@ namespace MagicalGirlLux
                     W.Cast(hero);
                 }
             }
+
 
         }
 
