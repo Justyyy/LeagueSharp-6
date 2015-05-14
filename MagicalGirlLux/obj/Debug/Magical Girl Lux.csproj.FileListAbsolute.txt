@@ -23,3 +23,16 @@ C:\Users\HAF911\Documents\GitHub\MagicalGirlLux\bin\Release\LeagueSharp.xml
 C:\Users\HAF911\Documents\GitHub\MagicalGirlLux\obj\Debug\Magical Girl Lux.csprojResolveAssemblyReference.cache
 C:\Users\HAF911\Documents\GitHub\MagicalGirlLux\obj\Debug\MagicalGirlLux.exe
 C:\Users\HAF911\Documents\GitHub\MagicalGirlLux\obj\Debug\MagicalGirlLux.pdb
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\MagicalGirlLux\bin\Release\MagicalGirlLux.exe.config
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\MagicalGirlLux\obj\Debug\MagicalGirlLux.exe
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\MagicalGirlLux\obj\Debug\MagicalGirlLux.pdb
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\MagicalGirlLux\bin\Release\MagicalGirlLux.exe
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\MagicalGirlLux\bin\Release\MagicalGirlLux.pdb
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\MagicalGirlLux\bin\Release\LeagueSharp.Common.dll
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\MagicalGirlLux\bin\Release\LeagueSharp.dll
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\MagicalGirlLux\bin\Release\SharpDX.Direct3D9.dll
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\MagicalGirlLux\bin\Release\SharpDX.dll
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\MagicalGirlLux\bin\Release\clipper_library.dll
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\MagicalGirlLux\bin\Release\LeagueSharp.Sandbox.dll
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\MagicalGirlLux\bin\Release\LeagueSharp.xml
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\MagicalGirlLux\obj\Debug\Magical Girl Lux.csprojResolveAssemblyReference.cache

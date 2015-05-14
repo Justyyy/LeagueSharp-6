@@ -578,7 +578,7 @@ namespace MagicalGirLux
             var allMinionsE = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, E.Range + E.Width,
                 MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
 
-            var Qfarmpos = W.GetLineFarmLocation(allMinionsQ, Q.Width);
+            var Qfarmpos = Q.GetLineFarmLocation(allMinionsQ, Q.Width);
             var Efarmpos = E.GetCircularFarmLocation(allMinionsE, E.Width);
             if (Qfarmpos.MinionsHit >= 1 && Config.Item("jungleQ").GetValue<bool>() &&
                 player.ManaPercent >= junglem)
@@ -599,7 +599,7 @@ namespace MagicalGirLux
             var allMinionsQ = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, Q.Range + Q.Width);
             var allMinionsE = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, E.Range + E.Width);
 
-            var Qfarmpos = W.GetLineFarmLocation(allMinionsQ, Q.Width);
+            var Qfarmpos = Q.GetLineFarmLocation(allMinionsQ, Q.Width);
             var Efarmpos = E.GetCircularFarmLocation(allMinionsE, E.Width);
             if (Qfarmpos.MinionsHit >= 1 && Config.Item("laneQ").GetValue<bool>() && player.ManaPercent >= lanem)
             {
@@ -916,7 +916,7 @@ namespace MagicalGirLux
 
         private static void Game_OnGameUpdate(EventArgs args)
         {
-            var wmana = Config.Item("wmana").GetValue<Slider>().Value;
+
 
             switch (Orbwalker.ActiveMode)
             {
