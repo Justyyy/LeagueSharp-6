@@ -813,16 +813,17 @@ namespace MagicalGirlLux
         private static void Wlogic()
         {
             if (player.HasBuff("zedulttargetmark")
-            || player.HasBuff("soulshackles")
-            || player.HasBuff("summonerdot")
-            || player.HasBuff("vladimirhemoplage")
-            || player.HasBuff("fallenonetarget")
-            || player.HasBuff("caitlynaceinthehole")
-            || player.HasBuff("fizzmarinerdoombomb")
-            || player.HasBuff("leblancsoulshackle")
-            || player.HasBuff("mordekaiserchildrenofthegrave"))
-
-                W.Cast(player, Config.Item("packetcast").GetValue<bool>());
+                || player.HasBuff("soulshackles")
+                || player.HasBuff("summonerdot")
+                || player.HasBuff("vladimirhemoplage")
+                || player.HasBuff("fallenonetarget")
+                || player.HasBuff("caitlynaceinthehole")
+                || player.HasBuff("fizzmarinerdoombomb")
+                || player.HasBuff("leblancsoulshackle")
+                || player.HasBuff("mordekaiserchildrenofthegrave"))
+            {
+                W.Cast(player);
+            }
 
             if (player.HasBuff("Recall") || player.InFountain() || player.IsDead)
                 return;
@@ -834,7 +835,9 @@ namespace MagicalGirlLux
                 && Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo) ||
                 player.HasBuffOfType(BuffType.Poison)
                 || player.HasBuffOfType(BuffType.Snare))
-                W.Cast(player, Config.Item("packetcast").GetValue<bool>());
+            {
+                W.Cast(player);
+            }
 
             foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(h => h.IsAlly && !h.IsMe))
             {
@@ -846,7 +849,9 @@ namespace MagicalGirlLux
                     hero.Position.CountEnemiesInRange(W.Range) >= 1
                     || hero.HasBuffOfType(BuffType.Poison)
                     || hero.HasBuffOfType(BuffType.Snare))
-                    W.Cast(hero, Config.Item("packetcast").GetValue<bool>());
+                {
+                    W.Cast(hero);
+                }
 
                 if (hero.HasBuff("zedulttargetmark")
                     || hero.HasBuff("summonerdot")
@@ -857,8 +862,9 @@ namespace MagicalGirlLux
                     || hero.HasBuff("fizzmarinerdoombomb")
                     || hero.HasBuff("leblancsoulshackle")
                     || hero.HasBuff("mordekaiserchildrenofthegrave"))
-
-                    W.Cast(hero, Config.Item("packetcast").GetValue<bool>());
+                {
+                    W.Cast(hero);
+                }
             }
 
         }
@@ -1008,6 +1014,10 @@ namespace MagicalGirlLux
                     Jungleclear();
                     break;
             }
+            if (Config.Item("UseW").GetValue<bool>() && player.ManaPercent >= wmana)
+            {
+                Wlogic();
+            }
             if (Config.Item("jungleks").GetValue<KeyBind>().Active)
             {
                 Junglesteal();
@@ -1031,10 +1041,6 @@ namespace MagicalGirlLux
             if (Config.Item("AutoQ").GetValue<KeyBind>().Active)
             {
                 Autospells();
-            }
-            if (Config.Item("UseW").GetValue<bool>() && player.ManaPercent >= wmana)
-            {
-                Wlogic();
             }
         }
     }
