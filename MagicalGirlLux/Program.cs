@@ -139,7 +139,7 @@ namespace MagicalGirlLux
 
             Config.AddToMainMenu();
 
-            Game.OnUpdate += Game_OnUpdate;
+            Game.OnUpdate += Game_OnGameUpdate;
             GameObject.OnDelete += LuxEgone;
             GameObject.OnCreate += GameObject_OnCreate;
             Drawing.OnDraw += OnDraw;
@@ -914,9 +914,12 @@ namespace MagicalGirlLux
                 player.Spellbook.CastSpell(Ignite, target);
         }
 
-        private static void Game_OnUpdate(EventArgs args)
+
+        private static void Game_OnGameUpdate(EventArgs args)
         {
-           switch (Orbwalker.ActiveMode)
+            var wmana = Config.Item("wmana").GetValue<Slider>().Value;
+
+            switch (Orbwalker.ActiveMode)
             {
                 case Orbwalking.OrbwalkingMode.Combo:
                     Combo();
@@ -930,26 +933,34 @@ namespace MagicalGirlLux
                     Jungleclear();
                     break;
             }
-
-            if (Config.Item("jungleks").GetValue<KeyBind>().Active)            
+            if (Config.Item("jungleks").GetValue<KeyBind>().Active)
+            {
                 Junglesteal();
-            
-            if (E.IsReady())            
+            }
+            if (E.IsReady())
+            {
                 Edetonate();
-            
-            if (Config.Item("SmartKS").GetValue<bool>())           
+            }
+            if (Config.Item("SmartKS").GetValue<bool>())
+            {
                 Killsteal();
-            
-            if (Config.Item("autoharass").GetValue<KeyBind>().Active)            
+            }
+            if (Config.Item("autoharass").GetValue<KeyBind>().Active)
+            {
                 Harass();
-            
-            if (Config.Item("semir").GetValue<KeyBind>().Active)           
+            }
+            if (Config.Item("semir").GetValue<KeyBind>().Active)
+            {
                 forceR();
-            
-            if (Config.Item("AutoQ").GetValue<KeyBind>().Active)            
-                Autospells();           
-            
+            }
+            if (Config.Item("AutoQ").GetValue<KeyBind>().Active)
+            {
+                Autospells();
+            }
+            if (Config.Item("UseW").GetValue<bool>() && player.ManaPercent >= wmana)
+            {
+                ;
+            }
         }
     }
 }
-
