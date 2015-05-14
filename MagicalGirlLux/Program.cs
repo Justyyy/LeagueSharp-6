@@ -25,13 +25,13 @@ namespace MagicalGirlLux
         {
             CustomEvents.Game.OnGameLoad += OnLoad;
         }
-        
+
         private static void OnLoad(EventArgs args)
         {
             if (player.ChampionName != ChampName)
                 return;
 
-            Notifications.AddNotification("Magical Girl Lux - Double Rainbows ~", 10000);
+            Notifications.AddNotification("Magical Girl Lux ~ ", 10000);
 
             Q = new Spell(SpellSlot.Q, 1175);
 
@@ -40,12 +40,16 @@ namespace MagicalGirlLux
             E = new Spell(SpellSlot.E, 1100);
 
             R = new Spell(SpellSlot.R, 3000);
+
             Q.SetSkillshot(0.25f, 70f, 1190f, false, SkillshotType.SkillshotLine);
+
             W.SetSkillshot(0.25f, 110f, 1200f, false, SkillshotType.SkillshotLine);
+
             E.SetSkillshot(0.25f, 280f, 1300f, false, SkillshotType.SkillshotCircle);
+
             R.SetSkillshot(1.35f, 190f, float.MaxValue, false, SkillshotType.SkillshotLine);
 
-            Config = new Menu("Magical Girl Lux", "MGL", true);
+            Config = new Menu("Magical Girl Lux", "MLGLux", true);
             Orbwalker = new Orbwalking.Orbwalker(Config.AddSubMenu(new Menu("[Magical]: Orbwalker", "Orbwalker")));
             TargetSelector.AddToMenu(Config.AddSubMenu(new Menu("[Magical]: Target Selector", "Target Selector")));
 
@@ -57,19 +61,25 @@ namespace MagicalGirlLux
             var misc = Config.AddSubMenu(new Menu("[Magical]: Misc Settings", "Misc Settings"));
             var drawing = Config.AddSubMenu(new Menu("[Magical]: Draw Settings", "Draw Settings"));
             var debug = Config.AddSubMenu(new Menu("[Magical]: Debug Settings", "debug"));
-            Config.AddItem(new MenuItem("Science", "Made by ScienceARK~"));
+            Config.AddItem(new MenuItem("Science", "Made By ScienceARK"));
 
             combo.SubMenu("[SBTW]ManaManager")
                 .AddItem(new MenuItem("qmana", "[Q] Mana %").SetValue(new Slider(10, 100, 0)));
+            combo.SubMenu("[SBTW]ManaManager")
+                .AddItem(new MenuItem("wmana", "[W] Mana %").SetValue(new Slider(20, 100, 0)));
             combo.SubMenu("[SBTW]ManaManager")
                 .AddItem(new MenuItem("emana", "[E] Mana %").SetValue(new Slider(5, 100, 0)));
             combo.SubMenu("[SBTW]ManaManager")
                 .AddItem(new MenuItem("rmana", "[R] Mana %").SetValue(new Slider(10, 100, 0)));
 
             combo.SubMenu("[Q] Settings").AddItem(new MenuItem("UseQ", "Use Q - Light Binding").SetValue(true));
-            combo.SubMenu("[Q] Settings").AddItem(new MenuItem("AutoQ", "Automagicly Q on CC'd targets").SetValue(true));
+            combo.SubMenu("[Q] Settings").AddItem(new MenuItem("AutoQ", "Auto Q on CC'd targets").SetValue(true));
 
-            combo.SubMenu("[W] Settings").AddItem(new MenuItem("UseW", "No W support, please use Oracle for W usage").SetValue(true));
+            combo.SubMenu("[W] Settings").AddItem(new MenuItem("UseW", "W IS CURRENTLY NOT SUPPORTED! USE ORACLE.").SetValue(true));
+            combo.SubMenu("[W] Settings").AddItem(new MenuItem("UseWP", "W on HP Percentage").SetValue(true));
+            combo.SubMenu("[W] Settings").AddItem(new MenuItem("UseWHP", "Player HP%").SetValue(new Slider(80, 100, 1)));
+            combo.SubMenu("[W] Settings").AddItem(new MenuItem("UseWA", "Use W on Allies").SetValue(true));
+            combo.SubMenu("[W] Settings").AddItem(new MenuItem("UseWAHP", "Ally Hp %").SetValue(new Slider(30, 100, 1)));
 
             combo.SubMenu("[E] Settings").AddItem(new MenuItem("UseE", "Use E - Lucent Singularity").SetValue(true));
 
@@ -78,7 +88,7 @@ namespace MagicalGirlLux
             combo.SubMenu("[R] Settings").AddItem(new MenuItem("UseR", "Use R - Finales Funkeln").SetValue(true));
             combo.SubMenu("[R] Settings").AddItem(new MenuItem("UseRA", "Use R [AOE]").SetValue(false));
             combo.SubMenu("[R] Settings").AddItem(new MenuItem("RA", "Enemy Hit Count").SetValue(new Slider(3, 5, 1)));
-            combo.SubMenu("[R] Settings").AddItem(new MenuItem("RQ", "If Q hits target automagicly R").SetValue(false));
+            combo.SubMenu("[R] Settings").AddItem(new MenuItem("RQ", "If Q hits target auto R").SetValue(false));
 
             combo.SubMenu("Summoner Settings").AddItem(new MenuItem("UseIgnite", "Use Ignite").SetValue(true));
 
@@ -89,8 +99,8 @@ namespace MagicalGirlLux
             killsteal.AddItem(new MenuItem("RKS", "Use R").SetValue(true));
 
             drawing.AddItem(new MenuItem("Draw_Disabled", "Disable All Drawings").SetValue(false));
-            drawing.AddItem(new MenuItem("Qdraw", "Draw Q Range").SetValue(new Circle(true, System.Drawing.Color.Purple)));
-            drawing.AddItem(new MenuItem("Wdraw", "Draw W Range").SetValue(new Circle(true, System.Drawing.Color.MediumPurple)));
+            drawing.AddItem(new MenuItem("Qdraw", "Draw Q Range").SetValue(new Circle(true, System.Drawing.Color.Orange)));
+            drawing.AddItem(new MenuItem("Wdraw", "Draw W Range").SetValue(new Circle(true, System.Drawing.Color.DarkOrange)));
             drawing.AddItem(new MenuItem("Edraw", "Draw E Range").SetValue(new Circle(true, System.Drawing.Color.AntiqueWhite)));
             drawing.AddItem(new MenuItem("Rdraw", "Draw R Range").SetValue(new Circle(true, System.Drawing.Color.CornflowerBlue)));
             drawing.AddItem(new MenuItem("RLine", "Draw [R] Prediction").SetValue(new Circle(true, System.Drawing.Color.SkyBlue)));
@@ -98,7 +108,7 @@ namespace MagicalGirlLux
 
             harass.AddItem(new MenuItem("autoharass", "AutoHarass Toggle").SetValue(new KeyBind('L', KeyBindType.Toggle)));
             harass.AddItem(new MenuItem("Qharass", "Use Q").SetValue(true));
-            harass.AddItem(new MenuItem("Qharassslowed", "Only use Q if target is CC'd").SetValue(false));
+            harass.AddItem(new MenuItem("Qharassslowed", "Only use Q if target is slowed/stunned/rooted").SetValue(false));
             harass.AddItem(new MenuItem("Eharass", "Use E").SetValue(true));
             harass.AddItem(new MenuItem("harassmana", "Mana Percentage").SetValue(new Slider(30, 100, 0)));
 
@@ -109,7 +119,7 @@ namespace MagicalGirlLux
             misc
                 .AddItem(new MenuItem("AntiGapE", "AntiGapCloser [E]").SetValue(true));
             misc
-                .AddItem(new MenuItem("packetcast", "PacketCast (Not Supported Yet)").SetValue(true));
+                .AddItem(new MenuItem("packetcast", "Use Packetcasting").SetValue(true));
 
 
             laneclear
@@ -120,17 +130,26 @@ namespace MagicalGirlLux
                 .AddItem(new MenuItem("lanemana", "Mana Percentage").SetValue(new Slider(30, 100, 0)));
 
 
-            jungleclear.AddItem(new MenuItem("jungleQ", "Use Q").SetValue(true));
-            jungleclear.AddItem(new MenuItem("jungleE", "Use E").SetValue(true));
-            jungleclear.AddItem(new MenuItem("junglemana", "Mana Percentage").SetValue(new Slider(30, 100, 0)));
-            jungleclear.AddItem(new MenuItem("blank", "                                        "));
+            jungleclear
+                .AddItem(new MenuItem("jungleQ", "Use Q").SetValue(true));
+            jungleclear
+                .AddItem(new MenuItem("jungleE", "Use E").SetValue(true));
+            jungleclear
+                .AddItem(new MenuItem("junglemana", "Mana Percentage").SetValue(new Slider(30, 100, 0)));
+            jungleclear
+                .AddItem(new MenuItem("blank", "                                        "));
 
-            jungleclear.AddItem(new MenuItem("jungleks", "Junglesteal [TOGGLE] ").SetValue(new KeyBind('K', KeyBindType.Toggle)));
+            jungleclear.AddItem(
+                new MenuItem("jungleks", "Junglesteal [TOGGLE] ").SetValue(new KeyBind('K', KeyBindType.Toggle)));
 
-            jungleclear.AddItem(new MenuItem("Blue", "Steal Bluebuff").SetValue(true));
-            jungleclear.AddItem(new MenuItem("Red", "Steal Redbuff").SetValue(true));
-            jungleclear.AddItem(new MenuItem("Dragon", "Steal Dragon").SetValue(true));
-            jungleclear.AddItem(new MenuItem("Baron", "Steal Baron").SetValue(true));
+            jungleclear
+                .AddItem(new MenuItem("Blue", "Steal Bluebuff").SetValue(true));
+            jungleclear
+                .AddItem(new MenuItem("Red", "Steal Redbuff").SetValue(true));
+            jungleclear
+                .AddItem(new MenuItem("Dragon", "Steal Dragon").SetValue(true));
+            jungleclear
+                .AddItem(new MenuItem("Baron", "Steal Baron").SetValue(true));
 
             debug.AddItem(new MenuItem("Debug", "Draw Prediction || Cast Position").SetValue(false));
             debug.AddItem(new MenuItem("qdebug", "[Q] debug").SetValue(new Circle(true, System.Drawing.Color.Orange)));
