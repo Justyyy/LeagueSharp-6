@@ -339,8 +339,8 @@ namespace MagicalGirlLux
                     var qdebugp = Q.GetPrediction(target);
                     var edebugp = E.GetPrediction(target);
                     var rdebug = new Geometry.Polygon.Line(player.Position, rpredl, R.Range);
-                    var qdebug = new Geometry.Polygon.Line(player.Position, qdebugp.CastPosition, Q.Range);
-                    var edebug = new Geometry.Polygon.Line(player.Position, edebugp.CastPosition, E.Range);
+                    var qdebug = new Geometry.Polygon.Line(player.Position, qdebugp.CastPosition, Q.Range + 200);
+                    var edebug = new Geometry.Polygon.Line(player.Position, edebugp.CastPosition, E.Range + 200);
 
                     if (!Config.Item("Debug").GetValue<bool>())
                         return;
