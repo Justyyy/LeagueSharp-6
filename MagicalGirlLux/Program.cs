@@ -916,8 +916,6 @@ namespace MagicalGirlLux
         private static void Elogic()
         {
             var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
-            if (target == null)
-                return;
             var epred = E.GetPrediction(target);
             var emana = Config.Item("emana").GetValue<Slider>().Value;
 
@@ -932,7 +930,7 @@ namespace MagicalGirlLux
                 return;
 
             if (LuxEGameObject != null
-                && LuxEGameObject.Position.CountEnemiesInRange(E.Width) >= 1)
+                && LuxEGameObject.Position.CountEnemiesInRange(300) >= 1)
                 E.Cast();
 
             if (LuxEGameObject != null)
