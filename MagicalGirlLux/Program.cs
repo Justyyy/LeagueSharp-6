@@ -881,7 +881,7 @@ namespace MagicalGirLux
                 player.Spellbook.CastSpell(Ignite, target);
 
             if (player.Distance(target.Position) <= 600 && IgniteDamage(target) + E.GetDamage(target) >= target.Health &&
-            player.HealthPercent <= 25 && E.IsReady() && LuxEGameObject == null &&
+            player.HealthPercent <= 25 && E.IsReady() &&
             Config.Item("UseIgnite").GetValue<bool>())
             player.Spellbook.CastSpell(Ignite, target);
 
@@ -916,9 +916,7 @@ namespace MagicalGirLux
 
         private static void Game_OnGameUpdate(EventArgs args)
         {
-
-
-            switch (Orbwalker.ActiveMode)
+           switch (Orbwalker.ActiveMode)
             {
                 case Orbwalking.OrbwalkingMode.Combo:
                     Combo();
