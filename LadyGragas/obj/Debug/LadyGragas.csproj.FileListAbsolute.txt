@@ -1,0 +1,13 @@
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\Lady Gragas\bin\Release\LadyGragas.exe.config
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\Lady Gragas\bin\Release\LadyGragas.exe
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\Lady Gragas\bin\Release\LadyGragas.pdb
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\Lady Gragas\bin\Release\LeagueSharp.Common.dll
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\Lady Gragas\bin\Release\LeagueSharp.dll
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\Lady Gragas\bin\Release\SharpDX.Direct3D9.dll
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\Lady Gragas\bin\Release\SharpDX.dll
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\Lady Gragas\bin\Release\clipper_library.dll
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\Lady Gragas\bin\Release\LeagueSharp.Sandbox.dll
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\Lady Gragas\bin\Release\LeagueSharp.xml
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\Lady Gragas\obj\Debug\LadyGragas.csprojResolveAssemblyReference.cache
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\Lady Gragas\obj\Debug\LadyGragas.exe
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\Lady Gragas\obj\Debug\LadyGragas.pdb
