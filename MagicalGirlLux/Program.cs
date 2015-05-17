@@ -259,15 +259,15 @@ namespace MagicalGirlLux
 
         private static void LuxEgone(GameObject sender, EventArgs args)
         {
-            if (sender.Name.Contains("LuxLightstrike_tar_green"))
+            if (sender.Name == "Lux_Base_E_tar_aoe_green" || sender.Name == "Lux_Base_E_mis.troy")
 
                 LuxEGameObject = null;
         }
 
+
         private static void GameObject_OnCreate(GameObject sender, EventArgs args)
-        //I found this on pornhub trust me, no copy pasterino. //Credits to Chewymoon
         {
-            if (sender.Name.Contains("LuxLightstrike_tar_green"))
+            if (sender.Name == "Lux_Base_E_tar_aoe_green" || sender.Name == "Lux_Base_E_mis.troy")
 
                 LuxEGameObject = sender;
 
