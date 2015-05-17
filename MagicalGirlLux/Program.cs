@@ -309,9 +309,26 @@ namespace MagicalGirlLux
                     if (target.IsInvulnerable)
                         return;
 
-                    Render.Circle.DrawCircle(LuxEGameObject.Position, E.Width, System.Drawing.Color.DeepSkyBlue, 7);
-
                     var rpredl = R.GetPrediction(target).CastPosition;
+                    var rdmg = R.GetDamage(target);
+                    var rpdmg = R.GetDamage(target) + 10 + (8 * player.Level) + player.FlatMagicDamageMod * 0.2;
+                    var rpred = R.GetPrediction(target);
+                    var rdraw = new Geometry.Polygon.Line(player.Position, rpredl, R.Range);
+
+                    if (Config.Item("RLine").GetValue<Circle>().Active
+                        && target.IsValidTarget(R.Range)
+                        && R.IsReady()
+                        && rpred.Hitchance >= HitChance.VeryHigh
+                        && Config.Item("UseR").GetValue<bool>()
+                        && target.HasBuff("luxilluminatingfraulein")
+                        && target.Health < rpdmg
+                        && target.IsValidTarget(R.Range)
+                        && Config.Item("UseR").GetValue<bool>()
+                        && R.IsReady()
+                        && rpred.Hitchance >= HitChance.VeryHigh
+                        && target.Health < rdmg)
+
+                        rdraw.Draw(Config.Item("RLine").GetValue<Circle>().Color, 4);
 
                     var orbwalkert = Orbwalker.GetTarget();
                     if (orbwalkert.IsValidTarget(R.Range))
@@ -446,7 +463,7 @@ namespace MagicalGirlLux
                     return;
 
                 if (player.Distance(enemy.Position) < E.Range - 200 && E.GetDamage(enemy) > enemy.Health && E.IsReady() ||
-                    ObjectManager.Player.Spellbook.GetSpell(SpellSlot.E).ToggleState == 1 && enemy.Distance(LuxEGameObject.Position) <= E.Width &&
+                    LuxEGameObject != null && enemy.Distance(LuxEGameObject.Position) <= E.Width &&
                     enemy.Health < E.GetDamage(enemy) ||
                     player.Distance(enemy.Position) < E.Range - 200 && Q.GetDamage(enemy) > enemy.Health && Q.IsReady() &&
                     Q.GetPrediction(enemy).Hitchance >= HitChance.VeryHigh ||
@@ -454,7 +471,7 @@ namespace MagicalGirlLux
                     player.GetAutoAttackDamage(enemy) * 2 > enemy.Health)
                     return;
 
-                if (ObjectManager.Player.Spellbook.GetSpell(SpellSlot.E).ToggleState == 1 && enemy.Distance(LuxEGameObject.Position) <= E.Width &&
+                if (LuxEGameObject != null && enemy.Distance(LuxEGameObject.Position) <= E.Width &&
                     enemy.Health < E.GetDamage(enemy) ||
                     enemy.HasBuff("LuxLightBindingMis")
                     && enemy.Health < passiveaa && player.Distance(enemy.Position) <= Orbwalking.GetRealAutoAttackRange(player) &&
@@ -506,7 +523,7 @@ namespace MagicalGirlLux
 
                 if (player.Distance(enemy.Position) < 600 && E.GetDamage(enemy) > enemy.Health && E.IsReady()
                     ||
-                    ObjectManager.Player.Spellbook.GetSpell(SpellSlot.E).ToggleState == 1 && enemy.Distance(LuxEGameObject.Position) <= E.Width &&
+                    LuxEGameObject != null && enemy.Distance(LuxEGameObject.Position) <= E.Width &&
                     enemy.Health < E.GetDamage(enemy) ||
                     player.Distance(enemy.Position) < 600 && Q.GetDamage(enemy) > enemy.Health && Q.IsReady() ||
                     player.Distance(enemy.Position) < 600 && enemy.Health < player.GetAutoAttackDamage(enemy) * 2)
@@ -592,7 +609,7 @@ namespace MagicalGirlLux
                 player.ManaPercent >= junglem)
                 E.Cast(Efarmpos.Position, Config.Item("packetcast").GetValue<bool>());
 
-            if (ObjectManager.Player.Spellbook.GetSpell(SpellSlot.E).ToggleState == 1)
+            if (LuxEGameObject != null)
                 E.Cast();
         }
 
@@ -608,12 +625,12 @@ namespace MagicalGirlLux
             {
                 Q.Cast(Qfarmpos.Position, Config.Item("packetcast").GetValue<bool>());
             }
-            if (ObjectManager.Player.Spellbook.GetSpell(SpellSlot.E).ToggleState == 1)
-                E.Cast();
             if (Efarmpos.MinionsHit >= 3 && allMinionsE.Count >= 2 && Config.Item("laneE").GetValue<bool>() &&
                 player.ManaPercent >= lanem)
                 E.Cast(Efarmpos.Position, Config.Item("packetcast").GetValue<bool>());
 
+            if (LuxEGameObject != null)
+                E.Cast();
         }
 
         private static void forceR()
@@ -675,24 +692,24 @@ namespace MagicalGirlLux
                 qcasted)
                 return;
 
-            if (ObjectManager.Player.Spellbook.GetSpell(SpellSlot.E).ToggleState == 1 && target.IsValidTarget(R.Range) &&
+            if (LuxEGameObject != null && target.IsValidTarget(R.Range) &&
                 target.Position.Distance(LuxEGameObject.Position) <= E.Width && R.IsReady() //EPR combo
                 && target.IsValidTarget(R.Range) && rpred.Hitchance >= HitChance.VeryHigh &&
                 target.Health < cdmg + (passivedmg * 1) && target.HasBuff("LuxLightBindingMis")
                 ||
-                ObjectManager.Player.Spellbook.GetSpell(SpellSlot.E).ToggleState == 1 && target.IsValidTarget(R.Range) &&
+                LuxEGameObject != null && target.IsValidTarget(R.Range) &&
                 target.Position.Distance(LuxEGameObject.Position) <= E.Width && R.IsReady() && Ignite.IsReady()
                 //ERQPI combo
                 && target.IsValidTarget(R.Range) && rpred.Hitchance >= HitChance.VeryHigh &&
                 target.Health < cdmg + (passivedmg * 1) + IgniteDamage(target) && target.HasBuff("LuxLightBindingMis")
                 ||
-                ObjectManager.Player.Spellbook.GetSpell(SpellSlot.E).ToggleState == 1 && target.IsValidTarget(R.Range) && player.HasBuff("lichbane") &&
+                LuxEGameObject != null && target.IsValidTarget(R.Range) && player.HasBuff("lichbane") &&
                 player.Distance(target.Position) <= Orbwalking.GetRealAutoAttackRange(player) && //ERPB combo
                 target.Position.Distance(LuxEGameObject.Position) <= E.Width && R.IsReady()
                 && target.IsValidTarget(R.Range) && rpred.Hitchance >= HitChance.VeryHigh &&
                 target.Health < cdmg + (passivedmg * 1) + lichdmg && target.HasBuff("LuxLightBindingMis")
                 ||
-                ObjectManager.Player.Spellbook.GetSpell(SpellSlot.E).ToggleState == 1 && target.IsValidTarget(R.Range) && player.HasBuff("lichbane") &&
+                LuxEGameObject != null && target.IsValidTarget(R.Range) && player.HasBuff("lichbane") &&
                 player.Distance(target.Position) <= Orbwalking.GetRealAutoAttackRange(player) && //ERLIP combo
                 target.Position.Distance(LuxEGameObject.Position) <= E.Width && R.IsReady() && Ignite.IsReady()
                 && target.IsValidTarget(R.Range) && rpred.Hitchance >= HitChance.VeryHigh &&
@@ -720,7 +737,7 @@ namespace MagicalGirlLux
                 return;
 
             if (player.Distance(target.Position) < E.Range - 200 && E.GetDamage(target) > target.Health && E.IsReady() ||
-                ObjectManager.Player.Spellbook.GetSpell(SpellSlot.E).ToggleState == 1 && target.Distance(LuxEGameObject.Position) <= E.Width &&
+                LuxEGameObject != null && target.Distance(LuxEGameObject.Position) <= E.Width &&
                 target.Health < E.GetDamage(target) || //ECHECK
                 player.Distance(target.Position) < E.Range - 200 && Q.GetDamage(target) > target.Health && Q.IsReady() &&
                 Q.GetPrediction(target).Hitchance >= HitChance.VeryHigh ||
@@ -728,7 +745,7 @@ namespace MagicalGirlLux
                 player.GetAutoAttackDamage(target) * 2 > target.Health)
                 return;
 
-            if (ObjectManager.Player.Spellbook.GetSpell(SpellSlot.E).ToggleState == 1 && target.Distance(LuxEGameObject.Position) <= E.Width &&
+            if (LuxEGameObject != null && target.Distance(LuxEGameObject.Position) <= E.Width &&
                 target.Health < E.GetDamage(target) ||
                 target.HasBuff("LuxLightBindingMis")
                 && target.Health < passiveaa && player.Distance(target.Position) <= Orbwalking.GetRealAutoAttackRange(player) &&
@@ -782,7 +799,7 @@ namespace MagicalGirlLux
 
             if (player.Distance(target.Position) < 600 && E.GetDamage(target) > target.Health && E.IsReady()
                 ||
-                ObjectManager.Player.Spellbook.GetSpell(SpellSlot.E).ToggleState == 1 && target.Distance(LuxEGameObject.Position) <= E.Width &&
+                LuxEGameObject != null && target.Distance(LuxEGameObject.Position) <= E.Width &&
                 target.Health < E.GetDamage(target) ||
                 player.Distance(target.Position) < 600 && Q.GetDamage(target) > target.Health && Q.IsReady() ||
                 player.Distance(target.Position) < 600 && target.Health < player.GetAutoAttackDamage(target) * 2)
@@ -871,12 +888,39 @@ namespace MagicalGirlLux
         }
 
 
-        private static void Elogic()
+        private static void Edetonate()
         {
             var target = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
+            if (target == null)
+                return;
+
+            if (LuxEGameObject != null && LuxEGameObject.Position.CountEnemiesInRange(E.Width) >= 2)
+                E.Cast();
+
+            if (LuxEGameObject != null && LuxEGameObject.Position.CountEnemiesInRange(E.Width) >= 1 &&
+                target.Position.CountEnemiesInRange(500) >= 2)
+                E.Cast();
+
+            if (LuxEGameObject != null && LuxEGameObject.Position.CountEnemiesInRange(E.Width) >= 1 &&
+                player.Distance(target.Position) >= Orbwalking.GetRealAutoAttackRange(player))
+                E.Cast();
+
+            if (target.HasBuff("luxilluminatingfraulein") && target.HasBuff("LuxLightBindingMis") &&
+                player.Distance(target.Position) <= Orbwalking.GetRealAutoAttackRange(player))
+                return;
+
+            if (LuxEGameObject != null && LuxEGameObject.Position.CountEnemiesInRange(E.Width) >= 1)
+                E.Cast();
+        }
+
+        private static void Elogic()
+        {
+            var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
             var epred = E.GetPrediction(target);
             var emana = Config.Item("emana").GetValue<Slider>().Value;
 
+            if (LuxEGameObject != null && E.IsReady() && LuxEGameObject.Position.CountEnemiesInRange(E.Width) < 1)
+                Utility.DelayAction.Add(2000, () => E.Cast());
 
             if (target.IsInvulnerable)
                 return;
@@ -884,10 +928,16 @@ namespace MagicalGirlLux
             if (target.HasBuff("luxilluminatingfraulein") && target.HasBuff("LuxLightBindingMis") &&
                 player.Distance(target.Position) <= Orbwalking.GetRealAutoAttackRange(player))
                 return;
-            if (ObjectManager.Player.Spellbook.GetSpell(SpellSlot.E).ToggleState == 1)
-                E.Cast();  
 
-            if (ObjectManager.Player.Spellbook.GetSpell(SpellSlot.E).ToggleState == 1)
+            if (LuxEGameObject != null
+                && LuxEGameObject.Position.CountEnemiesInRange(300) >= 1)
+                E.Cast();
+
+            if (LuxEGameObject != null
+                && target.HasBuffOfType(BuffType.Slow))
+                E.Cast();
+
+            if (LuxEGameObject != null)
                 return;
 
             if (player.ManaPercent >= emana && epred.Hitchance >= HitChance.VeryHigh)
@@ -939,7 +989,7 @@ namespace MagicalGirlLux
 
 
             if (player.Distance(target.Position) <= 600 && IgniteDamage(target) + E.GetDamage(target) >= target.Health &&
-            player.HealthPercent <= 25 && E.IsReady() && ObjectManager.Player.Spellbook.GetSpell(SpellSlot.E).ToggleState == 1 && target.Distance(LuxEGameObject.Position) <= LuxEGameObject.BoundingRadius &&
+            player.HealthPercent <= 25 && E.IsReady() && LuxEGameObject != null && target.Distance(LuxEGameObject.Position) <= LuxEGameObject.BoundingRadius &&
             Config.Item("UseIgnite").GetValue<bool>())
                 player.Spellbook.CastSpell(Ignite, target);
 
@@ -954,7 +1004,7 @@ namespace MagicalGirlLux
                 player.Distance(target.Position) < Orbwalking.GetRealAutoAttackRange(player))
                 return;
 
-            if (ObjectManager.Player.Spellbook.GetSpell(SpellSlot.E).ToggleState == 1 && target.Distance(LuxEGameObject.Position) <= E.Width &&
+            if (LuxEGameObject != null && target.Distance(LuxEGameObject.Position) <= E.Width &&
                 target.Health < E.GetDamage(target) ||
                 target.HasBuff("LuxLightBindingMis")
                 && target.Health < passiveaa && player.Distance(target.Position) <= Orbwalking.GetRealAutoAttackRange(player) &&
@@ -992,6 +1042,10 @@ namespace MagicalGirlLux
             {
                 Junglesteal();
             }
+            if (E.IsReady())
+            {
+                Edetonate();
+            }
             if (Config.Item("SmartKS").GetValue<bool>())
             {
                 Killsteal();
@@ -1008,13 +1062,6 @@ namespace MagicalGirlLux
             {
                 Autospells();
             }
-            var target = TargetSelector.GetTarget(2000, TargetSelector.DamageType.Magical);
-            if (target.HasBuff("luxilluminatingfraulein") && target.HasBuff("LuxLightBindingMis") &&
-                player.Distance(target.Position) <= Orbwalking.GetRealAutoAttackRange(player))
-                return;
-
-            if (ObjectManager.Player.Spellbook.GetSpell(SpellSlot.E).ToggleState == 1)
-                E.Cast();  
         }
     }
 }
