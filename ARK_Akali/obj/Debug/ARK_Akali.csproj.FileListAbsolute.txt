@@ -8,6 +8,5 @@ c:\users\haf911\documents\visual studio 2013\Projects\ARK_Akali\ARK_Akali\bin\Re
 c:\users\haf911\documents\visual studio 2013\Projects\ARK_Akali\ARK_Akali\bin\Release\clipper_library.dll
 c:\users\haf911\documents\visual studio 2013\Projects\ARK_Akali\ARK_Akali\bin\Release\LeagueSharp.Sandbox.dll
 c:\users\haf911\documents\visual studio 2013\Projects\ARK_Akali\ARK_Akali\bin\Release\LeagueSharp.xml
-c:\users\haf911\documents\visual studio 2013\Projects\ARK_Akali\ARK_Akali\obj\Debug\ARK_Akali.csprojResolveAssemblyReference.cache
 c:\users\haf911\documents\visual studio 2013\Projects\ARK_Akali\ARK_Akali\obj\Debug\ARK_Akali.exe
 c:\users\haf911\documents\visual studio 2013\Projects\ARK_Akali\ARK_Akali\obj\Debug\ARK_Akali.pdb

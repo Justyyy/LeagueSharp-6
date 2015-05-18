@@ -61,6 +61,8 @@ namespace ARK_Akali
 
             //[R] Settings
             combo.SubMenu("Advanced Features [R]").AddItem(new MenuItem("Rkill", "Only use [R] if Killable").SetValue(true));
+            combo.SubMenu("Advanced Features [R]").AddItem(new MenuItem("rturretcheck", "Don't R into Turret Range if HP below %").SetValue(true));
+            combo.SubMenu("Advanced Features [W]").AddItem(new MenuItem("turrethp", "% HP").SetValue(new Slider(70, 100, 0)));
             combo.SubMenu("Advanced Features [R]").AddItem(new MenuItem("Rcheck", "Don't [R] into X amount of enemies").SetValue(false));
             combo.SubMenu("Advanced Features [R]").AddItem(new MenuItem("eslider", "Enemy Count").SetValue(new Slider(3, 5, 0)));
             combo.SubMenu("Advanced Features [R]").AddItem(new MenuItem("rangeR", "Use Minion to gapclose? [Requires 2 R stacks]").SetValue(true));
@@ -212,13 +214,14 @@ namespace ARK_Akali
             var tiamat = ItemData.Tiamat_Melee_Only.GetItem();
             var hydra = ItemData.Ravenous_Hydra_Melee_Only.GetItem();
             var prediction = R.GetPrediction(target);
-            var rENDPOS = Player.ServerPosition.Extend(prediction.CastPosition, Player.ServerPosition.Distance(prediction.CastPosition) + 150);
+            var RendPos = Player.ServerPosition.Extend(prediction.CastPosition, Player.ServerPosition.Distance(prediction.CastPosition) + 150);
             Ignite = Player.GetSpellSlot("summonerdot");
             
             var rrange = Config.Item("rangeRslider").GetValue<Slider>().Value;
 
             if (R.IsReady())
             {
+                //When not to use R
                 if (Player.Distance(target.ServerPosition) <= Orbwalking.GetRealAutoAttackRange(Player) && Player.HealthPercent > 30 && thp > rdmg)
                     return;
                 if (Player.Distance(target.ServerPosition) <= E.Range && E.IsReady() && Player.HealthPercent > 40 && thp < edmg)
@@ -231,7 +234,8 @@ namespace ARK_Akali
                     target.Health < IgniteDamage(target))
                     return;
 
-                if (thp < edmg + rdmg
+                //When to use R
+                if (thp < edmg + rdmg && E.IsReady()
                     || thp < qdmg + rdmg * 2 + Player.GetAutoAttackDamage(target) + hexdmg && Q.IsReady() && hextech.IsReady()
                     || thp < rdmg * 2 + Player.GetAutoAttackDamage(target) + hexdmg && hextech.IsReady()
                     || thp < edmg + qdmg + rdmg * 2 + Player.GetAutoAttackDamage(target) + hexdmg && E.IsReady() && Q.IsReady() && hextech.IsReady()
@@ -292,33 +296,53 @@ namespace ARK_Akali
                     || thp < rdmg * 2 + Player.GetAutoAttackDamage(target) + bilgedmg && cutlass.IsReady() 
                     || thp < rdmg * 2 + Player.GetAutoAttackDamage(target) + botrkdmg && botrk.IsReady())
                 {
-
-                    //ACTUAL R ENGAGE IF KILLABLE
-                    if (target.CountEnemiesInRange(1200) <= Config.Item("eslider").GetValue<Slider>().Value &&
+                    //TURRET CHECK FOR ENEMY COUNT
+                    if (target.CountEnemiesInRange(1200) >= Config.Item("eslider").GetValue<Slider>().Value &&
                         Config.Item("Rcheck").GetValue<bool>())
-                    {
-                        R.Cast(target, true);
-                    }
-                    else if (Config.Item("UseR").GetValue<bool>())
-                    {
-                        R.Cast(target, true);  
-                    }
+                        return;
+
+                    if (ObjectManager.Get<Obj_AI_Turret>()
+                            .Any( //TURRET CHECK
+                                t => t.Team != Player.Team && !t.IsDead && t.Distance(RendPos, true) < 775*775 &&
+                                    Config.Item("rturretcheck").GetValue<bool>()) && Player.HealthPercent <= Config.Item("turrethp").GetValue<Slider>().Value)
+                        return;
+                    
+                        //ACTUAL R ENGAGE IF KILLABLE
+                        if (target.CountEnemiesInRange(1200) <= Config.Item("eslider").GetValue<Slider>().Value &&
+                            Config.Item("Rcheck").GetValue<bool>())
+                        {
+                            R.Cast(target, true);
+                        }
+                        else if (Config.Item("UseR").GetValue<bool>())
+                        {
+                            R.Cast(target, true);
+                        }
 
 
 
+                        //GAPCLOSE
+                        if (Player.Distance(target.ServerPosition) >= rrange)
 
+                            R.Cast(target, true);
 
-                    //GAPCLOSE
-                    if (Player.Distance(target.ServerPosition) >= rrange
-                    && target.CountEnemiesInRange(1200) <= Config.Item("eslider").GetValue<Slider>().Value &&
-                        Config.Item("Rcheck").GetValue<bool>())
-
-                        R.Cast(target, true);
-
-                    else if (Player.Distance(target.ServerPosition) >= rrange)
-                        R.Cast(target);
+                        else if (Player.Distance(target.ServerPosition) >= rrange)
+                            R.Cast(target);
+                    
                 }
             }
+            //IF RKILL DISABLED
+
+            //Turret check for enemy count
+            if (target.CountEnemiesInRange(1200) >= Config.Item("eslider").GetValue<Slider>().Value &&
+                Config.Item("Rcheck").GetValue<bool>())
+                return;
+
+            if (ObjectManager.Get<Obj_AI_Turret>()
+                    .Any( //TURRET CHECK
+                        t => t.Team != Player.Team && !t.IsDead && t.Distance(RendPos, true) < 775 * 775 &&
+                            Config.Item("rturretcheck").GetValue<bool>()) && Player.HealthPercent <= Config.Item("turrethp").GetValue<Slider>().Value)
+                            return;
+
                     if (!Config.Item("Rkill").GetValue<bool>() && Player.Distance(target.ServerPosition) >= rrange 
                     && target.CountEnemiesInRange(1200) <= Config.Item("eslider").GetValue<Slider>().Value &&
                         Config.Item("Rcheck").GetValue<bool>())
@@ -327,6 +351,7 @@ namespace ARK_Akali
 
                     else if (!Config.Item("Rkill").GetValue<bool>() && Player.Distance(target.ServerPosition) >= rrange)
                         R.Cast(target);
+
 
         }
 
