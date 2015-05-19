@@ -12,12 +12,6 @@ namespace ARK_Akali
 {
     internal class Program
     {
-            internal class AkaliW
-    {
-        public GameObject Object { get; set; }
-        public Vector3 WPos { get; set; }
-        public double ExpireTime { get; set; }
-    }
         public const string ChampName = "Akali";
         public static Menu Config;
         public static Orbwalking.Orbwalker Orbwalker;
@@ -25,7 +19,6 @@ namespace ARK_Akali
         private static SpellSlot Ignite;
         public static HpBarIndicator Hpi = new HpBarIndicator();
         private static readonly Obj_AI_Hero Player = ObjectManager.Player;
-       private static readonly AkaliW akaliW = new AkaliW();
 
         private static void Main(string[] args)
         {
