@@ -266,7 +266,7 @@ namespace ARK_Akali
                     ObjectManager.Get<Obj_AI_Minion>().Where(minion => minion.IsValidTarget() && minion.IsEnemy &&
                                                                        minion.Distance(Player.ServerPosition) <= Q.Range))
             {
-                if (Config.Item("LasthitQ").GetValue<bool>() && minion.Health < Q.GetDamage(minion))
+                if (Config.Item("LastHitQ").GetValue<bool>() && minion.Health < Q.GetDamage(minion))
                     Q.Cast(minion);
             }
         }
