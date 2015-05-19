@@ -1,12 +1,12 @@
-c:\users\haf911\documents\visual studio 2013\Projects\ARK_Akali\ARK_Akali\bin\Release\ARK_Akali.exe.config
-c:\users\haf911\documents\visual studio 2013\Projects\ARK_Akali\ARK_Akali\bin\Release\ARK_Akali.exe
-c:\users\haf911\documents\visual studio 2013\Projects\ARK_Akali\ARK_Akali\bin\Release\ARK_Akali.pdb
-c:\users\haf911\documents\visual studio 2013\Projects\ARK_Akali\ARK_Akali\bin\Release\LeagueSharp.Common.dll
-c:\users\haf911\documents\visual studio 2013\Projects\ARK_Akali\ARK_Akali\bin\Release\LeagueSharp.dll
-c:\users\haf911\documents\visual studio 2013\Projects\ARK_Akali\ARK_Akali\bin\Release\SharpDX.Direct3D9.dll
-c:\users\haf911\documents\visual studio 2013\Projects\ARK_Akali\ARK_Akali\bin\Release\SharpDX.dll
-c:\users\haf911\documents\visual studio 2013\Projects\ARK_Akali\ARK_Akali\bin\Release\clipper_library.dll
-c:\users\haf911\documents\visual studio 2013\Projects\ARK_Akali\ARK_Akali\bin\Release\LeagueSharp.Sandbox.dll
-c:\users\haf911\documents\visual studio 2013\Projects\ARK_Akali\ARK_Akali\bin\Release\LeagueSharp.xml
-c:\users\haf911\documents\visual studio 2013\Projects\ARK_Akali\ARK_Akali\obj\Debug\ARK_Akali.exe
-c:\users\haf911\documents\visual studio 2013\Projects\ARK_Akali\ARK_Akali\obj\Debug\ARK_Akali.pdb
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\ARK_Akali\bin\Release\ARK_Akali.exe.config
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\ARK_Akali\bin\Release\ARK_Akali.exe
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\ARK_Akali\bin\Release\ARK_Akali.pdb
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\ARK_Akali\bin\Release\LeagueSharp.Common.dll
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\ARK_Akali\bin\Release\LeagueSharp.dll
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\ARK_Akali\bin\Release\SharpDX.Direct3D9.dll
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\ARK_Akali\bin\Release\SharpDX.dll
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\ARK_Akali\bin\Release\clipper_library.dll
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\ARK_Akali\bin\Release\LeagueSharp.Sandbox.dll
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\ARK_Akali\bin\Release\LeagueSharp.xml
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\ARK_Akali\obj\Debug\ARK_Akali.exe
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\ARK_Akali\obj\Debug\ARK_Akali.pdb
