@@ -45,7 +45,7 @@ namespace ARK_Akali
             var harass = Config.AddSubMenu(new Menu("[ARK]: Harass Settings", "Harass Settings"));
             var killsteal = Config.AddSubMenu(new Menu("[ARK]: Killsteal Settings", "Killsteal Settings"));
             var laneclear = Config.AddSubMenu(new Menu("[ARK]: Laneclear Settings", "Laneclear Settings"));
-            var lasthit = Config.AddSubMenu(new Menu("[ARK]: Lasthit Settings", "Laneclear Settings"));
+            var lasthit = Config.AddSubMenu(new Menu("[ARK]: Lasthit Settings", "Lasthit Settings"));
             var jungleclear = Config.AddSubMenu(new Menu("[ARK]: Jungle Settings", "Jungle Settings"));
             var misc = Config.AddSubMenu(new Menu("[ARK]: Misc Settings", "Misc Settings"));
             var drawing = Config.AddSubMenu(new Menu("[ARK]: Draw Settings", "Draw Settings"));
