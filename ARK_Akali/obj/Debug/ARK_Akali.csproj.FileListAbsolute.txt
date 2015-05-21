@@ -10,3 +10,4 @@ C:\Users\HAF911\Documents\GitHub\LeagueSharp\ARK_Akali\bin\Release\LeagueSharp.S
 C:\Users\HAF911\Documents\GitHub\LeagueSharp\ARK_Akali\bin\Release\LeagueSharp.xml
 C:\Users\HAF911\Documents\GitHub\LeagueSharp\ARK_Akali\obj\Debug\ARK_Akali.exe
 C:\Users\HAF911\Documents\GitHub\LeagueSharp\ARK_Akali\obj\Debug\ARK_Akali.pdb
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\ARK_Akali\obj\Debug\ARK_Akali.csprojResolveAssemblyReference.cache

@@ -915,7 +915,7 @@ namespace MagicalGirlLux
 
         private static void Elogic()
         {
-            var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
+            var target = TargetSelector.GetTarget(E.Range + 500, TargetSelector.DamageType.Magical);
             var epred = E.GetPrediction(target);
             var emana = Config.Item("emana").GetValue<Slider>().Value;
 
@@ -1058,7 +1058,7 @@ namespace MagicalGirlLux
             {
                 forceR();
             }
-            if (Config.Item("AutoQ").GetValue<KeyBind>().Active)
+            if (Config.Item("AutoQ").GetValue<bool>())
             {
                 Autospells();
             }

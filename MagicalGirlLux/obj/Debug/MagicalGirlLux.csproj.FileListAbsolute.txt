@@ -8,6 +8,5 @@ C:\Users\HAF911\Documents\GitHub\LeagueSharp\MagicalGirlLux\bin\Release\SharpDX.
 C:\Users\HAF911\Documents\GitHub\LeagueSharp\MagicalGirlLux\bin\Release\clipper_library.dll
 C:\Users\HAF911\Documents\GitHub\LeagueSharp\MagicalGirlLux\bin\Release\LeagueSharp.Sandbox.dll
 C:\Users\HAF911\Documents\GitHub\LeagueSharp\MagicalGirlLux\bin\Release\LeagueSharp.xml
-C:\Users\HAF911\Documents\GitHub\LeagueSharp\MagicalGirlLux\obj\Debug\MagicalGirlLux.csprojResolveAssemblyReference.cache
 C:\Users\HAF911\Documents\GitHub\LeagueSharp\MagicalGirlLux\obj\Debug\MagicalGirlLux.exe
 C:\Users\HAF911\Documents\GitHub\LeagueSharp\MagicalGirlLux\obj\Debug\MagicalGirlLux.pdb
