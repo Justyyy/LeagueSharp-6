@@ -8,6 +8,8 @@ C:\Users\HAF911\Documents\GitHub\LeagueSharp\ARK_Akali\bin\Release\SharpDX.dll
 C:\Users\HAF911\Documents\GitHub\LeagueSharp\ARK_Akali\bin\Release\clipper_library.dll
 C:\Users\HAF911\Documents\GitHub\LeagueSharp\ARK_Akali\bin\Release\LeagueSharp.Sandbox.dll
 C:\Users\HAF911\Documents\GitHub\LeagueSharp\ARK_Akali\bin\Release\LeagueSharp.xml
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\ARK_Akali\obj\Debug\ARK_Akali.csprojResolveAssemblyReference.cache
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\ARK_Akali\obj\Debug\ARK_Akali.Properties.Resources.resources
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\ARK_Akali\obj\Debug\ARK_Akali.csproj.GenerateResource.Cache
 C:\Users\HAF911\Documents\GitHub\LeagueSharp\ARK_Akali\obj\Debug\ARK_Akali.exe
 C:\Users\HAF911\Documents\GitHub\LeagueSharp\ARK_Akali\obj\Debug\ARK_Akali.pdb
-C:\Users\HAF911\Documents\GitHub\LeagueSharp\ARK_Akali\obj\Debug\ARK_Akali.csprojResolveAssemblyReference.cache

@@ -3,10 +3,15 @@ using System.CodeDom;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Drawing;
+using System.Drawing.Text;
+using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
+using ARK_Akali.Properties;
 using LeagueSharp;
 using LeagueSharp.Common;
 using LeagueSharp.Common.Data;
 using SharpDX;
+using Color = System.Drawing.Color;
 
 namespace ARK_Akali
 {
@@ -35,12 +40,11 @@ namespace ARK_Akali
 
             Q = new Spell(SpellSlot.Q, 600);
             W = new Spell(SpellSlot.W, 700);
-            E = new Spell(SpellSlot.E, 325);
+            E = new Spell(SpellSlot.E, 300);
             R = new Spell(SpellSlot.R, 700);
 
             Q.SetTargetted(Q.Instance.SData.SpellCastTime, Q.Instance.SData.MissileSpeed);
-          
-
+            E.SetSkillshot(E.Instance.SData.SpellCastTime, E.Instance.SData.LineWidth, E.Instance.SData.MissileSpeed, false, SkillshotType.SkillshotCircle);
 
             Config = new Menu("ARK Akali", "Akali", true);
             Orbwalker = new Orbwalking.Orbwalker(Config.AddSubMenu(new Menu("[ARK]: Orbwalker", "Orbwalker")));
@@ -71,7 +75,7 @@ namespace ARK_Akali
             combo.SubMenu("Advanced Features [R]").AddItem(new MenuItem("rturrethp", "% HP").SetValue(new Slider(70, 100, 0)));
             combo.SubMenu("Advanced Features [R]").AddItem(new MenuItem("Rcheck", "Don't [R] into X amount of enemies").SetValue(false));
             combo.SubMenu("Advanced Features [R]").AddItem(new MenuItem("eslider", "Enemy Count").SetValue(new Slider(3, 5, 0)));
-            combo.SubMenu("Advanced Features [R]").AddItem(new MenuItem("miniongapcloser", "Use Minion to gapclose? [Requires 2 R stacks]").SetValue(true));
+            combo.SubMenu("Advanced Features [R]").AddItem(new MenuItem("miniongapclose", "Use Minion to gapclose? [Requires 2 R stacks]").SetValue(true));
             combo.SubMenu("Advanced Features [R]").AddItem(new MenuItem("rangeRslider", "[R] gapclose Range").SetValue(new Slider(200, 600, 0)));
 
             //ITEMS
@@ -101,6 +105,7 @@ namespace ARK_Akali
             drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawdmg", "Draw Damage on Enemy HPbar").SetValue(true));
             drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawpotential", "Draw Potential Combo DMG").SetValue(true));
             drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawRend", "Draw R stacks").SetValue(true));
+            drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("rlines", "Draw [R] Gapclose Lines").SetValue(true));
             drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawRstacks", "Draw R End Position").SetValue(true));
             drawing.SubMenu("Spell Drawings").AddItem(new MenuItem("Qdraw", "Draw Q Range").SetValue(new Circle(true, System.Drawing.Color.IndianRed)));
             drawing.SubMenu("Spell Drawings").AddItem(new MenuItem("Wdraw", "Draw W Range").SetValue(new Circle(true, System.Drawing.Color.IndianRed)));
@@ -116,6 +121,8 @@ namespace ARK_Akali
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
             Drawing.OnDraw += OnDraw;
             Drawing.OnEndScene += OnEndScene;
+            Drawing.OnDraw += Gapcloserdraw;
+
 
         }
 
@@ -275,11 +282,12 @@ namespace ARK_Akali
                 if (Config.Item("LastHitQ").GetValue<bool>() && predictedHealthminionq < Q.GetDamage(minion))
                     Q.Cast(minion);
             }
+           
         }
 
         private static void Rlogic()
         {
-            var target = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
+            var target = TargetSelector.GetTarget(R.Range * 2 + 150, TargetSelector.DamageType.Magical);
             if (target == null || !target.IsValidTarget())
                 return;
             var edmg = E.GetDamage(target);
@@ -288,7 +296,6 @@ namespace ARK_Akali
             var thp = target.Health;
             var RendPos = Player.ServerPosition.Extend(target.Position, Player.ServerPosition.Distance(target.Position) + 175);
             Ignite = Player.GetSpellSlot("summonerdot");
-            var rstacks = Player.Buffs.Find(buff => buff.Name == "AkaliShadowDance").Count;
             
             var rrange = Config.Item("rangeRslider").GetValue<Slider>().Value;
 
@@ -334,31 +341,12 @@ namespace ARK_Akali
 
                         else if (Player.Distance(target.ServerPosition) >= rrange)
                             R.Cast(target);
-                    
-                    //Minion Gapclose
-                    foreach (var minion in
-                        ObjectManager.Get<Obj_AI_Minion>().Where(minion => minion.IsValidTarget() && minion.IsEnemy &&
-                                                                           minion.Distance(Player.ServerPosition) <=
-                                                                           R.Range))
-                    {
-                        target = TargetSelector.GetTarget(R.Range*2, TargetSelector.DamageType.Magical);
-                        if (Config.Item("miniongapclose").GetValue<bool>() && rstacks > 1 &&
-                            minion.Distance(target.Position) < R.Range)
-                            R.Cast(minion);
-                    }
-                    foreach (var h in
-                        ObjectManager.Get<Obj_AI_Hero>().Where(h => h.IsValidTarget() && h.IsEnemy &&
-                                                                           h.Distance(Player.ServerPosition) <=
-                                                                           R.Range))
-                    {
-                        target = TargetSelector.GetTarget(R.Range * 2, TargetSelector.DamageType.Magical);
-                        if (Config.Item("miniongapclose").GetValue<bool>() && rstacks > 1 &&
-                            h.Distance(target.Position) < R.Range)
-                            R.Cast(h);
-                    }
+
+                        Gapcloser();
 
                 }
             }
+            
             //IF RKILL DISABLED
 
             //Turret check for enemy count
@@ -369,28 +357,73 @@ namespace ARK_Akali
                     else if (!Config.Item("Rkill").GetValue<bool>() && Player.Distance(target.ServerPosition) >= rrange)
                         R.Cast(target);
 
-                    foreach (var minion in
-                        ObjectManager.Get<Obj_AI_Minion>().Where(minion => minion.IsValidTarget() && minion.IsEnemy &&
-                                                               minion.Distance(Player.ServerPosition) <=
-                                                               R.Range))
-                    {
-                        target = TargetSelector.GetTarget(R.Range * 2, TargetSelector.DamageType.Magical);
-                        if (Config.Item("miniongapclose").GetValue<bool>() && rstacks > 1 &&
-                            minion.Distance(target.Position) < R.Range)
-                            R.Cast(minion);
-                    }
-                    foreach (var h in
-                        ObjectManager.Get<Obj_AI_Hero>().Where(h => h.IsValidTarget() && h.IsEnemy &&
-                                                                           h.Distance(Player.ServerPosition) <=
-                                                                           R.Range))
-                    {
-                        target = TargetSelector.GetTarget(R.Range * 2, TargetSelector.DamageType.Magical);
-                        if (Config.Item("miniongapclose").GetValue<bool>() && rstacks > 1 &&
-                            h.Distance(target.Position) < R.Range)
-                            R.Cast(h);
-                    }
+                    Gapcloser();
 
 
+        }
+        private static void Gapcloserdraw(EventArgs args)
+        {
+            var rstacks = Player.Buffs.Find(buff => buff.Name == "AkaliShadowDance").Count;
+            var target = TargetSelector.GetTarget(R.Range * 2 + 300, TargetSelector.DamageType.Magical);
+
+
+            foreach (var minion in
+                ObjectManager.Get<Obj_AI_Minion>().Where(minion => minion.IsValidTarget() && minion.IsEnemy &&
+                                                                   minion.Distance(Player.ServerPosition) <=
+                                                                   R.Range * 2))
+            {
+                if (Config.Item("miniongapclose").GetValue<bool>() && rstacks > 1 &&
+                    minion.Distance(target.Position) > 100 &&
+                    minion.Distance(target.Position) < R.Range && Player.Distance(target.Position) >= R.Range && minion.IsValidTarget(R.Range))
+                {
+                    var rdraw = new Geometry.Polygon.Line(Player.Position, minion.Position);
+                    var rmdraw = new Geometry.Polygon.Line(minion.Position, target.Position);
+                    rdraw.Draw(Color.White, 1);
+                    rmdraw.Draw(Color.White, 1);
+                }
+
+                foreach (var h in
+                    ObjectManager.Get<Obj_AI_Hero>().Where(h => h.IsValidTarget() && h.IsEnemy &&
+                                                                h.Distance(Player.ServerPosition) <=
+                                                                R.Range * 2))
+                {
+                    if (Config.Item("miniongapclose").GetValue<bool>() && rstacks > 1 &&
+                        Player.Distance(target.Position) >= R.Range && h.Distance(target.Position) > 100 && h.Distance(target.Position) < R.Range && h.IsValidTarget(R.Range))
+                    {
+                        var rdraw = new Geometry.Polygon.Line(Player.Position, h.Position);
+                        var rmdraw = new Geometry.Polygon.Line(h.Position, target.Position);
+                        rdraw.Draw(Color.White, 1);
+                        rmdraw.Draw(Color.White, 1);
+                    }
+                }
+            }
+        }
+        private static void Gapcloser()
+        {
+            var rstacks = Player.Buffs.Find(buff => buff.Name == "AkaliShadowDance").Count;
+            var target = TargetSelector.GetTarget(R.Range*2 + 300, TargetSelector.DamageType.Magical);
+
+
+            foreach (var minion in
+                ObjectManager.Get<Obj_AI_Minion>().Where(minion => minion.IsValidTarget() && minion.IsEnemy &&
+                                                                   minion.Distance(Player.ServerPosition) <=
+                                                                   R.Range*2))
+            {
+                if (Config.Item("miniongapclose").GetValue<bool>() && rstacks > 1 && minion.Distance(target.Position) > 100 &&
+                    minion.Distance(target.Position) < R.Range && Player.Distance(target.Position) >= R.Range)
+                    R.Cast(minion);
+
+                 }
+            foreach (var h in
+                ObjectManager.Get<Obj_AI_Hero>().Where(h => h.IsValidTarget() && h.IsEnemy &&
+                                                            h.Distance(Player.ServerPosition) <=
+                                                            R.Range*2))
+            {
+                if (Config.Item("miniongapclose").GetValue<bool>() && rstacks > 1 &&
+                    Player.Distance(target.Position) >= R.Range && h.Distance(target.Position) > 100 &&
+                    h.Distance(target.Position) < R.Range)
+                    R.Cast(h);
+            }
         }
 
         private static void Elogic()
@@ -401,17 +434,17 @@ namespace ARK_Akali
                 return;
             if (E.IsReady() && Player.Distance(target.ServerPosition) >= Orbwalking.GetRealAutoAttackRange(Player) &&
                 Config.Item("UseE").GetValue<bool>() && target.IsValidTarget(E.Range))
-                E.Cast();
+                E.Cast(target);
 
             //DONT USE E CANCEL -> IF KILLABLE
             if (E.IsReady() && target.Health < E.GetDamage(target) && target.Distance(Player.Position) < E.Width - 15)
-                E.Cast(Player, true);
+                E.Cast(target, true);
 
             if (E.IsReady() && target.Health < E.GetDamage(target) + IgniteDamage(target) &&
                 Config.Item("UseE").GetValue<bool>() && Config.Item("UseIgnite").GetValue<bool>()
                 && target.Distance(Player.Position) < E.Width - 15)
             {
-                E.Cast(Player, true);
+                E.Cast(target, true);
                 Player.Spellbook.CastSpell(Ignite, target);
             }
         }
@@ -553,6 +586,9 @@ namespace ARK_Akali
                 {
                     Render.Circle.DrawCircle(minion.Position, 50, System.Drawing.Color.IndianRed, 10);
                 }
+
+            //DRAW LINES BETWEEN MINION AND TARGET
+
             //DRAW POTENTIAL DMG IN NUMBERS
             foreach (var enemy in
                 ObjectManager.Get<Obj_AI_Hero>().Where(ene => !ene.IsDead && ene.IsEnemy && ene.IsVisible))
@@ -562,13 +598,20 @@ namespace ARK_Akali
                     Drawing.DrawText(epos.X - 50, epos.Y + 50, System.Drawing.Color.Gold,
                         "Potential DMG = " + PotentialDmg(enemy).ToString());
             }
+
+
             var target = TargetSelector.GetTarget(R.Range*2 + 500, TargetSelector.DamageType.Magical);
-            var prediction = R.GetPrediction(target);
             var RendPos = Player.ServerPosition.Extend(target.Position, Player.ServerPosition.Distance(target.Position) + 175);
             if (Config.Item("drawRend").GetValue<bool>() && !target.IsMoving)
                   Render.Circle.DrawCircle(RendPos, 15, System.Drawing.Color.Green, 20);
             if (Config.Item("drawRend").GetValue<bool>() && target.IsMoving && !target.IsFacing(Player))
                 Render.Circle.DrawCircle(RendPos - 75, 15, System.Drawing.Color.Green, 20);
+
+
+
+
+
+
         }
 
         }      
