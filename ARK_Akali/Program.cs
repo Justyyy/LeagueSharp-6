@@ -40,64 +40,53 @@ namespace ARK_Akali
                 false, SkillshotType.SkillshotCircle);
 
             Config = new Menu("ARK Akali", "Akali", true);
-            Orbwalker = new Orbwalking.Orbwalker(Config.AddSubMenu(new Menu("[ARK]: Orbwalker", "Orbwalker")));
-            TargetSelector.AddToMenu(Config.AddSubMenu(new Menu("[ARK]: Target Selector", "Target Selector")));
+            Orbwalker = new Orbwalking.Orbwalker(Config.AddSubMenu(new Menu("[Orbwalker]", "Orbwalker")));
+            TargetSelector.AddToMenu(Config.AddSubMenu(new Menu("[Target Selector]", "Target Selector")));
 
-            var combo = Config.AddSubMenu(new Menu("[ARK]: Combo Settings", "Combo Settings"));
-            var harass = Config.AddSubMenu(new Menu("[ARK]: Harass Settings", "Harass Settings"));
-            var killsteal = Config.AddSubMenu(new Menu("[ARK]: Killsteal Settings", "Killsteal Settings"));
-            var laneclear = Config.AddSubMenu(new Menu("[ARK]: Laneclear Settings", "Laneclear Settings"));
-            var lasthit = Config.AddSubMenu(new Menu("[ARK]: Lasthit Settings", "Lasthit Settings"));
-            var jungleclear = Config.AddSubMenu(new Menu("[ARK]: Jungle Settings", "Jungle Settings"));
-            var misc = Config.AddSubMenu(new Menu("[ARK]: Misc Settings", "Misc Settings"));
-            var drawing = Config.AddSubMenu(new Menu("[ARK]: Draw Settings", "Draw Settings"));
+            var combo = Config.AddSubMenu(new Menu("[Combo Settings]", "Combo Settings"));
+            var harass = Config.AddSubMenu(new Menu("[Harass Settings]", "Harass Settings"));
+            var killsteal = Config.AddSubMenu(new Menu("[Killsteal Settings]", "Killsteal Settings"));
+            var laneclear = Config.AddSubMenu(new Menu("[Laneclear Settings]", "Laneclear Settings"));
+            var lasthit = Config.AddSubMenu(new Menu("[Lasthit Settings]", "Lasthit Settings"));
+            var jungleclear = Config.AddSubMenu(new Menu("[Jungle Settings]", "Jungle Settings"));
+            var misc = Config.AddSubMenu(new Menu("[Misc Settings]", "Misc Settings"));
+            var drawing = Config.AddSubMenu(new Menu("[Draw Settings]", "Draw Settings"));
 
             //Advanced Settings //[E] Settings
-            combo.SubMenu("Advanced Features [Q/E]").AddItem(new MenuItem("prioE", "Use [E] after AA").SetValue(false));
+            combo.SubMenu("[Advanced Features Q/E]").AddItem(new MenuItem("prioE", "Use [E] after AA").SetValue(false));
 
             //[W] Settings
-            combo.SubMenu("Advanced Features [W]")
-                .AddItem(new MenuItem("WPROC", "Use [W] on Dangerous Spells").SetValue(true));
-            combo.SubMenu("Advanced Features [W]").AddItem(new MenuItem("WHP", "Use [W] on < % HP ").SetValue(true));
-            combo.SubMenu("Advanced Features [W]")
-                .AddItem(new MenuItem("WHPslider", "% HP").SetValue(new Slider(35, 100, 0)));
-            combo.SubMenu("Advanced Features [W]")
-                .AddItem(new MenuItem("WHE", "Use [W] X amount of enemies ").SetValue(true));
-            combo.SubMenu("Advanced Features [W]")
-                .AddItem(new MenuItem("WHEslider", "Enemy Count").SetValue(new Slider(3, 5, 0)));
+            combo.SubMenu("[Advanced Features W]").AddItem(new MenuItem("WPROC", "Use [W] on Dangerous Spells").SetValue(true));
+            combo.SubMenu("[Advanced Features W]").AddItem(new MenuItem("WHP", "Use [W] on < % HP ").SetValue(true));
+            combo.SubMenu("[Advanced Features W]").AddItem(new MenuItem("WHPslider", "% HP").SetValue(new Slider(35, 100, 0)));
+            combo.SubMenu("[Advanced Features W]").AddItem(new MenuItem("WHE", "Use [W] X amount of enemies ").SetValue(true));
+            combo.SubMenu("[Advanced Features W]").AddItem(new MenuItem("WHEslider", "Enemy Count").SetValue(new Slider(3, 5, 0)));
 
             //[R] Settings
-            combo.SubMenu("Advanced Features [R]")
-                .AddItem(new MenuItem("Rkill", "Only use [R] if Killable").SetValue(true));
-            combo.SubMenu("Advanced Features [R]")
-                .AddItem(new MenuItem("rturret", "Don't R into Turret Range if HP below %").SetValue(true));
-            combo.SubMenu("Advanced Features [R]")
-                .AddItem(new MenuItem("rturrethp", "% HP").SetValue(new Slider(70, 100, 0)));
-            combo.SubMenu("Advanced Features [R]")
-                .AddItem(new MenuItem("Rcheck", "Don't [R] into X amount of enemies").SetValue(false));
-            combo.SubMenu("Advanced Features [R]")
-                .AddItem(new MenuItem("eslider", "Enemy Count").SetValue(new Slider(3, 5, 0)));
-            combo.SubMenu("Advanced Features [R]")
-                .AddItem(new MenuItem("miniongapclose", "Use Minion to gapclose? [Requires 2 R stacks]").SetValue(true));
-            combo.SubMenu("Advanced Features [R]")
-                .AddItem(new MenuItem("rangeRslider", "[R] gapclose Range").SetValue(new Slider(200, 600, 0)));
+            combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("Rkill", "Only use [R] if Killable").SetValue(true));
+            combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("rturret", "Don't R into Turret Range if HP below %").SetValue(true));
+            combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("rturrethp", "% HP").SetValue(new Slider(70, 100, 0)));
+            combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("rturrete", "Don't R into Turret Range if target HP above %").SetValue(true));
+            combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("rturrethpe", "% HP").SetValue(new Slider(40, 100, 0)));
+            combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("Rcheck", "Don't [R] into X amount of enemies").SetValue(false));
+            combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("eslider", "Enemy Count").SetValue(new Slider(3, 5, 0)));
+            combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("miniongapclose", "Use Minion to gapclose? [Requires 2 R stacks]").SetValue(true));
+            combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("miniongapcloseq", "Minion Gapclose if Q > Target HP [Requires 1 R stack]").SetValue(true));
+            combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("herogapclose", "Use Enemy Champion to gapclose? [Requires 2 R stacks]").SetValue(true));
+            combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("herogapcloseq", "Enemy Champion Gapclose if Q > Target HP [Requires 1 R stack]").SetValue(true));
+            combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("rangeRslider", "[R] gapclose Range").SetValue(new Slider(200, 600, 0)));
 
             //ITEMS
-            combo.SubMenu("Item Settings").AddItem(new MenuItem("UseItems", "Use Offensive Items").SetValue(true));
-            combo.SubMenu("Item Settings")
-                .AddItem(new MenuItem("UseBOTRK", "Use Blade of the Ruined King").SetValue(true));
-            combo.SubMenu("Item Settings")
-                .AddItem(new MenuItem("eL", "  Enemy HP Percentage").SetValue(new Slider(80, 100, 0)));
-            combo.SubMenu("Item Settings")
-                .AddItem(new MenuItem("oL", "  Own HP Percentage").SetValue(new Slider(65, 100, 0)));
-            combo.SubMenu("Item Settings").AddItem(new MenuItem("UseHEX", "Use Hextech Gunblade").SetValue(true));
-            combo.SubMenu("Item Settings")
-                .AddItem(new MenuItem("eH", "  Enemy HP Percentage").SetValue(new Slider(80, 100, 0)));
-            combo.SubMenu("Item Settings").AddItem(new MenuItem("UseBILGE", "Use Bilgewater Cutlass").SetValue(true));
-            combo.SubMenu("Item Settings")
-                .AddItem(new MenuItem("HLe", "  Enemy HP Percentage").SetValue(new Slider(80, 100, 0)));
-            combo.SubMenu("Item Settings").AddItem(new MenuItem("UseTIAMAT", "Use Tiamat").SetValue(true));
-            combo.SubMenu("Item Settings").AddItem(new MenuItem("UseHYDRA", "Use Hydra").SetValue(true));
+            combo.SubMenu("[Item Settings]").AddItem(new MenuItem("UseItems", "Use Offensive Items").SetValue(true));
+            combo.SubMenu("[Item Settings]").AddItem(new MenuItem("UseBOTRK", "Use Blade of the Ruined King").SetValue(true));
+            combo.SubMenu("[Item Settings]").AddItem(new MenuItem("eL", "  Enemy HP Percentage").SetValue(new Slider(80, 100, 0)));
+            combo.SubMenu("[Item Settings]").AddItem(new MenuItem("oL", "  Own HP Percentage").SetValue(new Slider(65, 100, 0)));
+            combo.SubMenu("[Item Settings]").AddItem(new MenuItem("UseHEX", "Use Hextech Gunblade").SetValue(true));
+            combo.SubMenu("[Item Settings]").AddItem(new MenuItem("eH", "  Enemy HP Percentage").SetValue(new Slider(80, 100, 0)));
+            combo.SubMenu("[Item Settings]").AddItem(new MenuItem("UseBILGE", "Use Bilgewater Cutlass").SetValue(true));
+            combo.SubMenu("[Item Settings]").AddItem(new MenuItem("HLe", "  Enemy HP Percentage").SetValue(new Slider(80, 100, 0)));
+            combo.SubMenu("[Item Settings]").AddItem(new MenuItem("UseTIAMAT", "Use Tiamat").SetValue(true));
+            combo.SubMenu("[Item Settings]").AddItem(new MenuItem("UseHYDRA", "Use Hydra").SetValue(true));
 
             //Combo Settings
             combo.AddItem(new MenuItem("UseQ", "Use Q").SetValue(true));
@@ -105,7 +94,6 @@ namespace ARK_Akali
             combo.AddItem(new MenuItem("UseE", "Use E").SetValue(true));
             combo.AddItem(new MenuItem("UseR", "Use R").SetValue(true));
             combo.AddItem(new MenuItem("UseIgnite", "Use Ignite").SetValue(true));
-            combo.AddItem(new MenuItem("UseF", "Use [Q-FLASH-AA-E-IGNITE] if Killable").SetValue(false));
 
             //LASTHIT
             lasthit.AddItem(new MenuItem("LastHitQ", "Lasthit with Q").SetValue(true));
@@ -125,27 +113,17 @@ namespace ARK_Akali
 
             //DRAWING
             drawing.AddItem(new MenuItem("Draw_Disabled", "Disable All Spell Drawings").SetValue(false));
-            drawing.SubMenu("Misc Drawings")
-                .AddItem(new MenuItem("drawdmg", "Draw Damage on Enemy HPbar").SetValue(true));
-            drawing.SubMenu("Misc Drawings")
-                .AddItem(new MenuItem("drawpotential", "Draw Potential Combo DMG").SetValue(true));
-            drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawRend", "Draw R stacks").SetValue(true));
+            drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawdmg", "Draw Damage on Enemy HPbar").SetValue(true));
+            drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawpotential", "Draw Potential Combo DMG").SetValue(true));
+            drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawRstacks", "Draw R stacks").SetValue(true));
             drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("rlines", "Draw [R] Gapclose Lines").SetValue(true));
-            drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawRstacks", "Draw R End Position").SetValue(true));
-            drawing.SubMenu("Spell Drawings")
-                .AddItem(new MenuItem("Qdraw", "Draw Q Range").SetValue(new Circle(true, System.Drawing.Color.IndianRed)));
-            drawing.SubMenu("Spell Drawings")
-                .AddItem(new MenuItem("Wdraw", "Draw W Range").SetValue(new Circle(true, System.Drawing.Color.IndianRed)));
-            drawing.SubMenu("Spell Drawings")
-                .AddItem(new MenuItem("Edraw", "Draw E Range").SetValue(new Circle(true, System.Drawing.Color.IndianRed)));
-            drawing.SubMenu("Spell Drawings")
-                .AddItem(new MenuItem("Rdraw", "Draw R Range").SetValue(new Circle(true, System.Drawing.Color.IndianRed)));
-            drawing.SubMenu("Spell Drawings")
-                .AddItem(
-                    new MenuItem("RGdraw", "Draw R Gapclose Range").SetValue(new Circle(true,
-                        System.Drawing.Color.IndianRed)));
-            drawing.SubMenu("Spell Drawings")
-                .AddItem(new MenuItem("CircleThickness", "Circle Thickness").SetValue(new Slider(7, 30, 0)));
+            drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawRend", "Draw R End Position").SetValue(true));
+            drawing.SubMenu("Spell Drawings").AddItem(new MenuItem("Qdraw", "Draw Q Range").SetValue(new Circle(true, System.Drawing.Color.IndianRed)));
+            drawing.SubMenu("Spell Drawings").AddItem(new MenuItem("Wdraw", "Draw W Range").SetValue(new Circle(true, System.Drawing.Color.IndianRed)));
+            drawing.SubMenu("Spell Drawings").AddItem(new MenuItem("Edraw", "Draw E Range").SetValue(new Circle(true, System.Drawing.Color.IndianRed)));
+            drawing.SubMenu("Spell Drawings").AddItem(new MenuItem("Rdraw", "Draw R Range").SetValue(new Circle(true, System.Drawing.Color.IndianRed)));
+            drawing.SubMenu("Spell Drawings").AddItem(new MenuItem("RGdraw", "Draw R Gapclose Range").SetValue(new Circle(true, System.Drawing.Color.IndianRed)));
+            drawing.SubMenu("Spell Drawings").AddItem(new MenuItem("CircleThickness", "Circle Thickness").SetValue(new Slider(7, 30, 0)));
 
             Config.AddToMainMenu();
 
@@ -199,9 +177,6 @@ namespace ARK_Akali
             if (Config.Item("drawRstacks").GetValue<bool>())
                 Drawing.DrawText(zpos.X - 50, zpos.Y + 50, System.Drawing.Color.HotPink,
                     "[R] stacks = " + rstacks.ToString());
-
-            if (Config.Item("UseItems").GetValue<bool>())
-                Item();
 
         }
 
@@ -267,11 +242,11 @@ namespace ARK_Akali
 
         private static int PotentialDmg(Obj_AI_Hero target)
         {
-
             var aa = Player.GetAutoAttackDamage(target, true);
             var damage = aa;
             var markdmg = Player.CalcDamage(target, Damage.DamageType.Magical,
-                (45 + 35*Q.Level + 0.5*Player.FlatMagicDamageMod));
+                (45 + 35 * Q.Level + 0.5 * Player.FlatMagicDamageMod));
+
 
             if (Items.HasItem(3153) && Items.CanUseItem(3153))
                 damage += Player.GetItemDamage(target, Damage.DamageItems.Botrk); //Botrk
@@ -284,14 +259,15 @@ namespace ARK_Akali
             if (Items.HasItem(3144) && Items.CanUseItem(3146))
                 damage += Player.GetItemDamage(target, Damage.DamageItems.Hexgun); //Hexblade
 
-            if (E.Level >= 1)
+
+            if (E.Level == 1 || E.Level == 2)
                 damage += E.GetDamage(target);
 
-            if (E.Level >= 1 && E.Level >= 5)
-                damage += E.GetDamage(target)*3;
+            if (E.Level == 3 || E.Level == 4)
+                damage += E.GetDamage(target) * 2;
 
-            if (E.Level >= 1 && E.Level == Q.Level && Player.Level > 13)
-                damage += E.GetDamage(target)*3;
+            if (E.Level == 5)
+                damage += E.GetDamage(target) * 3;
 
             if (R.Level >= 1) // rdamage          
                 damage += R.GetDamage(target);
@@ -299,9 +275,15 @@ namespace ARK_Akali
             if (Q.Level >= 1 && !target.HasBuff("AkaliMota"))
                 damage += Q.GetDamage(target) + markdmg;
 
+            if (Q.Level >= 1 && target.HasBuff("AkaliMota"))
+                damage += Q.GetDamage(target);
+
 
             if (Ignite.IsReady())
                 damage += Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite);
+
+
+            return (int)damage;
 
 
             return (int) damage;
@@ -399,7 +381,40 @@ namespace ARK_Akali
             if (Config.Item("JungleClearE").GetValue<bool>() && E.IsReady() && MinionsE.Count >= 1)
                 E.Cast();
         }
-    
+
+        private static void IgniteLogic()
+        {
+
+          var target = TargetSelector.GetTarget(R.Range * 2 + 150, TargetSelector.DamageType.Magical);
+          var rstacks = Player.Buffs.Find(buff => buff.Name == "AkaliShadowDance").Count;
+          var markdmg = Player.CalcDamage(target, Damage.DamageType.Magical,
+              (45 + 35 * Q.Level + 0.5 * Player.FlatMagicDamageMod));
+          var RendPos = Player.ServerPosition.Extend(target.Position, Player.ServerPosition.Distance(target.Position) + 175);
+          Ignite = Player.GetSpellSlot("summonerdot");
+            if (!Config.Item("UseIgnite").GetValue<bool>())
+                return;
+
+            //WHEN NOT TO IGNITE
+            if (Player.Distance(target.Position) <= E.Range && E.IsReady() && target.Health < E.GetDamage(target))
+                return;
+            if (Player.Distance(target.Position) <= Q.Range && Q.IsReady() && target.Health < Q.GetDamage(target))
+                return;
+            if (Player.Distance(target.Position) <= Orbwalking.GetRealAutoAttackRange(Player) && target.Health < Player.GetAutoAttackDamage(target))
+                return;
+            if (Player.Distance(target.Position) <= Orbwalking.GetRealAutoAttackRange(Player) && target.Health < Player.GetAutoAttackDamage(target) + markdmg && target.HasBuff("AkaliMota"))
+                return;
+
+            //WHEN TO IGNITE
+            if (Player.Distance(target.Position) <= E.Range && Ignite.IsReady() && PotentialDmg(target) > target.Health && Player.ManaPercent > 50 && rstacks >= 1 && !RendPos.UnderTurret(true))
+                 Player.Spellbook.CastSpell(Ignite, target);
+
+            if (Player.Distance(target.Position) <= Q.Range && Ignite.IsReady() && Q.GetDamage(target) + E.GetDamage(target) + IgniteDamage(target) > target.Health && Player.ManaPercent > 50 && rstacks >= 1 && !RendPos.UnderTurret(true) && Q.IsReady() && E.IsReady())
+                Player.Spellbook.CastSpell(Ignite, target);
+
+            if (Player.Distance(target.Position) <= 600 && Ignite.IsReady() && IgniteDamage(target) > target.Health)
+                Player.Spellbook.CastSpell(Ignite, target);
+
+        }
         private static void Rlogic()
         {
             var target = TargetSelector.GetTarget(R.Range * 2 + 150, TargetSelector.DamageType.Magical);
@@ -412,7 +427,10 @@ namespace ARK_Akali
             var RendPos = Player.ServerPosition.Extend(target.Position, Player.ServerPosition.Distance(target.Position) + 175);
             var DRendPos = Player.ServerPosition.Extend(target.Position, Player.ServerPosition.Distance(target.Position) + 175);
             Ignite = Player.GetSpellSlot("summonerdot");
-            
+
+            Item();
+            IgniteLogic();
+
             var rrange = Config.Item("rangeRslider").GetValue<Slider>().Value;
 
             if (target.IsMoving && target.IsFacing(Player))
@@ -429,6 +447,11 @@ namespace ARK_Akali
                 if (target.CountEnemiesInRange(1200) > Config.Item("eslider").GetValue<Slider>().Value &&
                     Config.Item("Rcheck").GetValue<bool>())
                     return;
+
+                if (RendPos.UnderTurret(true) && Config.Item("rturrete").GetValue<bool>() &&
+                     target.HealthPercent > Config.Item("rturrethpe").GetValue<Slider>().Value)
+                    return;
+
 
                 if (RendPos.UnderTurret(true) && Config.Item("rturret").GetValue<bool>() &&
                     Player.HealthPercent < Config.Item("rturrethp").GetValue<Slider>().Value)
@@ -448,8 +471,9 @@ namespace ARK_Akali
                     target.Health < IgniteDamage(target))
                     return;
 
+
                 //When to use R
-                if (thp < PotentialDmg(target) + 15 * Player.Level && DRendPos.Distance(target.ServerPosition) <= 150)                  
+                if (thp < PotentialDmg(target) + 15 * Player.Level)                  
                 {
                         if (Config.Item("UseR").GetValue<bool>())
                         {
@@ -457,11 +481,11 @@ namespace ARK_Akali
                         }
 
                         //GAPCLOSE
-                        if (Player.Distance(target.ServerPosition) >= rrange)
+                        if (Player.Distance(target.ServerPosition) >= rrange && DRendPos.Distance(target.ServerPosition) <= 175)
 
                             R.Cast(target, true);
 
-                        else if (Player.Distance(target.ServerPosition) >= rrange)
+                        else if (Player.Distance(target.ServerPosition) >= rrange && DRendPos.Distance(target.ServerPosition) <= 175)
                             R.Cast(target);
 
                         Gapcloser();
@@ -472,13 +496,15 @@ namespace ARK_Akali
             //IF RKILL DISABLED
 
             //Turret check for enemy count
-            if (!Config.Item("Rkill").GetValue<bool>() && Player.Distance(target.ServerPosition) >= rrange && DRendPos.Distance(target.ServerPosition) <= 150)
+            if (!Config.Item("Rkill").GetValue<bool>() && Player.Distance(target.ServerPosition) >= rrange && DRendPos.Distance(target.ServerPosition) <= 175)
                     
                         R.Cast(target, true);
 
-            else if (!Config.Item("Rkill").GetValue<bool>() && Player.Distance(target.ServerPosition) >= rrange && DRendPos.Distance(target.ServerPosition) <= 150)
+            else if (!Config.Item("Rkill").GetValue<bool>() && Player.Distance(target.ServerPosition) >= rrange && DRendPos.Distance(target.ServerPosition) <= 175)
+
                         R.Cast(target);
 
+            if (!Config.Item("Rkill").GetValue<bool>())
                     Gapcloser();
 
 
@@ -525,32 +551,45 @@ namespace ARK_Akali
             var rstacks = Player.Buffs.Find(buff => buff.Name == "AkaliShadowDance").Count;
             var target = TargetSelector.GetTarget(R.Range*2 + 300, TargetSelector.DamageType.Magical);
 
+            if (target.IsValidTarget(R.Range))
+                return;
 
             foreach (var minion in
                 ObjectManager.Get<Obj_AI_Minion>().Where(minion => minion.IsValidTarget() && minion.IsEnemy &&
                                                                    minion.Distance(Player.ServerPosition) <=
-                                                                   R.Range*2))
+                                                                   R.Range*2 + 100))
             {
                 if (Config.Item("miniongapclose").GetValue<bool>() && rstacks > 1 && minion.Distance(target.Position) > 100 &&
-                    minion.Distance(target.Position) < R.Range && Player.Distance(target.Position) >= R.Range)
+                    minion.Distance(target.Position) < R.Range + 100 && Player.Distance(target.Position) >= R.Range)
                     R.Cast(minion);
 
+                if (Config.Item("miniongapcloseq").GetValue<bool>() && Config.Item("miniongapclose").GetValue<bool>() &&
+                    rstacks >= 1 &&
+                    Player.Distance(target.Position) >= R.Range && minion.Distance(target.Position) > 100 &&
+                    minion.Distance(target.Position) < Q.Range - 50 && target.Health < Q.GetDamage(Player))
+                    R.Cast(minion);
                  }
             foreach (var h in
                 ObjectManager.Get<Obj_AI_Hero>().Where(h => h.IsValidTarget() && h.IsEnemy &&
                                                             h.Distance(Player.ServerPosition) <=
-                                                            R.Range*2))
+                                                            R.Range*2 + 100))
             {
-                if (Config.Item("miniongapclose").GetValue<bool>() && rstacks > 1 &&
+                if (Config.Item("herogapclose").GetValue<bool>() && rstacks > 1 &&
                     Player.Distance(target.Position) >= R.Range && h.Distance(target.Position) > 100 &&
-                    h.Distance(target.Position) < R.Range)
+                    h.Distance(target.Position) < R.Range + 100)
+                    R.Cast(h);
+
+
+                if (Config.Item("herogapcloseq").GetValue<bool>() && Config.Item("miniongapclose").GetValue<bool>() &&
+                    rstacks >= 1 &&
+                    Player.Distance(target.Position) >= R.Range && h.Distance(target.Position) > 100 &&
+                    h.Distance(target.Position) < Q.Range - 50 && target.Health < Q.GetDamage(Player))
                     R.Cast(h);
             }
         }
 
         private static void Elogic()
         {
-            Ignite = Player.GetSpellSlot("summonerdot");
             var target = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
             if (target == null || !target.IsValidTarget())
                 return;
@@ -559,16 +598,10 @@ namespace ARK_Akali
                 E.Cast(target);
 
             //DONT USE E CANCEL -> IF KILLABLE
-            if (E.IsReady() && target.Health < E.GetDamage(target) && target.Distance(Player.Position) < E.Width - 15)
+            if (E.IsReady() && target.Health < E.GetDamage(target) && target.Distance(Player.Position) < E.Width)
                 E.Cast(target, true);
-
-            if (E.IsReady() && target.Health < E.GetDamage(target) + IgniteDamage(target) &&
-                Config.Item("UseE").GetValue<bool>() && Config.Item("UseIgnite").GetValue<bool>()
-                && target.Distance(Player.Position) < E.Width - 15)
-            {
-                E.Cast(target, true);
-                Player.Spellbook.CastSpell(Ignite, target);
-            }
+            Item();
+            IgniteLogic();
         }
 
         private static void Item()
