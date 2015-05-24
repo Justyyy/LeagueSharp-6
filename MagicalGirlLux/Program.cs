@@ -33,7 +33,7 @@ namespace MagicalGirlLux
 
             Notifications.AddNotification("Magical Girl Lux ~ ", 10000);
 
-            Q = new Spell(SpellSlot.Q, 1175);
+            Q = new Spell(SpellSlot.Q, 1300f);
 
             W = new Spell(SpellSlot.W, 1075);
 
