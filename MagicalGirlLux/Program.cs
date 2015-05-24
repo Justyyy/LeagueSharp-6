@@ -33,7 +33,7 @@ namespace MagicalGirlLux
 
             Notifications.AddNotification("Magical Girl Lux ~ ", 10000);
 
-            Q = new Spell(SpellSlot.Q, 1300f);
+            Q = new Spell(SpellSlot.Q, 1175);
 
             W = new Spell(SpellSlot.W, 1075);
 
@@ -41,7 +41,7 @@ namespace MagicalGirlLux
 
             R = new Spell(SpellSlot.R, 3000);
 
-            Q.SetSkillshot(0.25f, 70f, 1190f, false, SkillshotType.SkillshotLine);
+            Q.SetSkillshot(0.25f, 70f, 1300f, false, SkillshotType.SkillshotLine);
 
             W.SetSkillshot(0.25f, 110f, 1200f, false, SkillshotType.SkillshotLine);
 
