@@ -5,7 +5,7 @@ using LeagueSharp.Common;
 using LeagueSharp.Common.Data;
 using Color = System.Drawing.Color;
 
-namespace ARK_Akali
+namespace BloodMoonAkali
 {
     internal class Program
     {

@@ -4,7 +4,7 @@ using LeagueSharp;
 using SharpDX;
 using SharpDX.Direct3D9;
 
-namespace ARK_Akali
+namespace BloodMoonAkali
 {
     class HpBarIndicator
     {
