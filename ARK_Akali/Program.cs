@@ -98,18 +98,19 @@ namespace BloodMoonAkali
             //LASTHIT
             lasthit.AddItem(new MenuItem("LastHitQ", "Lasthit with Q").SetValue(true));
             lasthit.AddItem(new MenuItem("LastHitE", "Lasthit with E").SetValue(true));
-            //lasthit.AddItem(new MenuItem("LastHitHitcount", "Minion Count").SetValue(new Slider(2, 10, 0)));
-            lasthit.AddItem(new MenuItem("LastHitQA", "Lasthit Marked Minions").SetValue(true));
+            lasthit.AddItem(new MenuItem("LastHitQA", "Calculate Q Mark damage in LastHit").SetValue(true));
 
+            //LANECLEAR
             laneclear.AddItem(new MenuItem("LaneClearQ", "Laneclear with Q").SetValue(true));
             laneclear.AddItem(new MenuItem("LaneClearE", "Laneclear with E").SetValue(true));
-            laneclear.AddItem(new MenuItem("ehitcount", "Minion Count").SetValue(new Slider(3, 10, 0)));
-            //laneclear.AddItem(new MenuItem("LaneClearEnergy", "% Energy").SetValue(new Slider(50, 200, 0)));
-            laneclear.AddItem(new MenuItem("LaneClearQA", "Laneclear Marked Minions").SetValue(true));
+            laneclear.AddItem(new MenuItem("LaneClearCount", "Minion HitCount").SetValue(new Slider(3, 10, 0)));
+            laneclear.AddItem(new MenuItem("LaneClearEnergy", "% Energy").SetValue(new Slider(50, 100, 0)));
+            laneclear.AddItem(new MenuItem("LaneClearOnlyQE", "Semi Automatic Laneclear").SetValue(true));
+            laneclear.AddItem(new MenuItem("LaneClearQA", "Calculate Q Mark damage in LaneClear").SetValue(true));
+          //laneclear.AddItem(new MenuItem("tiamatlaneclear", "Use Tiamat").SetValue(true));
 
             jungleclear.AddItem(new MenuItem("JungleClearQ", "Jungleclear with Q").SetValue(true));
             jungleclear.AddItem(new MenuItem("JungleClearE", "Jungleclear with E").SetValue(true));
-            //jungleclear.AddItem(new MenuItem("JungleClearForceProc", "Force to proc Q mark").SetValue(true));
 
             //DRAWING
             drawing.AddItem(new MenuItem("Draw_Disabled", "Disable All Spell Drawings").SetValue(false));
@@ -290,7 +291,6 @@ namespace BloodMoonAkali
 
 
         }
-
         private static void Lasthit()
         {
             foreach (var minion in
@@ -300,58 +300,151 @@ namespace BloodMoonAkali
                 var aa = Player.GetAutoAttackDamage(minion, true);
                 var damage = aa;
                 var markdmg = Player.CalcDamage(minion, Damage.DamageType.Magical,
-                    (45 + 35*Q.Level + 0.5*Player.FlatMagicDamageMod) + aa);
+                    (45 + 35 * Q.Level + 0.5 * Player.FlatMagicDamageMod) + aa);
                 var MinionsE = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, E.Range);
 
                 float predictedHealtMinionq = HealthPrediction.GetHealthPrediction(minion,
-                    (int) (R.Delay + (Player.Distance(minion.ServerPosition)/Q.Speed)));
+                    (int)(R.Delay + (Player.Distance(minion.ServerPosition) / Q.Speed)));
 
-                if (Config.Item("LastHitQ").GetValue<bool>() && predictedHealtMinionq < Q.GetDamage(minion))
+                //Check 1
+                if (minion.Health <= aa + 20 && minion.HasBuff("AkaliMota") && E.IsReady() && minion.Distance(Player.Position) < Orbwalking.GetRealAutoAttackRange(Player))
+                    return;
+                //Check 2
+                if (minion.HasBuff("AkaliMota") && Config.Item("LastHitQA").GetValue<bool>() && minion.Health <= markdmg
+                    && minion.Distance(Player.Position) <= Orbwalking.GetRealAutoAttackRange(Player) && E.IsReady())
+                    return;
+                //Check 3
+                if (minion.Distance(Player.Position) < Orbwalking.GetRealAutoAttackRange(Player) && Q.IsReady()
+                    && Config.Item("LastHitQ").GetValue<bool>() && minion.Health <= aa + 8)
+                    return;
+                //Check 4
+                if (minion.Distance(Player.Position) < Orbwalking.GetRealAutoAttackRange(Player) && E.IsReady()
+                    && Config.Item("LastHitE").GetValue<bool>() && minion.Health <= aa + 8)
+                    return;
+                //Q Cast
+                if (Config.Item("LastHitQ").GetValue<bool>() && predictedHealtMinionq < Q.GetDamage(minion) && Q.IsReady())
                     Q.Cast(minion);
-
-                if (Config.Item("LastHitE").GetValue<bool>() && E.IsReady() && minion.Health < E.GetDamage(minion) && MinionsE.Count >= 1)
+                //E Cast
+                if (Config.Item("LastHitE").GetValue<bool>() && E.IsReady() && minion.Health < E.GetDamage(minion))
                     E.Cast(minion);
-
-                if (Config.Item("LastHitQA").GetValue<bool>() && predictedHealtMinionq < Q.GetDamage(minion) + markdmg
-                    && minion.Distance(Player.Position) < Orbwalking.GetRealAutoAttackRange(Player))
-                    Q.Cast(minion);
-                if (Config.Item("LastHitQA").GetValue<bool>() && minion.HasBuff("AkaliMota")
-                    && minion.Health < markdmg)
+                //Q + Mark
+                if (Config.Item("LastHitQA").GetValue<bool>())
                 {
-                    Orbwalker.ForceTarget(minion);
-                    Player.IssueOrder(GameObjectOrder.AutoAttack, minion);
-                }
+                    if (Config.Item("LastHitQA").GetValue<bool>() && predictedHealtMinionq < Q.GetDamage(minion) + markdmg
+                        && minion.Distance(Player.Position) < Orbwalking.GetRealAutoAttackRange(Player) && Q.IsReady())
+                        Q.Cast(minion);
 
+                    if (Config.Item("LastHitQA").GetValue<bool>() && minion.HasBuff("AkaliMota")
+                        && minion.Health < markdmg)
+                    {
+                        Orbwalker.ForceTarget(minion);
+                        Player.IssueOrder(GameObjectOrder.AutoAttack, minion);
+                    }
+                }
             }
         }
-
         private static void LaneClear()
         {
+            if (Config.Item("LaneClearOnlyQE").GetValue<bool>())
+            {
+                foreach (var minion in
+               ObjectManager.Get<Obj_AI_Minion>().Where(minion => minion.IsValidTarget() && minion.IsEnemy &&
+                                                                  minion.Distance(Player.ServerPosition) <= Q.Range))
+                {
+                    var aa = Player.GetAutoAttackDamage(minion, true);
+                    var damage = aa;
+                    var markdmg = Player.CalcDamage(minion, Damage.DamageType.Magical,
+                        (45 + 35 * Q.Level + 0.5 * Player.FlatMagicDamageMod) + aa);
+                    var MinionsE = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, E.Range);
+                    var laneE = Config.Item("LaneClearEnergy").GetValue<Slider>().Value;
+
+                    float predictedHealtMinionq = HealthPrediction.GetHealthPrediction(minion,
+                     (int)(R.Delay + (Player.Distance(minion.ServerPosition) / Q.Speed)));
+
+                    //Check 1
+                    if (minion.Health < aa + 5 && Q.IsReady() && Config.Item("LaneClearQ").GetValue<bool>()
+                        && minion.Distance(Player.Position) < Orbwalking.GetRealAutoAttackRange(Player))
+                        return;
+                    //Check 2 
+                    if (minion.Health <= markdmg + 8 && minion.HasBuff("AkaliMota") && E.IsReady() && minion.IsValidTarget(E.Range))
+                        return;
+                    //Check 3
+                    if (minion.Health <= aa + 5 && minion.Distance(Player.Position) < Orbwalking.GetRealAutoAttackRange(Player) + 25
+                        && E.IsReady() && Config.Item("LaneClearE").GetValue<bool>())
+                        return;
+                    //Q Cast
+                    if (Config.Item("LaneClearQ").GetValue<bool>() && Config.Item("LaneClearOnlyQE").GetValue<bool>()
+                        && predictedHealtMinionq < Q.GetDamage(minion) && Q.IsReady())
+                        Q.Cast(minion);
+
+                    //Q + Mark
+                    if (Config.Item("LaneClearQA").GetValue<bool>())
+                    {
+                        if (Config.Item("LaneClearQA").GetValue<bool>() && Config.Item("LaneClearOnlyQE").GetValue<bool>()
+                            && predictedHealtMinionq < Q.GetDamage(minion) + markdmg
+                            && minion.Distance(Player.Position) < Orbwalking.GetRealAutoAttackRange(Player) && Q.IsReady())
+                            Q.Cast(minion);
+
+                        if (Config.Item("LaneClearQA").GetValue<bool>() && Config.Item("LaneClearOnlyQE").GetValue<bool>()
+                            && minion.HasBuff("AkaliMota") && minion.Health < markdmg)
+                        {
+                            Orbwalker.ForceTarget(minion);
+                            Player.IssueOrder(GameObjectOrder.AutoAttack, minion);
+                        }
+                    }
+                    //if (laneE < Player.ManaPercent)
+                    //return;
+
+                    //E Cast
+                    if (Config.Item("LaneClearE").GetValue<bool>() && Config.Item("LaneClearOnlyQE").GetValue<bool>()
+                        && E.IsReady() && minion.Health < E.GetDamage(minion)
+                        && MinionsE.Count >= 1)
+                        E.Cast(minion);
+                }
+            }
+
+            if (Config.Item("LaneClearOnlyQE").GetValue<bool>())
+                return;
+
             foreach (var minion in
-                ObjectManager.Get<Obj_AI_Minion>().Where(minion => minion.IsValidTarget() && minion.IsEnemy &&
-                                                                   minion.Distance(Player.ServerPosition) <= Q.Range))
+           ObjectManager.Get<Obj_AI_Minion>().Where(minion => minion.IsValidTarget() && minion.IsEnemy &&
+                                                              minion.Distance(Player.ServerPosition) <= Q.Range))
             {
                 var aa = Player.GetAutoAttackDamage(minion, true);
                 var markdmg = Player.CalcDamage(minion, Damage.DamageType.Magical,
-                    (45 + 35*Q.Level + 0.5*Player.FlatMagicDamageMod) + aa);
+                    (45 + 35 * Q.Level + 0.5 * Player.FlatMagicDamageMod) + aa);
                 var MinionsE = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, E.Range);
+                var laneE = Config.Item("LaneClearEnergy").GetValue<Slider>().Value;
+                var tiamat = ItemData.Tiamat_Melee_Only.GetItem();
 
                 float predictedHealtMinionq = HealthPrediction.GetHealthPrediction(minion,
-                    (int) (R.Delay + (Player.Distance(minion.ServerPosition)/Q.Speed)));
+                    (int)(R.Delay + (Player.Distance(minion.ServerPosition) / Q.Speed)));
 
                 if (minion.Team == GameObjectTeam.Neutral)
                     return;
 
+                //Q Logic
+                if (minion.HasBuff("AkaliMota") && Q.IsReady() && minion.IsValidTarget(Q.Range))
+                    return;
 
-                if (Config.Item("LaneClearQ").GetValue<bool>() && Q.IsReady())
+                if (Q.IsReady() && Config.Item("LaneClearQ").GetValue<bool>() && predictedHealtMinionq < Q.GetDamage(minion))
                     Q.Cast(minion);
 
-                if (Config.Item("LaneClearE").GetValue<bool>() &&
-                    MinionsE.Count >= Config.Item("ehitcount").GetValue<Slider>().Value)
-                    E.Cast();
-
+                if (Q.IsReady() && Config.Item("LaneClearQ").GetValue<bool>() && predictedHealtMinionq < Q.GetDamage(minion))
+                    return;
+                //Check 1
+                if (minion.Health <= aa + 20 && minion.HasBuff("AkaliMota") && E.IsReady() && minion.Distance(Player.Position) < Orbwalking.GetRealAutoAttackRange(Player))
+                    return;
+                //Check 2
+                if (minion.HasBuff("AkaliMota") && Config.Item("LaneClearQA").GetValue<bool>() && minion.Health <= markdmg
+                    && minion.Distance(Player.Position) <= Orbwalking.GetRealAutoAttackRange(Player) && E.IsReady())
+                    return;
+                //Q Cast
+                if (Config.Item("LaneClearQ").GetValue<bool>() && Q.IsReady())
+                    Q.Cast(minion);
+                //Q + Mark
                 if (Config.Item("LaneClearQA").GetValue<bool>() && predictedHealtMinionq < Q.GetDamage(minion) + markdmg
-                    && minion.Distance(Player.Position) < Orbwalking.GetRealAutoAttackRange(Player))
+                    && minion.Distance(Player.Position) < Orbwalking.GetRealAutoAttackRange(Player) && Q.IsReady())
                     Q.Cast(minion);
 
                 if (Config.Item("LaneClearQA").GetValue<bool>() && minion.HasBuff("AkaliMota")
@@ -360,11 +453,13 @@ namespace BloodMoonAkali
                     Orbwalker.ForceTarget(minion);
                     Player.IssueOrder(GameObjectOrder.AutoAttack, minion);
                 }
-
-                //if (MinionManager.GetMinions(Player.Position, E.Range, MinionTypes.All, MinionTeam.Enemy).Count >= Config.SubMenu("laneclear").Item("LaneClearHitcount", true).GetValue<Slider>().Value) 
-                //E.Cast();                
+                if (Player.ManaPercent <= laneE)
+                    return;
+                //E Cast
+                if (Config.Item("LaneClearE").GetValue<bool>() && E.IsReady() &&
+                    MinionsE.Count >= Config.Item("LaneClearCount").GetValue<Slider>().Value)
+                    E.Cast();
             }
-
         }
 
         private static void Jungleclear()
@@ -381,7 +476,6 @@ namespace BloodMoonAkali
             if (Config.Item("JungleClearE").GetValue<bool>() && E.IsReady() && MinionsE.Count >= 1)
                 E.Cast();
         }
-
         private static void IgniteLogic()
         {
 
