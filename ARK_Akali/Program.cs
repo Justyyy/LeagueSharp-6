@@ -28,7 +28,7 @@ namespace BloodMoonAkali
             if (Player.ChampionName != ChampName)
                 return;
 
-            Notifications.AddNotification("ARK AKALI V1", 1000);
+            Notifications.AddNotification("BloodMoonAkali V1", 1000);
 
             Q = new Spell(SpellSlot.Q, 600);
             W = new Spell(SpellSlot.W, 700);
@@ -39,7 +39,7 @@ namespace BloodMoonAkali
             E.SetSkillshot(E.Instance.SData.SpellCastTime, E.Instance.SData.LineWidth, E.Instance.SData.MissileSpeed,
                 false, SkillshotType.SkillshotCircle);
 
-            Config = new Menu("ARK Akali", "Akali", true);
+            Config = new Menu("BloodMoonAkali", "Akali", true);
             Orbwalker = new Orbwalking.Orbwalker(Config.AddSubMenu(new Menu("[Orbwalker]", "Orbwalker")));
             TargetSelector.AddToMenu(Config.AddSubMenu(new Menu("[Target Selector]", "Target Selector")));
 
@@ -107,24 +107,36 @@ namespace BloodMoonAkali
             laneclear.AddItem(new MenuItem("LaneClearEnergy", "% Energy").SetValue(new Slider(50, 100, 0)));
             laneclear.AddItem(new MenuItem("LaneClearOnlyQE", "Semi Automatic Laneclear").SetValue(true));
             laneclear.AddItem(new MenuItem("LaneClearQA", "Calculate Q Mark damage in LaneClear").SetValue(true));
-          //laneclear.AddItem(new MenuItem("tiamatlaneclear", "Use Tiamat").SetValue(true));
+            //laneclear.AddItem(new MenuItem("tiamatlaneclear", "Use Tiamat").SetValue(true));
 
             jungleclear.AddItem(new MenuItem("JungleClearQ", "Jungleclear with Q").SetValue(true));
             jungleclear.AddItem(new MenuItem("JungleClearE", "Jungleclear with E").SetValue(true));
 
+            //KILLSTEAL
+            killsteal.SubMenu("Smart Killsteal").AddItem(new MenuItem("SmartKS", "Use Smart Killsteal").SetValue(true));
+            killsteal.SubMenu("Smart Killsteal").AddItem(new MenuItem("SmartKSQ", "Use Q").SetValue(true));
+            killsteal.SubMenu("Smart Killsteal").AddItem(new MenuItem("SmartKSE", "Use E").SetValue(true));
+            killsteal.SubMenu("Smart Killsteal").AddItem(new MenuItem("SmartKSR", "Use R").SetValue(true));
+            killsteal.SubMenu("Rekkles Killsteal").AddItem(new MenuItem("RekklesKS", "Use Rekkless Killsteal").SetValue(true));
+            killsteal.SubMenu("Rekkles Killsteal").AddItem(new MenuItem("RekklesKSQ", "Use Q").SetValue(true));
+            killsteal.SubMenu("Rekkles Killsteal").AddItem(new MenuItem("RekklesKSE", "Use E").SetValue(true));
+            killsteal.SubMenu("Rekkles Killsteal").AddItem(new MenuItem("RekklesKSR", "Use R").SetValue(true));
+            killsteal.SubMenu("Rekkles Killsteal").AddItem(new MenuItem("RekklesKSRInfo", "Calculates R DMG + Sheen / Lichbane"));
+            killsteal.AddItem(new MenuItem("KSIngite", "Use Ingite").SetValue(true));
+
             //DRAWING
             drawing.AddItem(new MenuItem("Draw_Disabled", "Disable All Spell Drawings").SetValue(false));
-            drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawdmg", "Draw Damage on Enemy HPbar").SetValue(true));
-            drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawpotential", "Draw Potential Combo DMG").SetValue(true));
-            drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawRstacks", "Draw R stacks").SetValue(true));
-            drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("rlines", "Draw [R] Gapclose Lines").SetValue(true));
-            drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawRend", "Draw R End Position").SetValue(true));
             drawing.SubMenu("Spell Drawings").AddItem(new MenuItem("Qdraw", "Draw Q Range").SetValue(new Circle(true, System.Drawing.Color.IndianRed)));
             drawing.SubMenu("Spell Drawings").AddItem(new MenuItem("Wdraw", "Draw W Range").SetValue(new Circle(true, System.Drawing.Color.IndianRed)));
             drawing.SubMenu("Spell Drawings").AddItem(new MenuItem("Edraw", "Draw E Range").SetValue(new Circle(true, System.Drawing.Color.IndianRed)));
             drawing.SubMenu("Spell Drawings").AddItem(new MenuItem("Rdraw", "Draw R Range").SetValue(new Circle(true, System.Drawing.Color.IndianRed)));
             drawing.SubMenu("Spell Drawings").AddItem(new MenuItem("RGdraw", "Draw R Gapclose Range").SetValue(new Circle(true, System.Drawing.Color.IndianRed)));
             drawing.SubMenu("Spell Drawings").AddItem(new MenuItem("CircleThickness", "Circle Thickness").SetValue(new Slider(7, 30, 0)));
+            drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawdmg", "Draw Damage on Enemy HPbar").SetValue(true));
+            drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawpotential", "Draw Potential Combo DMG").SetValue(true));
+            drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawRstacks", "Draw R stacks").SetValue(true));
+            drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("rlines", "Draw R Gapclose Lines").SetValue(true));
+            drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawRend", "Draw R End Position").SetValue(true));
 
             Config.AddToMainMenu();
 
@@ -170,7 +182,15 @@ namespace BloodMoonAkali
                     LaneClear();
                     Jungleclear();
                     break;
+            }
 
+            if (Config.Item("SmartKS").GetValue<bool>())
+            {
+                SmartKS();
+            }
+            if (Config.Item("RekklesKS").GetValue<bool>())
+            {
+                RekklesKS();
             }
 
             var zpos = Drawing.WorldToScreen(Player.Position);
@@ -180,9 +200,8 @@ namespace BloodMoonAkali
                     "[R] stacks = " + rstacks.ToString());
 
         }
-
         private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
-            //W ON DANGEROUS SPELLS! SUCH AS RIVEN W/JAX Q/VLAD ULT/CAIT R/CASSIO R/RENGAR JUMP/LISS ULT/RYZE W/TALON E/ZED ULT/VAYNE E/VI ULT
+        //W ON DANGEROUS SPELLS! SUCH AS RIVEN W/JAX Q/VLAD ULT/CAIT R/CASSIO R/RENGAR JUMP/LISS ULT/RYZE W/TALON E/ZED ULT/VAYNE E/VI ULT
         {
             throw new NotImplementedException();
         }
@@ -192,7 +211,7 @@ namespace BloodMoonAkali
         {
             if (Ignite == SpellSlot.Unknown || Player.Spellbook.CanUseSpell(Ignite) != SpellState.Ready)
                 return 0f;
-            return (float) Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite);
+            return (float)Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite);
         }
 
         private static int CalcDamage(Obj_AI_Base target)
@@ -201,7 +220,7 @@ namespace BloodMoonAkali
             var aa = Player.GetAutoAttackDamage(target, true);
             var damage = aa;
             var markdmg = Player.CalcDamage(target, Damage.DamageType.Magical,
-                (45 + 35*Q.Level + 0.5*Player.FlatMagicDamageMod));
+                (45 + 35 * Q.Level + 0.5 * Player.FlatMagicDamageMod));
 
             if (Items.HasItem(3153) && Items.CanUseItem(3153))
                 damage += Player.GetItemDamage(target, Damage.DamageItems.Botrk); //Botrk
@@ -218,10 +237,10 @@ namespace BloodMoonAkali
                 damage += E.GetDamage(target);
 
             if (E.IsReady() && E.Level >= 5)
-                damage += E.GetDamage(target)*3;
+                damage += E.GetDamage(target) * 3;
 
             if (E.IsReady() && E.Level == Q.Level && Player.Level > 13)
-                damage += E.GetDamage(target)*3;
+                damage += E.GetDamage(target) * 3;
 
             if (R.IsReady()) // rdamage          
                 damage += R.GetDamage(target);
@@ -238,7 +257,7 @@ namespace BloodMoonAkali
             if (Ignite.IsReady())
                 damage += Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite);
 
-            return (int) damage;
+            return (int)damage;
         }
 
         private static int PotentialDmg(Obj_AI_Hero target)
@@ -286,8 +305,6 @@ namespace BloodMoonAkali
 
             return (int)damage;
 
-
-            return (int) damage;
 
 
         }
@@ -476,15 +493,248 @@ namespace BloodMoonAkali
             if (Config.Item("JungleClearE").GetValue<bool>() && E.IsReady() && MinionsE.Count >= 1)
                 E.Cast();
         }
+        private static void SmartKS()
+        {
+            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>()
+                 .Where(x => x.IsValidTarget(R.Range * 2 + 150))
+                 .Where(x => !x.IsZombie)
+                 .Where(x => !x.IsDead))
+            {
+                Ignite = Player.GetSpellSlot("summonerdot");
+                var qdmg = Q.GetDamage(enemy);
+                var edmg = E.GetDamage(enemy);
+                var rdmg = R.GetDamage(enemy);
+                var aa = Player.GetAutoAttackDamage(enemy, true);
+                var markdmg = Player.CalcDamage(enemy, Damage.DamageType.Magical,
+                (45 + 35 * Q.Level + 0.5 * Player.FlatMagicDamageMod) + aa);
+                var ksrstacks = Config.Item("KSRStacks").GetValue<Slider>().Value;
+
+                var sheendmg = Player.CalcDamage(enemy, Damage.DamageType.Magical, Player.BaseAttackDamage);
+
+                var lichbanedmg = Player.CalcDamage(enemy, Damage.DamageType.Magical, (Player.BaseAttackDamage * 0.75)
+                    + ((Player.BaseAbilityDamage + Player.FlatMagicDamageMod) * 0.5));
+
+
+                if (Ignite.IsReady() && IgniteDamage(enemy) >= enemy.Health
+                    && Config.Item("KSIgnite").GetValue<bool>()
+                    && Player.Distance(enemy.Position) <= 600)
+                    Player.Spellbook.CastSpell(Ignite, enemy);
+
+                if (enemy.Health < qdmg && Q.IsReady() &&
+                    Config.Item("SmartKSQ").GetValue<bool>())
+                    Q.Cast(enemy);
+
+                if (enemy.Health < edmg && E.IsReady()
+                    && Config.Item("SmartKSE").GetValue<bool>())
+                    E.Cast(enemy);
+
+                if (Player.HasBuff("sheen") && enemy.Health < sheendmg &&
+                    Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player))
+                    return;
+
+                if (Player.HasBuff("lichbane") && enemy.Health < lichbanedmg &&
+                    Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player))
+                    return;
+
+                if (enemy.Health < edmg + qdmg
+                    && enemy.IsValidTarget(E.Range) && Q.IsReady() && E.IsReady())
+                    return;
+
+                if (enemy.Health < qdmg + markdmg + edmg && Q.IsReady()
+                    && E.IsReady() && Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player))
+                    return;
+
+                if (enemy.Health < edmg + markdmg && E.IsReady()
+                    && Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player))
+                    return;
+
+                if (enemy.Health < qdmg + markdmg && Q.IsReady()
+                    && Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player))
+                    return;
+
+                if (enemy.Health < sheendmg + edmg && E.IsReady()
+                    && Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player))
+                    return;
+
+                if (enemy.Health < markdmg + edmg + sheendmg && E.IsReady()
+                    && Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player)
+                    && enemy.HasBuff("AkaliMota"))
+                    return;
+
+                if (enemy.Health < qdmg + markdmg + sheendmg && Q.IsReady()
+                    && Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player))
+                    return;
+
+                if (enemy.Health < markdmg + sheendmg && Player.HasBuff("sheen")
+                    && enemy.HasBuff("AkaliMota") && Player.Distance(enemy.Position)
+                    < Orbwalking.GetRealAutoAttackRange(Player))
+                    return;
+
+                if (enemy.Health < qdmg + markdmg + sheendmg + edmg && Q.IsReady()
+                    && Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player))
+                    return;
+
+                if (enemy.Health < rdmg && R.IsReady() && enemy.IsValidTarget(R.Range)
+                    && Config.Item("SmartKSR").GetValue<bool>())
+                    R.Cast(enemy);                  
+            }
+        }
+        private static void RekklesKS()
+        {
+            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>()
+                  .Where(x => x.IsValidTarget(R.Range * 2 + 150))
+                  .Where(x => !x.IsZombie)
+                  .Where(x => !x.IsDead))
+            {
+                Ignite = Player.GetSpellSlot("summonerdot");
+                var qdmg = Q.GetDamage(enemy);
+                var edmg = E.GetDamage(enemy);
+                var rdmg = R.GetDamage(enemy);
+                var aa = Player.GetAutoAttackDamage(enemy, true);
+                var markdmg = Player.CalcDamage(enemy, Damage.DamageType.Magical,
+                (45 + 35 * Q.Level + 0.5 * Player.FlatMagicDamageMod) + aa);
+                var ksrstacks = Config.Item("KSRStacks").GetValue<Slider>().Value;
+
+                var sheendmg = Player.CalcDamage(enemy, Damage.DamageType.Magical, Player.BaseAttackDamage);
+
+                var lichbanedmg = Player.CalcDamage(enemy, Damage.DamageType.Magical, (Player.BaseAttackDamage * 0.75)
+                    + ((Player.BaseAbilityDamage + Player.FlatMagicDamageMod) * 0.5));
+
+                if (Ignite.IsReady() && IgniteDamage(enemy) >= enemy.Health
+                    && Config.Item("KSIgnite").GetValue<bool>()
+                    && Player.Distance(enemy.Position) <= 600)
+                    Player.Spellbook.CastSpell(Ignite, enemy);
+
+                if (enemy.Health < qdmg && Q.IsReady() &&
+                    Config.Item("RekklessKSQ").GetValue<bool>())
+                    Q.Cast(enemy);
+
+                if (enemy.Health < qdmg + markdmg && Q.IsReady()
+                    && Config.Item("RekklesKSQ").GetValue<bool>()
+                    && Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player))
+                    Q.Cast(enemy);
+
+                if (enemy.Health < markdmg && enemy.HasBuff("AkaliMota")
+                    && Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player))
+                {
+                    Orbwalker.ForceTarget(enemy);
+                    Player.IssueOrder(GameObjectOrder.AutoAttack, enemy);
+                }
+
+                if (enemy.Health < edmg && E.IsReady()
+                    && Config.Item("RekklessKSE").GetValue<bool>())
+                    E.Cast(enemy);
+
+                if (Player.HasBuff("sheen") && enemy.Health < sheendmg &&
+                    Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player))
+                {
+                    Orbwalker.ForceTarget(enemy);
+                    Player.IssueOrder(GameObjectOrder.AutoAttack, enemy);
+                }
+
+                if (Player.HasBuff("lichbane") && enemy.Health < lichbanedmg &&
+                    Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player))
+                {
+                    Orbwalker.ForceTarget(enemy);
+                    Player.IssueOrder(GameObjectOrder.AutoAttack, enemy);
+                }
+
+                if (enemy.Health < edmg + qdmg
+                    && enemy.IsValidTarget(E.Range) && Q.IsReady() && E.IsReady()
+                    && Config.Item("RekklesKSQ").GetValue<bool>() && Config.Item("Rekkles").GetValue<bool>())
+                    Q.Cast(enemy);
+
+                if (enemy.Health < qdmg + markdmg + edmg && Q.IsReady()
+                    && E.IsReady() && Player.Distance(enemy.Position)
+                    < Orbwalking.GetRealAutoAttackRange(Player)
+                    && Config.Item("RekklesKSQ").GetValue<bool>()
+                    && Config.Item("RekklesKSE").GetValue<bool>())
+                    Q.Cast(enemy);
+
+                if (enemy.Health < edmg + markdmg && E.IsReady()
+                    && Player.Distance(enemy.Position)
+                    < Orbwalking.GetRealAutoAttackRange(Player)
+                    && enemy.HasBuff("AkaliMota") && Config.Item("RekklessKSE").GetValue<bool>())
+                    E.Cast(enemy);
+
+                if (enemy.Health < sheendmg + edmg && E.IsReady()
+                    && Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player)
+                    && Config.Item("RekklesKSE").GetValue<bool>())
+                    E.Cast(enemy);
+
+                if (enemy.Health < markdmg + edmg + sheendmg && E.IsReady()
+                    && Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player)
+                    && enemy.HasBuff("AkaliMota") && Config.Item("RekklesKSE").GetValue<bool>() ||
+                    enemy.Health < markdmg + edmg + lichbanedmg && E.IsReady()
+                        && Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player)
+                        && enemy.HasBuff("AkaliMota") && Config.Item("RekklesKSE").GetValue<bool>())
+                    E.Cast(enemy);
+
+                if (enemy.Health < markdmg + sheendmg && Player.HasBuff(".")
+                    && enemy.HasBuff("AkaliMota") && Player.Distance(enemy.Position)
+                    < Orbwalking.GetRealAutoAttackRange(Player) ||
+                    enemy.Health < markdmg + lichbanedmg && Player.HasBuff("lichbane")
+                    && enemy.HasBuff("AkaliMota") && Player.Distance(enemy.Position)
+                    < Orbwalking.GetRealAutoAttackRange(Player))
+                {
+                    Orbwalker.ForceTarget(enemy);
+                    Player.IssueOrder(GameObjectOrder.AutoAttack, enemy);
+                }
+                    
+                if (enemy.Health < qdmg + markdmg + sheendmg && Q.IsReady()
+                    && Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player)
+                    && Config.Item("RekklesKSQ").GetValue<bool>() ||
+                    enemy.Health < qdmg + markdmg + lichbanedmg && Q.IsReady()
+                    && Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player))
+                    Q.Cast(enemy);
+
+                if (enemy.Health < qdmg + markdmg + sheendmg + edmg && Q.IsReady()
+                    && Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player)
+                    && E.IsReady()
+                    && Config.Item("RekklesKSQ").GetValue<bool>() && Config.Item("RekklesKSE").GetValue<bool>() ||
+                    enemy.Health < qdmg + markdmg + lichbanedmg + edmg && Q.IsReady()
+                    && Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player)
+                    && E.IsReady() && Config.Item("RekklesKSQ").GetValue<bool>()
+                    && Config.Item("RekklesKSE").GetValue<bool>())
+                    Q.Cast(enemy);
+
+                if (enemy.Health < rdmg + qdmg + markdmg + edmg + sheendmg                   
+                    && R.IsReady() && Q.IsReady() && E.IsReady()
+                    && Config.Item("RekklesKSQ").GetValue<bool>() 
+                    && Config.Item("RekklessKSE").GetValue<bool>()
+                    && Config.Item("RekklesKSR").GetValue<bool>()
+                    && enemy.IsValidTarget(R.Range))
+                    R.Cast(enemy);
+                if (enemy.Health < rdmg + qdmg + markdmg + edmg + lichbanedmg
+                    && R.IsReady() && Q.IsReady() && E.IsReady()
+                    && Config.Item("RekklesKSQ").GetValue<bool>()
+                    && Config.Item("RekklessKSE").GetValue<bool>()
+                    && Config.Item("RekklesKSR").GetValue<bool>()
+                    && enemy.IsValidTarget(R.Range))
+                    R.Cast(enemy);
+                if (enemy.Health < rdmg + qdmg + markdmg + edmg
+                    && R.IsReady() && Q.IsReady() && E.IsReady()
+                    && Config.Item("RekklesKSQ").GetValue<bool>()
+                    && Config.Item("RekklessKSE").GetValue<bool>()
+                    && Config.Item("RekklesKSR").GetValue<bool>()
+                    && enemy.IsValidTarget(R.Range))
+                    R.Cast(enemy);
+
+                if (enemy.Health < rdmg && R.IsReady()
+                    && Config.Item("RekklesKSR").GetValue<bool>()
+                    && enemy.IsValidTarget(R.Range))
+                    R.Cast(enemy);
+            }
+        }
         private static void IgniteLogic()
         {
 
-          var target = TargetSelector.GetTarget(R.Range * 2 + 150, TargetSelector.DamageType.Magical);
-          var rstacks = Player.Buffs.Find(buff => buff.Name == "AkaliShadowDance").Count;
-          var markdmg = Player.CalcDamage(target, Damage.DamageType.Magical,
-              (45 + 35 * Q.Level + 0.5 * Player.FlatMagicDamageMod));
-          var RendPos = Player.ServerPosition.Extend(target.Position, Player.ServerPosition.Distance(target.Position) + 175);
-          Ignite = Player.GetSpellSlot("summonerdot");
+            var target = TargetSelector.GetTarget(R.Range * 2 + 150, TargetSelector.DamageType.Magical);
+            var rstacks = Player.Buffs.Find(buff => buff.Name == "AkaliShadowDance").Count;
+            var markdmg = Player.CalcDamage(target, Damage.DamageType.Magical,
+                (45 + 35 * Q.Level + 0.5 * Player.FlatMagicDamageMod));
+            var RendPos = Player.ServerPosition.Extend(target.Position, Player.ServerPosition.Distance(target.Position) + 175);
+            Ignite = Player.GetSpellSlot("summonerdot");
             if (!Config.Item("UseIgnite").GetValue<bool>())
                 return;
 
@@ -500,7 +750,7 @@ namespace BloodMoonAkali
 
             //WHEN TO IGNITE
             if (Player.Distance(target.Position) <= E.Range && Ignite.IsReady() && PotentialDmg(target) > target.Health && Player.ManaPercent > 50 && rstacks >= 1 && !RendPos.UnderTurret(true))
-                 Player.Spellbook.CastSpell(Ignite, target);
+                Player.Spellbook.CastSpell(Ignite, target);
 
             if (Player.Distance(target.Position) <= Q.Range && Ignite.IsReady() && Q.GetDamage(target) + E.GetDamage(target) + IgniteDamage(target) > target.Health && Player.ManaPercent > 50 && rstacks >= 1 && !RendPos.UnderTurret(true) && Q.IsReady() && E.IsReady())
                 Player.Spellbook.CastSpell(Ignite, target);
@@ -567,39 +817,39 @@ namespace BloodMoonAkali
 
 
                 //When to use R
-                if (thp < PotentialDmg(target) + 15 * Player.Level)                  
+                if (thp < PotentialDmg(target) + 15 * Player.Level)
                 {
-                        if (Config.Item("UseR").GetValue<bool>())
-                        {
-                            R.Cast(target, true);
-                        }
+                    if (Config.Item("UseR").GetValue<bool>())
+                    {
+                        R.Cast(target, true);
+                    }
 
-                        //GAPCLOSE
-                        if (Player.Distance(target.ServerPosition) >= rrange && DRendPos.Distance(target.ServerPosition) <= 175)
+                    //GAPCLOSE
+                    if (Player.Distance(target.ServerPosition) >= rrange && DRendPos.Distance(target.ServerPosition) <= 175)
 
-                            R.Cast(target, true);
+                        R.Cast(target, true);
 
-                        else if (Player.Distance(target.ServerPosition) >= rrange && DRendPos.Distance(target.ServerPosition) <= 175)
-                            R.Cast(target);
+                    else if (Player.Distance(target.ServerPosition) >= rrange && DRendPos.Distance(target.ServerPosition) <= 175)
+                        R.Cast(target);
 
-                        Gapcloser();
+                    Gapcloser();
 
                 }
             }
-            
+
             //IF RKILL DISABLED
 
             //Turret check for enemy count
             if (!Config.Item("Rkill").GetValue<bool>() && Player.Distance(target.ServerPosition) >= rrange && DRendPos.Distance(target.ServerPosition) <= 175)
-                    
-                        R.Cast(target, true);
+
+                R.Cast(target, true);
 
             else if (!Config.Item("Rkill").GetValue<bool>() && Player.Distance(target.ServerPosition) >= rrange && DRendPos.Distance(target.ServerPosition) <= 175)
 
-                        R.Cast(target);
+                R.Cast(target);
 
             if (!Config.Item("Rkill").GetValue<bool>())
-                    Gapcloser();
+                Gapcloser();
 
 
         }
@@ -643,7 +893,7 @@ namespace BloodMoonAkali
         private static void Gapcloser()
         {
             var rstacks = Player.Buffs.Find(buff => buff.Name == "AkaliShadowDance").Count;
-            var target = TargetSelector.GetTarget(R.Range*2 + 300, TargetSelector.DamageType.Magical);
+            var target = TargetSelector.GetTarget(R.Range * 2 + 300, TargetSelector.DamageType.Magical);
 
             if (target.IsValidTarget(R.Range))
                 return;
@@ -651,7 +901,7 @@ namespace BloodMoonAkali
             foreach (var minion in
                 ObjectManager.Get<Obj_AI_Minion>().Where(minion => minion.IsValidTarget() && minion.IsEnemy &&
                                                                    minion.Distance(Player.ServerPosition) <=
-                                                                   R.Range*2 + 100))
+                                                                   R.Range * 2 + 100))
             {
                 if (Config.Item("miniongapclose").GetValue<bool>() && rstacks > 1 && minion.Distance(target.Position) > 100 &&
                     minion.Distance(target.Position) < R.Range + 100 && Player.Distance(target.Position) >= R.Range)
@@ -662,11 +912,11 @@ namespace BloodMoonAkali
                     Player.Distance(target.Position) >= R.Range && minion.Distance(target.Position) > 100 &&
                     minion.Distance(target.Position) < Q.Range - 50 && target.Health < Q.GetDamage(Player))
                     R.Cast(minion);
-                 }
+            }
             foreach (var h in
                 ObjectManager.Get<Obj_AI_Hero>().Where(h => h.IsValidTarget() && h.IsEnemy &&
                                                             h.Distance(Player.ServerPosition) <=
-                                                            R.Range*2 + 100))
+                                                            R.Range * 2 + 100))
             {
                 if (Config.Item("herogapclose").GetValue<bool>() && rstacks > 1 &&
                     Player.Distance(target.Position) >= R.Range && h.Distance(target.Position) > 100 &&
@@ -742,7 +992,7 @@ namespace BloodMoonAkali
             if (target == null || !target.IsValidTarget())
                 return;
             var markdmg = Player.CalcDamage(target, Damage.DamageType.Magical,
-                (45 + 35*Q.Level + 0.5*Player.FlatMagicDamageMod));          
+                (45 + 35 * Q.Level + 0.5 * Player.FlatMagicDamageMod));
             //Q BASIC CAST
             if (Q.IsReady() && target.IsValidTarget() && Config.Item("UseQ").GetValue<bool>())
                 Q.Cast(target, true);
@@ -758,7 +1008,7 @@ namespace BloodMoonAkali
                 Player.Spellbook.CastSpell(Ignite, target);
             }
 
-    }
+        }
         private static void OnReceiveBuff() //W on Cait R - Zed R
         {
 
@@ -780,7 +1030,7 @@ namespace BloodMoonAkali
 
             if (unit.IsMe && hydra.IsReady() && Config.Item("UseHYDRA").GetValue<bool>() && target.IsValidTarget(hydra.Range))
                 hydra.Cast();
-            
+
             if (unit.IsMe && tiamat.IsReady() && Config.Item("UseTIAMAT").GetValue<bool>() && target.IsValidTarget(tiamat.Range))
                 tiamat.Cast();
         }
@@ -791,50 +1041,50 @@ namespace BloodMoonAkali
             if (Config.Item("Draw_Disabled").GetValue<bool>())
                 return;
             //DRAW SPELL RANGES
-                if (Config.Item("Qdraw").GetValue<Circle>().Active)
-                    if (Q.Level > 0)
-                        Render.Circle.DrawCircle(ObjectManager.Player.Position, Q.Range,
-                            Q.IsReady() ? Config.Item("Qdraw").GetValue<Circle>().Color : System.Drawing.Color.Red,
+            if (Config.Item("Qdraw").GetValue<Circle>().Active)
+                if (Q.Level > 0)
+                    Render.Circle.DrawCircle(ObjectManager.Player.Position, Q.Range,
+                        Q.IsReady() ? Config.Item("Qdraw").GetValue<Circle>().Color : System.Drawing.Color.Red,
+                                                    Config.Item("CircleThickness").GetValue<Slider>().Value); //Thickness
+
+            if (Config.Item("Wdraw").GetValue<Circle>().Active)
+                if (W.Level > 0)
+                    Render.Circle.DrawCircle(ObjectManager.Player.Position, W.Range,
+                        W.IsReady() ? Config.Item("Wdraw").GetValue<Circle>().Color : System.Drawing.Color.Red,
+                                                    Config.Item("CircleThickness").GetValue<Slider>().Value); //Thickness
+
+            if (Config.Item("Edraw").GetValue<Circle>().Active)
+                if (E.Level > 0)
+                    Render.Circle.DrawCircle(ObjectManager.Player.Position, E.Range,
+                        E.IsReady() ? Config.Item("Edraw").GetValue<Circle>().Color : System.Drawing.Color.Red,
+                                                    Config.Item("CircleThickness").GetValue<Slider>().Value); //Thickness
+
+            if (Config.Item("Rdraw").GetValue<Circle>().Active)
+                if (R.Level > 0)
+                    Render.Circle.DrawCircle(ObjectManager.Player.Position, R.Range,
+                        R.IsReady() ? Config.Item("Rdraw").GetValue<Circle>().Color : System.Drawing.Color.Red,
                                                         Config.Item("CircleThickness").GetValue<Slider>().Value); //Thickness
 
-                if (Config.Item("Wdraw").GetValue<Circle>().Active)
-                    if (W.Level > 0)
-                        Render.Circle.DrawCircle(ObjectManager.Player.Position, W.Range,
-                            W.IsReady() ? Config.Item("Wdraw").GetValue<Circle>().Color : System.Drawing.Color.Red,
+            if (Config.Item("RGdraw").GetValue<Circle>().Active)
+                if (R.Level >= 0)
+                    Render.Circle.DrawCircle(ObjectManager.Player.Position, Config.Item("rangeRslider").GetValue<Slider>().Value,
+                        R.IsReady() ? Config.Item("RGdraw").GetValue<Circle>().Color : System.Drawing.Color.Red,
                                                         Config.Item("CircleThickness").GetValue<Slider>().Value); //Thickness
 
-                if (Config.Item("Edraw").GetValue<Circle>().Active)
-                    if (E.Level > 0)
-                        Render.Circle.DrawCircle(ObjectManager.Player.Position, E.Range,
-                            E.IsReady() ? Config.Item("Edraw").GetValue<Circle>().Color : System.Drawing.Color.Red,
-                                                        Config.Item("CircleThickness").GetValue<Slider>().Value); //Thickness
-
-                if (Config.Item("Rdraw").GetValue<Circle>().Active)
-                    if (R.Level > 0)
-                        Render.Circle.DrawCircle(ObjectManager.Player.Position, R.Range,
-                            R.IsReady() ? Config.Item("Rdraw").GetValue<Circle>().Color : System.Drawing.Color.Red,
-                                                            Config.Item("CircleThickness").GetValue<Slider>().Value); //Thickness
-
-                if (Config.Item("RGdraw").GetValue<Circle>().Active)
-                    if (R.Level >= 0)
-                        Render.Circle.DrawCircle(ObjectManager.Player.Position, Config.Item("rangeRslider").GetValue<Slider>().Value,
-                            R.IsReady() ? Config.Item("RGdraw").GetValue<Circle>().Color : System.Drawing.Color.Red,
-                                                            Config.Item("CircleThickness").GetValue<Slider>().Value); //Thickness
-
-                //Draw orbwalker target
-                var orbwalkert = Orbwalker.GetTarget();
-                if (orbwalkert.IsValidTarget(R.Range))
-                    Render.Circle.DrawCircle(orbwalkert.Position, 50, System.Drawing.Color.IndianRed, 7);
+            //Draw orbwalker target
+            var orbwalkert = Orbwalker.GetTarget();
+            if (orbwalkert.IsValidTarget(R.Range))
+                Render.Circle.DrawCircle(orbwalkert.Position, 50, System.Drawing.Color.IndianRed, 7);
 
 
-               //Draw Killable minion AA
-                foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(x => x.IsValidTarget() && x.IsEnemy
-                                                                                     && x.Distance(Player.ServerPosition) <
-                                                                                     E.Range &&
-                                                                                     x.Health < Player.GetAutoAttackDamage(x)))
-                {
-                    Render.Circle.DrawCircle(minion.Position, 50, System.Drawing.Color.IndianRed, 10);
-                }
+            //Draw Killable minion AA
+            foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(x => x.IsValidTarget() && x.IsEnemy
+                                                                                 && x.Distance(Player.ServerPosition) <
+                                                                                 E.Range &&
+                                                                                 x.Health < Player.GetAutoAttackDamage(x)))
+            {
+                Render.Circle.DrawCircle(minion.Position, 50, System.Drawing.Color.IndianRed, 10);
+            }
 
             //DRAW LINES BETWEEN MINION AND TARGET
 
@@ -862,12 +1112,9 @@ namespace BloodMoonAkali
 
 
 
-
-
-
         }
 
-        }      
+    }
 }
-    
+
 
