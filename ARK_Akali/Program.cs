@@ -95,6 +95,13 @@ namespace BloodMoonAkali
             combo.AddItem(new MenuItem("UseR", "Use R").SetValue(true));
             combo.AddItem(new MenuItem("UseIgnite", "Use Ignite").SetValue(true));
 
+            //HARASS
+            harass.AddItem(new MenuItem("Harass", "Harass").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Toggle)));
+            harass.AddItem(new MenuItem("HarassQ", "Use Q").SetValue(true));
+            harass.AddItem(new MenuItem("HarassQEnergy", " % Energy").SetValue(new Slider(50, 100, 0)));
+            harass.AddItem(new MenuItem("HarassE", "Use E").SetValue(true));
+            harass.AddItem(new MenuItem("HarassEEnergy", " % Energy").SetValue(new Slider(50, 100, 0)));
+
             //LASTHIT
             lasthit.AddItem(new MenuItem("LastHitQ", "Lasthit with Q").SetValue(true));
             lasthit.AddItem(new MenuItem("LastHitE", "Lasthit with E").SetValue(true));
@@ -121,7 +128,6 @@ namespace BloodMoonAkali
             killsteal.SubMenu("Rekkles Killsteal").AddItem(new MenuItem("RekklesKSQ", "Use Q").SetValue(true));
             killsteal.SubMenu("Rekkles Killsteal").AddItem(new MenuItem("RekklesKSE", "Use E").SetValue(true));
             killsteal.SubMenu("Rekkles Killsteal").AddItem(new MenuItem("RekklesKSR", "Use R").SetValue(true));
-            killsteal.SubMenu("Rekkles Killsteal").AddItem(new MenuItem("RekklesKSRInfo", "Calculates R DMG + Sheen / Lichbane"));
             killsteal.AddItem(new MenuItem("KSIngite", "Use Ingite").SetValue(true));
 
             //DRAWING
@@ -175,6 +181,9 @@ namespace BloodMoonAkali
                     Elogic();
                     Rlogic();
                     break;
+                case Orbwalking.OrbwalkingMode.Mixed:
+                    Harass();
+                    break;
                 case Orbwalking.OrbwalkingMode.LastHit:
                     Lasthit();
                     break;
@@ -183,6 +192,11 @@ namespace BloodMoonAkali
                     Jungleclear();
                     break;
             }
+            if (Config.Item("Harasss").GetValue<bool>())
+            {
+                Harass();
+            }
+
 
             if (Config.Item("SmartKS").GetValue<bool>())
             {
@@ -200,6 +214,7 @@ namespace BloodMoonAkali
                     "[R] stacks = " + rstacks.ToString());
 
         }
+
         private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         //W ON DANGEROUS SPELLS! SUCH AS RIVEN W/JAX Q/VLAD ULT/CAIT R/CASSIO R/RENGAR JUMP/LISS ULT/RYZE W/TALON E/ZED ULT/VAYNE E/VI ULT
         {
@@ -221,7 +236,6 @@ namespace BloodMoonAkali
             var damage = aa;
             var markdmg = Player.CalcDamage(target, Damage.DamageType.Magical,
                 (45 + 35 * Q.Level + 0.5 * Player.FlatMagicDamageMod));
-
             if (Items.HasItem(3153) && Items.CanUseItem(3153))
                 damage += Player.GetItemDamage(target, Damage.DamageItems.Botrk); //Botrk
             if (Items.HasItem(3077) && Items.CanUseItem(3077))
@@ -232,6 +246,7 @@ namespace BloodMoonAkali
                 damage += Player.GetItemDamage(target, Damage.DamageItems.Hydra); //Hydra
             if (Items.HasItem(3144) && Items.CanUseItem(3146))
                 damage += Player.GetItemDamage(target, Damage.DamageItems.Hexgun); //Hexblade
+
 
             if (E.IsReady())
                 damage += E.GetDamage(target);
@@ -496,7 +511,7 @@ namespace BloodMoonAkali
         private static void SmartKS()
         {
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>()
-                 .Where(x => x.IsValidTarget(R.Range * 2 + 150))
+                 .Where(x => x.IsValidTarget(R.Range + 150))
                  .Where(x => !x.IsZombie)
                  .Where(x => !x.IsDead))
             {
@@ -582,7 +597,7 @@ namespace BloodMoonAkali
         private static void RekklesKS()
         {
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>()
-                  .Where(x => x.IsValidTarget(R.Range * 2 + 150))
+                  .Where(x => x.IsValidTarget(R.Range + 150))
                   .Where(x => !x.IsZombie)
                   .Where(x => !x.IsDead))
             {
@@ -759,6 +774,29 @@ namespace BloodMoonAkali
                 Player.Spellbook.CastSpell(Ignite, target);
 
         }
+        private static void Harass()
+        {
+            var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
+            var HarassQ = Config.Item("HarassQEnergy").GetValue<Slider>().Value;
+            var HarassE = Config.Item("HarassEEnergy").GetValue<Slider>().Value;
+
+            if (!target.IsValidTarget() || target == null)
+                return;
+            if (Player.IsAttackingPlayer)
+                return;
+            if (HarassQ <= Player.ManaPercent)
+                return;
+            if (HarassE <= Player.ManaPercent)
+                return;
+            
+            if (Config.Item("HarassQ").GetValue<bool>() && Q.IsReady())
+                Q.Cast(target);
+            if (Config.Item("HarassE").GetValue<bool>() && E.IsReady()
+                && target.IsValidTarget(E.Range))
+                E.Cast(target);
+                
+
+        }
         private static void Rlogic()
         {
             var target = TargetSelector.GetTarget(R.Range * 2 + 150, TargetSelector.DamageType.Magical);
@@ -778,11 +816,17 @@ namespace BloodMoonAkali
             var rrange = Config.Item("rangeRslider").GetValue<Slider>().Value;
 
             if (target.IsMoving && target.IsFacing(Player))
-                DRendPos = Player.ServerPosition.Extend(target.Position, Player.ServerPosition.Distance(target.Position) + 250);
+                DRendPos = Player.ServerPosition.Extend(target.Position, Player.ServerPosition.Distance(target.Position) + 200);
             if (target.IsMoving && !target.IsFacing(Player))
                 DRendPos = Player.ServerPosition.Extend(target.Position, Player.ServerPosition.Distance(target.Position) + 75);
             if (!target.IsMoving)
                 DRendPos = Player.ServerPosition.Extend(target.Position, Player.ServerPosition.Distance(target.Position) + 150);
+            if (target.HasBuff("AkaliMota") && !target.IsMoving)
+                DRendPos = Player.ServerPosition.Extend(target.Position, Player.ServerPosition.Distance(target.Position) + 100);
+            if (target.HasBuff("AkaliMota") && target.IsMoving && !target.IsFacing(Player))
+                DRendPos = Player.ServerPosition.Extend(target.Position, Player.ServerPosition.Distance(target.Position) + 50);
+            if (target.HasBuff("AkaliMota") && !target.IsFacing(Player) && target.IsMoving)
+                DRendPos = Player.ServerPosition.Extend(target.Position, Player.ServerPosition.Distance(target.Position) + 100);
 
             //TURRET CHECK
 
