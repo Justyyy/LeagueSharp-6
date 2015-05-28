@@ -136,7 +136,6 @@ namespace PewPewTristana
             Config.SubMenu("[PPT]: Misc Settings").AddItem(new MenuItem("antigap", "Antigapcloser").SetValue(true));
             Config.SubMenu("[PPT]: Misc Settings").AddItem(new MenuItem("AntiRengar", "Anti-Rengar Leap").SetValue(true));
             Config.SubMenu("[PPT]: Misc Settings").AddItem(new MenuItem("AntiKhazix", "Anti-Khazix Leap").SetValue(true));
-            Config.SubMenu("[PPT]: Misc Settings").AddItem(new MenuItem("AntiRiven", "Anti-Riven Stun [Experimental]").SetValue(false));
 
             Config.AddToMainMenu();
 
@@ -147,17 +146,8 @@ namespace PewPewTristana
             Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
             AntiGapcloser.OnEnemyGapcloser += AntiGapCloser_OnEnemyGapcloser;
             GameObject.OnCreate += GameObject_OnCreate;
-            Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
 
 
-        }
-
-        private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base args, GameObjectProcessSpellCastEventArgs sender)
-        {
-            var riven = HeroManager.Enemies.Find(h => h.ChampionName.Equals("Riven"));
-            if (riven != null)
-                if (Config.Item("AntiRiven").GetValue<bool>() && R.IsReady() && sender.SData.Name == ("RivenMartyr"))
-                    R.Cast(riven);
         }
 
         private static void GameObject_OnCreate(GameObject sender, EventArgs args)
@@ -169,13 +159,6 @@ namespace PewPewTristana
             if (sender.Name == ("Rengar_LeapSound.troy") && Config.Item("AntiRengar").GetValue<bool>() &&
                 sender.Position.Distance(player.Position) < R.Range)
                 R.Cast(rengar);
-
-            var riven = HeroManager.Enemies.Find(h => h.ChampionName.Equals("Riven"));
-            if (riven != null)
-
-                if (sender.Name == ("Riven_Base_W_Cast.troy") && Config.Item("AntiRiven").GetValue<bool>() &&
-                sender.Position.Distance(player.Position) <= 260)
-                R.Cast(riven);
 
             var khazix = HeroManager.Enemies.Find(h => h.ChampionName.Equals("Khazix"));
             if (khazix != null)
