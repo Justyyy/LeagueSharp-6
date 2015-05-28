@@ -142,9 +142,15 @@ namespace BloodMoonAkali
             drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("rlines", "Draw R Gapclose Lines").SetValue(true));
             drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawRend", "Draw R End Position").SetValue(true));
 
+            //MISC
             misc.AddItem(new MenuItem("AntiGapW", "Anti-Gapcloser [W]").SetValue(true));
             misc.AddItem(new MenuItem("AntiR", "Anti-Rengar [Auto-W]").SetValue(true));
             misc.AddItem(new MenuItem("AntiZ", "Anti-Zed [Auto-W]").SetValue(true));
+            misc.AddItem(new MenuItem("AutoRedTrinket", "Auto Buy Sweeper").SetValue(true));
+            misc.AddItem(new MenuItem("AutoRedTrinketLevel", "Buy Sweeper at level").SetValue(new Slider(6, 18, 0)));
+            misc.AddItem(new MenuItem("AutoRedTrinketUpgrade", "Auto upgrade sweeper (Oracle Lens 250 Gold)").SetValue(true));
+            misc.AddItem(new MenuItem("AutoRedTrinketUpgradeLevel", "Upgrade sweeper at level").SetValue(new Slider(9, 18, 0)));
+
 
             Config.AddToMainMenu();
 
@@ -227,6 +233,38 @@ namespace BloodMoonAkali
                 Drawing.DrawText(zpos.X - 50, zpos.Y + 50, System.Drawing.Color.HotPink,
                     "[R] stacks = " + rstacks.ToString());
 
+            if (Config.Item("AutoRedTrinket").GetValue<bool>())
+            {
+                AutoRedTrinket();
+            }
+            if (Config.Item("AutoRedTrinketUpgrade").GetValue<bool>())
+            {
+                AutoRedTrinketUpgrade();
+            }
+
+        }
+
+        private static void AutoRedTrinketUpgrade()
+        {
+            if (Items.HasItem(3364))
+            {
+                if (Player.InShop() && Player.Level == Config.Item("AutoRedTrinketUpgradeLevel").GetValue<Slider>().Value
+                    && Player.Gold > 249)
+                {
+                    Player.BuyItem(ItemId.Oracles_Lens_Trinket);
+                }
+            }
+        }
+
+        private static void AutoRedTrinket()
+        {
+            if (Items.HasItem(3341) || Items.HasItem(3364))
+                return;
+
+            if (Player.InShop() && Player.Level == Config.Item("AutoRedTrinketLevel").GetValue<Slider>().Value)
+            {
+                Player.BuyItem(ItemId.Sweeping_Lens_Trinket);
+            }
         }
 
         private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
@@ -506,9 +544,6 @@ namespace BloodMoonAkali
                             Player.IssueOrder(GameObjectOrder.AutoAttack, minion);
                         }
                     }
-                    //if (laneE < Player.ManaPercent)
-                    //return;
-
                     //E Cast
                     if (Config.Item("LaneClearE").GetValue<bool>() && Config.Item("LaneClearOnlyQE").GetValue<bool>()
                         && E.IsReady() && minion.Health < E.GetDamage(minion)
@@ -892,6 +927,7 @@ namespace BloodMoonAkali
             var cutlass = ItemData.Bilgewater_Cutlass.GetItem();
             var botrk = ItemData.Blade_of_the_Ruined_King.GetItem();
             var hextech = ItemData.Hextech_Gunblade.GetItem();
+            var sweeper = ItemData.Sweeping_Lens_Trinket.GetItem();
             if (target == null || !target.IsValidTarget())
                 return;
             if (botrk.IsReady() && botrk.IsOwned(Player) && botrk.IsInRange(target)
