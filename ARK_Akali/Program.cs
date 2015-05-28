@@ -3,6 +3,7 @@ using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
 using LeagueSharp.Common.Data;
+using SharpDX;
 using Color = System.Drawing.Color;
 
 namespace BloodMoonAkali
@@ -145,6 +146,8 @@ namespace BloodMoonAkali
             drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawRend", "Draw R End Position").SetValue(true));
 
             misc.AddItem(new MenuItem("AntiGapW", "Anti-Gapcloser [W]").SetValue(true));
+            misc.AddItem(new MenuItem("AntiR", "Anti-Rengar [Auto-W]").SetValue(true));
+            misc.AddItem(new MenuItem("AntiZ", "Anti-Zed [Auto-W]").SetValue(true));
 
             Config.AddToMainMenu();
 
@@ -347,7 +350,7 @@ namespace BloodMoonAkali
             var aa = Player.GetAutoAttackDamage(target, true);
             var damage = aa;
             var markdmg = Player.CalcDamage(target, Damage.DamageType.Magical,
-                (45 + 35 * Q.Level + 0.5 * Player.FlatMagicDamageMod));
+                (45 + 35 * Q.Level + 0.5 * Player.FlatMagicDamageMod) + aa);
 
 
             if (Items.HasItem(3153) && Items.CanUseItem(3153))
@@ -372,6 +375,9 @@ namespace BloodMoonAkali
 
             if (Ignite.IsReady())
                 damage += Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite);
+
+            if (target.Distance(Player.Position) > Orbwalking.GetRealAutoAttackRange(Player))
+                damage += -aa;
 
             //R+Q+E DMG ETC
             if (R.IsReady() && target.IsValidTarget(R.Range) && !E.IsReady() && !Q.IsReady()) // rdamage          
@@ -576,7 +582,11 @@ namespace BloodMoonAkali
                     E.Cast();
             }
         }
-
+        private static bool IsWall(Vector3 pos)
+        {
+            CollisionFlags cFlags = NavMesh.GetCollisionFlags(pos);
+            return (cFlags == CollisionFlags.Wall);
+        }
         private static void Jungleclear()
         {
             var MinionsQ = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, Q.Range,
@@ -941,23 +951,22 @@ namespace BloodMoonAkali
                 if (Player.Distance(target.Position) <= 600 && target.HasBuff("summonerdot") &&
                     target.Health < IgniteDamage(target))
                     return;
+                if (target.IsValidTarget(E.Range))
+                    return;
 
 
                 //When to use R
                 if (thp < PotentialDmg(target) + 15 * Player.Level)
                 {
-                    if (Config.Item("UseR").GetValue<bool>())
+                    if (Config.Item("UseR").GetValue<bool>() && DRendPos.Distance(target.ServerPosition) <= 175 || Config.Item("UseR").GetValue<bool>() && IsWall(DRendPos))
                     {
                         R.Cast(target, true);
                     }
 
                     //GAPCLOSE
-                    if (Player.Distance(target.ServerPosition) >= rrange && DRendPos.Distance(target.ServerPosition) <= 175)
+                    if (Player.Distance(target.ServerPosition) >= rrange && DRendPos.Distance(target.ServerPosition) <= 175 || Player.Distance(target.ServerPosition) >=rrange && IsWall(DRendPos))
 
                         R.Cast(target, true);
-
-                    else if (Player.Distance(target.ServerPosition) >= rrange && DRendPos.Distance(target.ServerPosition) <= 175)
-                        R.Cast(target);
 
                     Gapcloser();
 
@@ -967,13 +976,9 @@ namespace BloodMoonAkali
             //IF RKILL DISABLED
 
             //Turret check for enemy count
-            if (!Config.Item("Rkill").GetValue<bool>() && Player.Distance(target.ServerPosition) >= rrange && DRendPos.Distance(target.ServerPosition) <= 175)
+            if (!Config.Item("Rkill").GetValue<bool>() && Player.Distance(target.ServerPosition) >= rrange && DRendPos.Distance(target.ServerPosition) <= 175 || !Config.Item("Rkill").GetValue<bool>() && Player.Distance(target.ServerPosition) >= rrange && IsWall(DRendPos))
 
                 R.Cast(target, true);
-
-            else if (!Config.Item("Rkill").GetValue<bool>() && Player.Distance(target.ServerPosition) >= rrange && DRendPos.Distance(target.ServerPosition) <= 175)
-
-                R.Cast(target);
 
             if (!Config.Item("Rkill").GetValue<bool>())
                 Gapcloser();
