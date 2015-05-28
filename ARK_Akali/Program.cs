@@ -864,7 +864,7 @@ namespace BloodMoonAkali
                                                                    minion.Distance(Player.ServerPosition) <=
                                                                    R.Range * 2))
             {
-                if (Config.Item("miniongapclose").GetValue<bool>() && rstacks > 1 &&
+                if (Config.Item("rlines").GetValue<bool>() && rstacks > 1 &&
                     minion.Distance(target.Position) > 100 &&
                     minion.Distance(target.Position) < R.Range && Player.Distance(target.Position) >= R.Range && minion.IsValidTarget(R.Range))
                 {
@@ -879,7 +879,7 @@ namespace BloodMoonAkali
                                                                 h.Distance(Player.ServerPosition) <=
                                                                 R.Range * 2))
                 {
-                    if (Config.Item("miniongapclose").GetValue<bool>() && rstacks > 1 &&
+                    if (Config.Item("rlines").GetValue<bool>() && rstacks > 1 &&
                         Player.Distance(target.Position) >= R.Range && h.Distance(target.Position) > 100 && h.Distance(target.Position) < R.Range && h.IsValidTarget(R.Range))
                     {
                         var rdraw = new Geometry.Polygon.Line(Player.Position, h.Position);
