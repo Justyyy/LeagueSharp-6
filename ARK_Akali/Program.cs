@@ -1210,11 +1210,17 @@ namespace BloodMoonAkali
             var DRendPos = Player.ServerPosition.Extend(target.Position, Player.ServerPosition.Distance(target.Position) + 175);
 
             if (target.IsMoving && target.IsFacing(Player))
-                DRendPos = Player.ServerPosition.Extend(target.Position, Player.ServerPosition.Distance(target.Position) + 250);
+                DRendPos = Player.ServerPosition.Extend(target.Position, Player.ServerPosition.Distance(target.Position) + 200);
             if (target.IsMoving && !target.IsFacing(Player))
                 DRendPos = Player.ServerPosition.Extend(target.Position, Player.ServerPosition.Distance(target.Position) + 75);
             if (!target.IsMoving)
                 DRendPos = Player.ServerPosition.Extend(target.Position, Player.ServerPosition.Distance(target.Position) + 150);
+            if (target.HasBuff("AkaliMota") && !target.IsMoving)
+                DRendPos = Player.ServerPosition.Extend(target.Position, Player.ServerPosition.Distance(target.Position) + 100);
+            if (target.HasBuff("AkaliMota") && target.IsMoving && !target.IsFacing(Player))
+                DRendPos = Player.ServerPosition.Extend(target.Position, Player.ServerPosition.Distance(target.Position) + 50);
+            if (target.HasBuff("AkaliMota") && !target.IsFacing(Player) && target.IsMoving)
+                DRendPos = Player.ServerPosition.Extend(target.Position, Player.ServerPosition.Distance(target.Position) + 100);
 
             if (Config.Item("drawRend").GetValue<bool>())
                 Render.Circle.DrawCircle(DRendPos, 15, System.Drawing.Color.Green, 20);
