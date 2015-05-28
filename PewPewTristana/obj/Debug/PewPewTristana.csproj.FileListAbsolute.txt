@@ -1,0 +1,13 @@
+C:\Users\HAF911\Documents\GitHub\PewPewTristana\bin\Release\PewPewTristana.exe.config
+C:\Users\HAF911\Documents\GitHub\PewPewTristana\bin\Release\PewPewTristana.exe
+C:\Users\HAF911\Documents\GitHub\PewPewTristana\bin\Release\PewPewTristana.pdb
+C:\Users\HAF911\Documents\GitHub\PewPewTristana\bin\Release\LeagueSharp.Common.dll
+C:\Users\HAF911\Documents\GitHub\PewPewTristana\bin\Release\LeagueSharp.dll
+C:\Users\HAF911\Documents\GitHub\PewPewTristana\bin\Release\SharpDX.Direct3D9.dll
+C:\Users\HAF911\Documents\GitHub\PewPewTristana\bin\Release\SharpDX.dll
+C:\Users\HAF911\Documents\GitHub\PewPewTristana\bin\Release\clipper_library.dll
+C:\Users\HAF911\Documents\GitHub\PewPewTristana\bin\Release\LeagueSharp.Sandbox.dll
+C:\Users\HAF911\Documents\GitHub\PewPewTristana\bin\Release\LeagueSharp.xml
+C:\Users\HAF911\Documents\GitHub\PewPewTristana\obj\Debug\PewPewTristana.csprojResolveAssemblyReference.cache
+C:\Users\HAF911\Documents\GitHub\PewPewTristana\obj\Debug\PewPewTristana.exe
+C:\Users\HAF911\Documents\GitHub\PewPewTristana\obj\Debug\PewPewTristana.pdb
