@@ -192,8 +192,7 @@ namespace BloodMoonAkali
         }
 
         private static void Game_OnGameUpdate(EventArgs args)
-        {
-            //Do stuff based on Orbwalker-Mode          
+        {        
             switch (Orbwalker.ActiveMode)
             {
                 case Orbwalking.OrbwalkingMode.Combo:
