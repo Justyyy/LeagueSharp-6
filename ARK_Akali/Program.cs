@@ -120,14 +120,11 @@ namespace BloodMoonAkali
             jungleclear.AddItem(new MenuItem("JungleClearE", "Jungleclear with E").SetValue(true));
 
             //KILLSTEAL
-            killsteal.SubMenu("Smart Killsteal").AddItem(new MenuItem("SmartKS", "Use Smart Killsteal").SetValue(true));
-            killsteal.SubMenu("Smart Killsteal").AddItem(new MenuItem("SmartKSQ", "Use Q").SetValue(true));
-            killsteal.SubMenu("Smart Killsteal").AddItem(new MenuItem("SmartKSE", "Use E").SetValue(true));
-            killsteal.SubMenu("Smart Killsteal").AddItem(new MenuItem("SmartKSR", "Use R").SetValue(true));
-            killsteal.SubMenu("Rekkles Killsteal").AddItem(new MenuItem("RekklesKS", "Use Rekkless Killsteal").SetValue(true));
-            killsteal.SubMenu("Rekkles Killsteal").AddItem(new MenuItem("RekklesKSQ", "Use Q").SetValue(true));
-            killsteal.SubMenu("Rekkles Killsteal").AddItem(new MenuItem("RekklesKSE", "Use E").SetValue(true));
-            killsteal.SubMenu("Rekkles Killsteal").AddItem(new MenuItem("RekklesKSR", "Use R").SetValue(true));
+            killsteal.AddItem(new MenuItem("SmartKS", "Use Smart Killsteal").SetValue(true));
+            killsteal.AddItem(new MenuItem("SmartKSQ", "Use Q").SetValue(true));
+            killsteal.AddItem(new MenuItem("SmartKSE", "Use E").SetValue(true));
+            killsteal.AddItem(new MenuItem("SmartKSR", "Use R").SetValue(true));
+            killsteal.AddItem(new MenuItem("SmartKSGapCloser", "Gapclose with R").SetValue(true));
             killsteal.AddItem(new MenuItem("KSIngite", "Use Ingite").SetValue(true));
 
             //DRAWING
@@ -216,17 +213,13 @@ namespace BloodMoonAkali
                     Jungleclear();
                     break;
             }
-            if (Config.Item("Harasss").GetValue<bool>())
+            if (Config.Item("Harass").GetValue<bool>())
             {
                 Harass();
             }
             if (Config.Item("SmartKS").GetValue<bool>())
             {
                 SmartKS();
-            }
-            if (Config.Item("RekklesKS").GetValue<bool>())
-            {
-                RekklesKS();
             }
 
             var zpos = Drawing.WorldToScreen(Player.Position);
@@ -604,9 +597,9 @@ namespace BloodMoonAkali
         private static void SmartKS()
         {
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>()
-                 .Where(x => x.IsValidTarget(R.Range + 150))
-                 .Where(x => !x.IsZombie)
-                 .Where(x => !x.IsDead))
+                .Where(x => x.IsValidTarget(R.Range + 150))
+                .Where(x => !x.IsZombie)
+                .Where(x => !x.IsDead))
             {
                 Ignite = Player.GetSpellSlot("summonerdot");
                 var qdmg = Q.GetDamage(enemy);
@@ -618,7 +611,6 @@ namespace BloodMoonAkali
                 var ksrstacks = Config.Item("KSRStacks").GetValue<Slider>().Value;
 
                 var sheendmg = Player.CalcDamage(enemy, Damage.DamageType.Magical, Player.BaseAttackDamage);
-
                 var lichbanedmg = Player.CalcDamage(enemy, Damage.DamageType.Magical, (Player.BaseAttackDamage * 0.75)
                     + ((Player.BaseAbilityDamage + Player.FlatMagicDamageMod) * 0.5));
 
@@ -636,204 +628,18 @@ namespace BloodMoonAkali
                     && Config.Item("SmartKSE").GetValue<bool>())
                     E.Cast(enemy);
 
-                if (Player.HasBuff("sheen") && enemy.Health < sheendmg &&
-                    Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player))
-                    return;
+                if (enemy.Health < ActualDMG(enemy) && R.IsReady()
+                    && Config.Item("SmartKSR").GetValue<bool>()
+                    && Config.Item("SmartKSGapCloser").GetValue<bool>())
+                {
+                    R.Cast(enemy);
+                    Gapcloser();
+                }
 
-                if (Player.HasBuff("lichbane") && enemy.Health < lichbanedmg &&
-                    Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player))
-                    return;
 
-                if (enemy.Health < edmg + qdmg
-                    && enemy.IsValidTarget(E.Range) && Q.IsReady() && E.IsReady())
-                    return;
-
-                if (enemy.Health < qdmg + markdmg + edmg && Q.IsReady()
-                    && E.IsReady() && Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player))
-                    return;
-
-                if (enemy.Health < edmg + markdmg && E.IsReady()
-                    && Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player))
-                    return;
-
-                if (enemy.Health < qdmg + markdmg && Q.IsReady()
-                    && Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player))
-                    return;
-
-                if (enemy.Health < sheendmg + edmg && E.IsReady()
-                    && Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player))
-                    return;
-
-                if (enemy.Health < markdmg + edmg + sheendmg && E.IsReady()
-                    && Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player)
-                    && enemy.HasBuff("AkaliMota"))
-                    return;
-
-                if (enemy.Health < qdmg + markdmg + sheendmg && Q.IsReady()
-                    && Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player))
-                    return;
-
-                if (enemy.Health < markdmg + sheendmg && Player.HasBuff("sheen")
-                    && enemy.HasBuff("AkaliMota") && Player.Distance(enemy.Position)
-                    < Orbwalking.GetRealAutoAttackRange(Player))
-                    return;
-
-                if (enemy.Health < qdmg + markdmg + sheendmg + edmg && Q.IsReady()
-                    && Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player))
-                    return;
-
-                if (enemy.Health < rdmg && R.IsReady() && enemy.IsValidTarget(R.Range)
-                    && Config.Item("SmartKSR").GetValue<bool>())
-                    R.Cast(enemy);                  
             }
         }
-        private static void RekklesKS()
-        {
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>()
-                  .Where(x => x.IsValidTarget(R.Range + 150))
-                  .Where(x => !x.IsZombie)
-                  .Where(x => !x.IsDead))
-            {
-                Ignite = Player.GetSpellSlot("summonerdot");
-                var qdmg = Q.GetDamage(enemy);
-                var edmg = E.GetDamage(enemy);
-                var rdmg = R.GetDamage(enemy);
-                var aa = Player.GetAutoAttackDamage(enemy, true);
-                var markdmg = Player.CalcDamage(enemy, Damage.DamageType.Magical,
-                (45 + 35 * Q.Level + 0.5 * Player.FlatMagicDamageMod) + aa);
-                var ksrstacks = Config.Item("KSRStacks").GetValue<Slider>().Value;
 
-                var sheendmg = Player.CalcDamage(enemy, Damage.DamageType.Magical, Player.BaseAttackDamage);
-
-                var lichbanedmg = Player.CalcDamage(enemy, Damage.DamageType.Magical, (Player.BaseAttackDamage * 0.75)
-                    + ((Player.BaseAbilityDamage + Player.FlatMagicDamageMod) * 0.5));
-
-                if (Ignite.IsReady() && IgniteDamage(enemy) >= enemy.Health
-                    && Config.Item("KSIgnite").GetValue<bool>()
-                    && Player.Distance(enemy.Position) <= 600)
-                    Player.Spellbook.CastSpell(Ignite, enemy);
-
-                if (enemy.Health < qdmg && Q.IsReady() &&
-                    Config.Item("RekklessKSQ").GetValue<bool>())
-                    Q.Cast(enemy);
-
-                if (enemy.Health < qdmg + markdmg && Q.IsReady()
-                    && Config.Item("RekklesKSQ").GetValue<bool>()
-                    && Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player))
-                    Q.Cast(enemy);
-
-                if (enemy.Health < markdmg && enemy.HasBuff("AkaliMota")
-                    && Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player))
-                {
-                    Orbwalker.ForceTarget(enemy);
-                    Player.IssueOrder(GameObjectOrder.AutoAttack, enemy);
-                }
-
-                if (enemy.Health < edmg && E.IsReady()
-                    && Config.Item("RekklessKSE").GetValue<bool>())
-                    E.Cast(enemy);
-
-                if (Player.HasBuff("sheen") && enemy.Health < sheendmg &&
-                    Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player))
-                {
-                    Orbwalker.ForceTarget(enemy);
-                    Player.IssueOrder(GameObjectOrder.AutoAttack, enemy);
-                }
-
-                if (Player.HasBuff("lichbane") && enemy.Health < lichbanedmg &&
-                    Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player))
-                {
-                    Orbwalker.ForceTarget(enemy);
-                    Player.IssueOrder(GameObjectOrder.AutoAttack, enemy);
-                }
-
-                if (enemy.Health < edmg + qdmg
-                    && enemy.IsValidTarget(E.Range) && Q.IsReady() && E.IsReady()
-                    && Config.Item("RekklesKSQ").GetValue<bool>() && Config.Item("Rekkles").GetValue<bool>())
-                    Q.Cast(enemy);
-
-                if (enemy.Health < qdmg + markdmg + edmg && Q.IsReady()
-                    && E.IsReady() && Player.Distance(enemy.Position)
-                    < Orbwalking.GetRealAutoAttackRange(Player)
-                    && Config.Item("RekklesKSQ").GetValue<bool>()
-                    && Config.Item("RekklesKSE").GetValue<bool>())
-                    Q.Cast(enemy);
-
-                if (enemy.Health < edmg + markdmg && E.IsReady()
-                    && Player.Distance(enemy.Position)
-                    < Orbwalking.GetRealAutoAttackRange(Player)
-                    && enemy.HasBuff("AkaliMota") && Config.Item("RekklessKSE").GetValue<bool>())
-                    E.Cast(enemy);
-
-                if (enemy.Health < sheendmg + edmg && E.IsReady()
-                    && Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player)
-                    && Config.Item("RekklesKSE").GetValue<bool>())
-                    E.Cast(enemy);
-
-                if (enemy.Health < markdmg + edmg + sheendmg && E.IsReady()
-                    && Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player)
-                    && enemy.HasBuff("AkaliMota") && Config.Item("RekklesKSE").GetValue<bool>() ||
-                    enemy.Health < markdmg + edmg + lichbanedmg && E.IsReady()
-                        && Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player)
-                        && enemy.HasBuff("AkaliMota") && Config.Item("RekklesKSE").GetValue<bool>())
-                    E.Cast(enemy);
-
-                if (enemy.Health < markdmg + sheendmg && Player.HasBuff(".")
-                    && enemy.HasBuff("AkaliMota") && Player.Distance(enemy.Position)
-                    < Orbwalking.GetRealAutoAttackRange(Player) ||
-                    enemy.Health < markdmg + lichbanedmg && Player.HasBuff("lichbane")
-                    && enemy.HasBuff("AkaliMota") && Player.Distance(enemy.Position)
-                    < Orbwalking.GetRealAutoAttackRange(Player))
-                {
-                    Orbwalker.ForceTarget(enemy);
-                    Player.IssueOrder(GameObjectOrder.AutoAttack, enemy);
-                }
-                    
-                if (enemy.Health < qdmg + markdmg + sheendmg && Q.IsReady()
-                    && Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player)
-                    && Config.Item("RekklesKSQ").GetValue<bool>() ||
-                    enemy.Health < qdmg + markdmg + lichbanedmg && Q.IsReady()
-                    && Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player))
-                    Q.Cast(enemy);
-
-                if (enemy.Health < qdmg + markdmg + sheendmg + edmg && Q.IsReady()
-                    && Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player)
-                    && E.IsReady()
-                    && Config.Item("RekklesKSQ").GetValue<bool>() && Config.Item("RekklesKSE").GetValue<bool>() ||
-                    enemy.Health < qdmg + markdmg + lichbanedmg + edmg && Q.IsReady()
-                    && Player.Distance(enemy.Position) < Orbwalking.GetRealAutoAttackRange(Player)
-                    && E.IsReady() && Config.Item("RekklesKSQ").GetValue<bool>()
-                    && Config.Item("RekklesKSE").GetValue<bool>())
-                    Q.Cast(enemy);
-
-                if (enemy.Health < rdmg + qdmg + markdmg + edmg + sheendmg                   
-                    && R.IsReady() && Q.IsReady() && E.IsReady()
-                    && Config.Item("RekklesKSQ").GetValue<bool>() 
-                    && Config.Item("RekklessKSE").GetValue<bool>()
-                    && Config.Item("RekklesKSR").GetValue<bool>()
-                    && enemy.IsValidTarget(R.Range))
-                    R.Cast(enemy);
-                if (enemy.Health < rdmg + qdmg + markdmg + edmg + lichbanedmg
-                    && R.IsReady() && Q.IsReady() && E.IsReady()
-                    && Config.Item("RekklesKSQ").GetValue<bool>()
-                    && Config.Item("RekklessKSE").GetValue<bool>()
-                    && Config.Item("RekklesKSR").GetValue<bool>()
-                    && enemy.IsValidTarget(R.Range))
-                    R.Cast(enemy);
-                if (enemy.Health < rdmg + qdmg + markdmg + edmg
-                    && R.IsReady() && Q.IsReady() && E.IsReady()
-                    && Config.Item("RekklesKSQ").GetValue<bool>()
-                    && Config.Item("RekklessKSE").GetValue<bool>()
-                    && Config.Item("RekklesKSR").GetValue<bool>()
-                    && enemy.IsValidTarget(R.Range))
-                    R.Cast(enemy);
-
-                if (enemy.Health < rdmg && R.IsReady()
-                    && Config.Item("RekklesKSR").GetValue<bool>()
-                    && enemy.IsValidTarget(R.Range))
-                    R.Cast(enemy);
-            }
-        }
         private static void IgniteLogic()
         {
 
