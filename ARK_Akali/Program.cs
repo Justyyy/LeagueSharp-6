@@ -144,6 +144,8 @@ namespace BloodMoonAkali
             drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("rlines", "Draw R Gapclose Lines").SetValue(true));
             drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawRend", "Draw R End Position").SetValue(true));
 
+            misc.AddItem(new MenuItem("AntiGapW", "Anti-Gapcloser [W]").SetValue(true));
+
             Config.AddToMainMenu();
 
             Game.OnUpdate += Game_OnGameUpdate;
@@ -152,7 +154,26 @@ namespace BloodMoonAkali
             Drawing.OnDraw += OnDraw;
             Drawing.OnEndScene += OnEndScene;
             Drawing.OnDraw += Gapcloserdraw;
+            AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
 
+
+        }
+
+        private static void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
+        {
+            if (Player.IsDead || gapcloser.Sender.IsInvulnerable)
+                return;
+
+            var targetpos = Drawing.WorldToScreen(gapcloser.Sender.Position);
+            if (gapcloser.Sender.IsValidTarget(Q.Range * 2) && Config.Item("AntiGap").GetValue<bool>())
+            {
+                Render.Circle.DrawCircle(gapcloser.Sender.Position, gapcloser.Sender.BoundingRadius, System.Drawing.Color.DeepPink);
+                Drawing.DrawText(targetpos[0] - 40, targetpos[1] + 20, System.Drawing.Color.MediumPurple, "GAPCLOSER!");
+            }
+
+            if (W.IsReady() && gapcloser.End.Distance(Player.Position) <= 300 &&
+                Config.Item("AntiGapW").GetValue<bool>())
+                W.Cast();
 
         }
 
