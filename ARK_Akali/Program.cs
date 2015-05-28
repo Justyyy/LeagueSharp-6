@@ -453,15 +453,18 @@ namespace BloodMoonAkali
                     float predictedHealtMinionq = HealthPrediction.GetHealthPrediction(minion,
                      (int)(R.Delay + (Player.Distance(minion.ServerPosition) / Q.Speed)));
 
+                    if (minion.Team == GameObjectTeam.Neutral)
+                        return;
+
                     //Check 1
-                    if (minion.Health < aa + 5 && Q.IsReady() && Config.Item("LaneClearQ").GetValue<bool>()
+                    if (minion.Health < aa && Q.IsReady() && Config.Item("LaneClearQ").GetValue<bool>()
                         && minion.Distance(Player.Position) < Orbwalking.GetRealAutoAttackRange(Player))
                         return;
                     //Check 2 
-                    if (minion.Health <= markdmg + 8 && minion.HasBuff("AkaliMota") && E.IsReady() && minion.IsValidTarget(E.Range))
+                    if (minion.Health <= markdmg && minion.HasBuff("AkaliMota") && E.IsReady() && minion.IsValidTarget(E.Range))
                         return;
                     //Check 3
-                    if (minion.Health <= aa + 5 && minion.Distance(Player.Position) < Orbwalking.GetRealAutoAttackRange(Player) + 25
+                    if (minion.Health <= aa && minion.Distance(Player.Position) < Orbwalking.GetRealAutoAttackRange(Player) + 25
                         && E.IsReady() && Config.Item("LaneClearE").GetValue<bool>())
                         return;
                     //Q Cast
