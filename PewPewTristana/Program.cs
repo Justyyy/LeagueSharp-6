@@ -136,7 +136,7 @@ namespace PewPewTristana
             Config.SubMenu("[PPT]: Misc Settings").AddItem(new MenuItem("antigap", "Antigapcloser").SetValue(true));
             Config.SubMenu("[PPT]: Misc Settings").AddItem(new MenuItem("AntiRengar", "Anti-Rengar Leap").SetValue(true));
             Config.SubMenu("[PPT]: Misc Settings").AddItem(new MenuItem("AntiKhazix", "Anti-Khazix Leap").SetValue(true));
-            Config.SubMenu("[PPT]: Misc Settings").AddItem(new MenuItem("AntiRiven", "Anti-Riven Stun").SetValue(true));
+            Config.SubMenu("[PPT]: Misc Settings").AddItem(new MenuItem("AntiRiven", "Anti-Riven Stun [Experimental]").SetValue(false));
 
             Config.AddToMainMenu();
 
