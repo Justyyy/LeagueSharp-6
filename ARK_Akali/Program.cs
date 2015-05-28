@@ -28,7 +28,7 @@ namespace BloodMoonAkali
             if (Player.ChampionName != ChampName)
                 return;
 
-            Notifications.AddNotification("BloodMoonAkali V1", 1000);
+            Notifications.AddNotification("Bloodmoon Akali V1", 1000);
 
             Q = new Spell(SpellSlot.Q, 600);
             W = new Spell(SpellSlot.W, 700);
@@ -36,8 +36,7 @@ namespace BloodMoonAkali
             R = new Spell(SpellSlot.R, 700);
 
             Q.SetTargetted(Q.Instance.SData.SpellCastTime, Q.Instance.SData.MissileSpeed);
-            E.SetSkillshot(E.Instance.SData.SpellCastTime, E.Instance.SData.LineWidth, E.Instance.SData.MissileSpeed,
-                false, SkillshotType.SkillshotCircle);
+            E.SetSkillshot(E.Instance.SData.SpellCastTime, E.Instance.SData.LineWidth, E.Instance.SData.MissileSpeed,false, SkillshotType.SkillshotCircle);
 
             Config = new Menu("BloodMoonAkali", "Akali", true);
             Orbwalker = new Orbwalking.Orbwalker(Config.AddSubMenu(new Menu("[Orbwalker]", "Orbwalker")));
@@ -56,7 +55,7 @@ namespace BloodMoonAkali
             combo.SubMenu("[Advanced Features Q/E]").AddItem(new MenuItem("prioE", "Use [E] after AA").SetValue(false));
 
             //[W] Settings
-            combo.SubMenu("[Advanced Features W]").AddItem(new MenuItem("WPROC", "Use [W] on Dangerous Spells").SetValue(true));
+            combo.SubMenu("[Advanced Features W]").AddItem(new MenuItem("WPROC", "Use [W] on Dangerous Spells [BROKEN]").SetValue(true));
             combo.SubMenu("[Advanced Features W]").AddItem(new MenuItem("WHP", "Use [W] on < % HP ").SetValue(true));
             combo.SubMenu("[Advanced Features W]").AddItem(new MenuItem("WHPslider", "% HP").SetValue(new Slider(35, 100, 0)));
             combo.SubMenu("[Advanced Features W]").AddItem(new MenuItem("WHE", "Use [W] X amount of enemies ").SetValue(true));
@@ -112,7 +111,7 @@ namespace BloodMoonAkali
             laneclear.AddItem(new MenuItem("LaneClearE", "Laneclear with E").SetValue(true));
             laneclear.AddItem(new MenuItem("LaneClearCount", "Minion HitCount").SetValue(new Slider(3, 10, 0)));
             laneclear.AddItem(new MenuItem("LaneClearEnergy", "% Energy").SetValue(new Slider(50, 100, 0)));
-            laneclear.AddItem(new MenuItem("LaneClearOnlyQE", "Semi Automatic Laneclear").SetValue(true));
+            laneclear.AddItem(new MenuItem("LaneClearOnlyQE", "Lasthit only").SetValue(true));
             laneclear.AddItem(new MenuItem("LaneClearQA", "Calculate Q Mark damage in LaneClear").SetValue(true));
             //laneclear.AddItem(new MenuItem("tiamatlaneclear", "Use Tiamat").SetValue(true));
 
@@ -140,6 +139,7 @@ namespace BloodMoonAkali
             drawing.SubMenu("Spell Drawings").AddItem(new MenuItem("CircleThickness", "Circle Thickness").SetValue(new Slider(7, 30, 0)));
             drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawdmg", "Draw Damage on Enemy HPbar").SetValue(true));
             drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawpotential", "Draw Potential Combo DMG").SetValue(true));
+            drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawreal", "Draw Potential Combo DMG").SetValue(true));
             drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawRstacks", "Draw R stacks").SetValue(true));
             drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("rlines", "Draw R Gapclose Lines").SetValue(true));
             drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawRend", "Draw R End Position").SetValue(true));
@@ -196,8 +196,6 @@ namespace BloodMoonAkali
             {
                 Harass();
             }
-
-
             if (Config.Item("SmartKS").GetValue<bool>())
             {
                 SmartKS();
@@ -248,13 +246,13 @@ namespace BloodMoonAkali
                 damage += Player.GetItemDamage(target, Damage.DamageItems.Hexgun); //Hexblade
 
 
-            if (E.IsReady())
+            if (E.Level == 1 && E.IsReady() || E.Level == 2 && E.IsReady())
                 damage += E.GetDamage(target);
 
-            if (E.IsReady() && E.Level >= 5)
-                damage += E.GetDamage(target) * 3;
+            if (E.Level == 3 && E.IsReady() || E.Level == 4 && E.IsReady())
+                damage += E.GetDamage(target) * 2;
 
-            if (E.IsReady() && E.Level == Q.Level && Player.Level > 13)
+            if (E.Level == 5 && E.IsReady())
                 damage += E.GetDamage(target) * 3;
 
             if (R.IsReady()) // rdamage          
@@ -304,7 +302,7 @@ namespace BloodMoonAkali
             if (E.Level == 5)
                 damage += E.GetDamage(target) * 3;
 
-            if (R.Level >= 1) // rdamage          
+            if (R.Level >= 1 ) // rdamage          
                 damage += R.GetDamage(target);
 
             if (Q.Level >= 1 && !target.HasBuff("AkaliMota"))
@@ -317,6 +315,68 @@ namespace BloodMoonAkali
             if (Ignite.IsReady())
                 damage += Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite);
 
+
+            return (int)damage;
+
+
+
+        }
+        private static int ActualDMG(Obj_AI_Hero target)
+        {
+            var aa = Player.GetAutoAttackDamage(target, true);
+            var damage = aa;
+            var markdmg = Player.CalcDamage(target, Damage.DamageType.Magical,
+                (45 + 35 * Q.Level + 0.5 * Player.FlatMagicDamageMod));
+
+
+            if (Items.HasItem(3153) && Items.CanUseItem(3153))
+                damage += Player.GetItemDamage(target, Damage.DamageItems.Botrk); //Botrk
+            if (Items.HasItem(3077) && Items.CanUseItem(3077))
+                damage += Player.GetItemDamage(target, Damage.DamageItems.Tiamat); //Tiamat
+            if (Items.HasItem(3144) && Items.CanUseItem(3144))
+                damage += Player.GetItemDamage(target, Damage.DamageItems.Bilgewater); //Bigle
+            if (Items.HasItem(3074) && Items.CanUseItem(3074))
+                damage += Player.GetItemDamage(target, Damage.DamageItems.Hydra); //Hydra
+            if (Items.HasItem(3144) && Items.CanUseItem(3146))
+                damage += Player.GetItemDamage(target, Damage.DamageItems.Hexgun); //Hexblade
+
+            if (E.IsReady() && target.IsValidTarget(E.Range) && !R.IsReady())
+                damage += E.GetDamage(target);
+
+            if (Q.IsReady() && target.IsValidTarget(Q.Range) && !R.IsReady())
+                damage += Q.GetDamage(target);
+
+            if (target.HasBuff("AkaliMota"))
+                damage += markdmg;
+
+            if (Ignite.IsReady())
+                damage += Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite);
+
+            //R+Q+E DMG ETC
+            if (R.IsReady() && target.IsValidTarget(R.Range) && !E.IsReady() && !Q.IsReady()) // rdamage          
+                damage += R.GetDamage(target);
+
+            //RE
+            if (R.IsReady() && target.IsValidTarget(R.Range) && E.IsReady() && !Q.IsReady()) // rdamage          
+                damage += R.GetDamage(target) + E.GetDamage(target);
+
+            //RQM
+            if (R.IsReady() && target.IsValidTarget(R.Range) && !E.IsReady() && Q.IsReady() && !target.HasBuff("AkaliMota")) // rdamage          
+                damage += R.GetDamage(target) + Q.GetDamage(target) + markdmg;
+
+            //RQ
+            if (R.IsReady() && target.IsValidTarget(R.Range) && E.IsReady() && Q.IsReady() && target.HasBuff("AkaliMota")) // rdamage          
+                damage += R.GetDamage(target) + Q.GetDamage(target);
+
+            //REQM
+            if (R.IsReady() && target.IsValidTarget(R.Range) && E.IsReady() && Q.IsReady() && !target.HasBuff("AkaliMota")) // rdamage          
+                damage += R.GetDamage(target) + E.GetDamage(target) + Q.GetDamage(target) + markdmg;
+
+            //REQ
+            if (R.IsReady() && target.IsValidTarget(R.Range) && E.IsReady() && Q.IsReady() && target.HasBuff("AkaliMota")) // rdamage          
+                damage += R.GetDamage(target) + E.GetDamage(target) + Q.GetDamage(target);
+
+            // Q & E Real DMG
 
             return (int)damage;
 
@@ -447,7 +507,6 @@ namespace BloodMoonAkali
                     (45 + 35 * Q.Level + 0.5 * Player.FlatMagicDamageMod) + aa);
                 var MinionsE = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, E.Range);
                 var laneE = Config.Item("LaneClearEnergy").GetValue<Slider>().Value;
-                var tiamat = ItemData.Tiamat_Melee_Only.GetItem();
 
                 float predictedHealtMinionq = HealthPrediction.GetHealthPrediction(minion,
                     (int)(R.Delay + (Player.Distance(minion.ServerPosition) / Q.Speed)));
@@ -948,7 +1007,7 @@ namespace BloodMoonAkali
                                                                    R.Range * 2 + 100))
             {
                 if (Config.Item("miniongapclose").GetValue<bool>() && rstacks > 1 && minion.Distance(target.Position) > 100 &&
-                    minion.Distance(target.Position) < R.Range + 100 && Player.Distance(target.Position) >= R.Range)
+                    minion.Distance(target.Position) < R.Range && Player.Distance(target.Position) >= R.Range)
                     R.Cast(minion);
 
                 if (Config.Item("miniongapcloseq").GetValue<bool>() && Config.Item("miniongapclose").GetValue<bool>() &&
@@ -964,7 +1023,7 @@ namespace BloodMoonAkali
             {
                 if (Config.Item("herogapclose").GetValue<bool>() && rstacks > 1 &&
                     Player.Distance(target.Position) >= R.Range && h.Distance(target.Position) > 100 &&
-                    h.Distance(target.Position) < R.Range + 100)
+                    h.Distance(target.Position) < R.Range)
                     R.Cast(h);
 
 
@@ -1140,6 +1199,9 @@ namespace BloodMoonAkali
                 if (Config.Item("drawpotential").GetValue<bool>())
                     Drawing.DrawText(epos.X - 50, epos.Y + 50, System.Drawing.Color.Gold,
                         "Potential DMG = " + PotentialDmg(enemy).ToString());
+                if (Config.Item("drawreal").GetValue<bool>())
+                    Drawing.DrawText(epos.X - 50, epos.Y + 75, System.Drawing.Color.Gold,
+                        "Actual DMG = " + ActualDMG(enemy).ToString());
             }
             var target = TargetSelector.GetTarget(R.Range * 2 + 500, TargetSelector.DamageType.Magical);
             var DRendPos = Player.ServerPosition.Extend(target.Position, Player.ServerPosition.Distance(target.Position) + 175);
