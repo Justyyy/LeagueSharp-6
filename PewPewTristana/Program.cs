@@ -37,7 +37,7 @@ namespace PewPewTristana
 
             Notifications.AddNotification("PewPewTristana Loaded!", 5000);
             Notifications.AddNotification("Latest Changes:", 2500);
-            Notifications.AddNotification("Anti-Rengar/Khazix/Riven Added", 2500);
+            Notifications.AddNotification("Anti-Rengar/Khazix Added", 2500);
 
             //Ability Information - Range - Variables.
             Q = new Spell(SpellSlot.Q);
