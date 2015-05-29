@@ -96,7 +96,7 @@ namespace BloodMoonAkali
             combo.AddItem(new MenuItem("UseIgnite", "Use Ignite").SetValue(true));
 
             //HARASS
-            harass.AddItem(new MenuItem("Harass", "Harass").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Toggle)));
+            harass.AddItem(new MenuItem("HarassToggle", "Harass Toggle").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Toggle)));
             harass.AddItem(new MenuItem("HarassQ", "Use Q").SetValue(true));
             harass.AddItem(new MenuItem("HarassQEnergy", " % Energy").SetValue(new Slider(50, 100, 0)));
             harass.AddItem(new MenuItem("HarassE", "Use E").SetValue(true));
@@ -112,9 +112,8 @@ namespace BloodMoonAkali
             laneclear.AddItem(new MenuItem("LaneClearE", "Laneclear with E").SetValue(true));
             laneclear.AddItem(new MenuItem("LaneClearCount", "Minion HitCount").SetValue(new Slider(3, 10, 0)));
             laneclear.AddItem(new MenuItem("LaneClearEnergy", "% Energy").SetValue(new Slider(50, 100, 0)));
-            laneclear.AddItem(new MenuItem("LaneClearOnlyQE", "Lasthit only").SetValue(true));
-            laneclear.AddItem(new MenuItem("LaneClearQA", "Calculate Q Mark damage in LaneClear").SetValue(true));
-            //laneclear.AddItem(new MenuItem("tiamatlaneclear", "Use Tiamat").SetValue(true));
+            laneclear.AddItem(new MenuItem("LaneClearOnlyQE", "Semi Auto LaneClear").SetValue(true));
+            laneclear.AddItem(new MenuItem("LaneClearQA", "Calculate Q Mark damage in LaneClear").SetValue(true));           
 
             jungleclear.AddItem(new MenuItem("JungleClearQ", "Jungleclear with Q").SetValue(true));
             jungleclear.AddItem(new MenuItem("JungleClearE", "Jungleclear with E").SetValue(true));
@@ -144,19 +143,19 @@ namespace BloodMoonAkali
 
             //MISC
             misc.AddItem(new MenuItem("AntiGapW", "Anti-Gapcloser [W]").SetValue(true));
-            misc.AddItem(new MenuItem("AntiR", "Anti-Rengar [Auto-W]").SetValue(true));
-            misc.AddItem(new MenuItem("AntiZ", "Anti-Zed [Auto-W]").SetValue(true));
+            misc.AddItem(new MenuItem("AntiZ", "Anti-Zed Ult [Auto-W]").SetValue(true));
+            misc.AddItem(new MenuItem("AntiC", "Anti-Cait Ult [Auto-W]").SetValue(true));
             misc.AddItem(new MenuItem("AutoRedTrinket", "Auto Buy Sweeper").SetValue(true));
-            misc.AddItem(new MenuItem("AutoRedTrinketLevel", "Buy Sweeper at level").SetValue(new Slider(6, 18, 0)));
+            misc.AddItem(new MenuItem("AutoRedTrinketLevel", "Buy Sweeper at level").SetValue(new Slider(6, 18, 1)));
             misc.AddItem(new MenuItem("AutoRedTrinketUpgrade", "Auto upgrade sweeper (Oracle Lens 250 Gold)").SetValue(true));
-            misc.AddItem(new MenuItem("AutoRedTrinketUpgradeLevel", "Upgrade sweeper at level").SetValue(new Slider(9, 18, 0)));
+            misc.AddItem(new MenuItem("AutoRedTrinketUpgradeLevel", "Upgrade sweeper at level").SetValue(new Slider(9, 18, 9)));
 
 
             Config.AddToMainMenu();
 
             Game.OnUpdate += Game_OnGameUpdate;
             Orbwalking.AfterAttack += OrbwalkingAfterAttack;
-            Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
+          //Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
             Drawing.OnDraw += OnDraw;
             Drawing.OnEndScene += OnEndScene;
             Drawing.OnDraw += Gapcloserdraw;
@@ -218,7 +217,7 @@ namespace BloodMoonAkali
                     Jungleclear();
                     break;
             }
-            if (Config.Item("Harass").GetValue<bool>())
+            if (Config.Item("HarassToggle").IsActive())
             {
                 Harass();
             }
@@ -226,13 +225,11 @@ namespace BloodMoonAkali
             {
                 SmartKS();
             }
-
-            var zpos = Drawing.WorldToScreen(Player.Position);
-            var rstacks = Player.Buffs.Find(buff => buff.Name == "AkaliShadowDance").Count;
-            if (Config.Item("drawRstacks").GetValue<bool>())
-                Drawing.DrawText(zpos.X - 50, zpos.Y + 50, System.Drawing.Color.HotPink,
-                    "[R] stacks = " + rstacks.ToString());
-
+            if (Config.Item("AntiZ").GetValue<bool>() ||
+                Config.Item("AntiC").GetValue<bool>())
+            {
+                OnReceiveBuff();
+            }
             if (Config.Item("AutoRedTrinket").GetValue<bool>())
             {
                 AutoRedTrinket();
@@ -242,13 +239,19 @@ namespace BloodMoonAkali
                 AutoRedTrinketUpgrade();
             }
 
+            var zpos = Drawing.WorldToScreen(Player.Position);
+            var rstacks = Player.Buffs.Find(buff => buff.Name == "AkaliShadowDance").Count;
+            if (Config.Item("drawRstacks").GetValue<bool>())
+                Drawing.DrawText(zpos.X - 50, zpos.Y + 50, System.Drawing.Color.HotPink,
+                    "[R] stacks = " + rstacks.ToString());
+
         }
 
         private static void AutoRedTrinketUpgrade()
         {
-            if (Items.HasItem(3364))
+            if (Items.HasItem(3341))
             {
-                if (Player.InShop() && Player.Level == Config.Item("AutoRedTrinketUpgradeLevel").GetValue<Slider>().Value
+                if (Player.InShop() && Player.Level >= Config.Item("AutoRedTrinketUpgradeLevel").GetValue<Slider>().Value
                     && Player.Gold > 249)
                 {
                     Player.BuyItem(ItemId.Oracles_Lens_Trinket);
@@ -258,19 +261,13 @@ namespace BloodMoonAkali
 
         private static void AutoRedTrinket()
         {
-            if (Items.HasItem(3341) || Items.HasItem(3364))
+            if (Items.HasItem(3341))
                 return;
 
-            if (Player.InShop() && Player.Level == Config.Item("AutoRedTrinketLevel").GetValue<Slider>().Value)
+            if (Player.InShop() && Player.Level >= Config.Item("AutoRedTrinketLevel").GetValue<Slider>().Value)
             {
                 Player.BuyItem(ItemId.Sweeping_Lens_Trinket);
             }
-        }
-
-        private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
-        //W ON DANGEROUS SPELLS! SUCH AS RIVEN W/JAX Q/VLAD ULT/CAIT R/CASSIO R/RENGAR JUMP/LISS ULT/RYZE W/TALON E/ZED ULT/VAYNE E/VI ULT
-        {
-            throw new NotImplementedException();
         }
 
         //IGNITEDAMAGE
@@ -710,24 +707,23 @@ namespace BloodMoonAkali
         private static void Harass()
         {
             var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
-            var HarassQ = Config.Item("HarassQEnergy").GetValue<Slider>().Value;
-            var HarassE = Config.Item("HarassEEnergy").GetValue<Slider>().Value;
+            var HarassQE = Config.Item("HarassQEnergy").GetValue<Slider>().Value;
+            var HarassEE = Config.Item("HarassEEnergy").GetValue<Slider>().Value;
 
             if (!target.IsValidTarget() || target == null)
                 return;
             if (Player.IsAttackingPlayer)
                 return;
-            if (HarassQ <= Player.ManaPercent)
+            if (Player.ManaPercent <= HarassQE)
                 return;
-            if (HarassE <= Player.ManaPercent)
+            if (Player.ManaPercent <= HarassEE)
                 return;
-            
+  
             if (Config.Item("HarassQ").GetValue<bool>() && Q.IsReady())
                 Q.Cast(target);
             if (Config.Item("HarassE").GetValue<bool>() && E.IsReady()
                 && target.IsValidTarget(E.Range))
                 E.Cast(target);
-                
 
         }
         private static void Rlogic()
@@ -983,11 +979,13 @@ namespace BloodMoonAkali
             }
 
         }
-        private static void OnReceiveBuff() //W on Cait R - Zed R
+        private static void OnReceiveBuff()
         {
 
-            if (Player.HasBuff("zedultmark") || (Player.HasBuff("caitultbuff")))
-                W.Cast();
+            if (Player.HasBuff("zedulttargetmark") && Config.Item("Antiz").GetValue<bool>() || 
+               (Player.HasBuff("caitlynaceinthehole") && Config.Item("AntiC").GetValue<bool>()))
+                W.Cast(Player);
+
         }
         private static void OrbwalkingAfterAttack(AttackableUnit unit, AttackableUnit target)
         {
