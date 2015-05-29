@@ -53,7 +53,6 @@ namespace BloodMoonAkali
             var drawing = Config.AddSubMenu(new Menu("[Draw Settings]", "Draw Settings"));
 
             //Advanced Settings //[E] Settings
-            combo.SubMenu("[Advanced Features Q/E]").AddItem(new MenuItem("prioE", "Use [E] after AA").SetValue(false));
 
             //[W] Settings
             combo.SubMenu("[Advanced Features W]").AddItem(new MenuItem("WPROC", "Use [W] on Dangerous Spells [BROKEN]").SetValue(true));
@@ -119,11 +118,10 @@ namespace BloodMoonAkali
             jungleclear.AddItem(new MenuItem("JungleClearE", "Jungleclear with E").SetValue(true));
 
             //KILLSTEAL
-            killsteal.AddItem(new MenuItem("SmartKS", "Use Smart Killsteal").SetValue(true));
-            killsteal.AddItem(new MenuItem("SmartKSQ", "Use Q").SetValue(true));
-            killsteal.AddItem(new MenuItem("SmartKSE", "Use E").SetValue(true));
-            killsteal.AddItem(new MenuItem("SmartKSR", "Use R").SetValue(true));
-            killsteal.AddItem(new MenuItem("SmartKSGapCloser", "Gapclose with R").SetValue(true));
+            killsteal.AddItem(new MenuItem("KS", "Use Smart Killsteal").SetValue(true));
+            killsteal.AddItem(new MenuItem("KSQ", "Use Q").SetValue(true));
+            killsteal.AddItem(new MenuItem("KSE", "Use E").SetValue(true));
+            killsteal.AddItem(new MenuItem("KSR", "Use R").SetValue(true));
             killsteal.AddItem(new MenuItem("KSIngite", "Use Ingite").SetValue(true));
 
             //DRAWING
@@ -221,7 +219,7 @@ namespace BloodMoonAkali
             {
                 Harass();
             }
-            if (Config.Item("SmartKS").GetValue<bool>())
+            if (Config.Item("KS").GetValue<bool>())
             {
                 SmartKS();
             }
@@ -330,6 +328,12 @@ namespace BloodMoonAkali
             var damage = aa;
             var markdmg = Player.CalcDamage(target, Damage.DamageType.Magical,
                 (45 + 35 * Q.Level + 0.5 * Player.FlatMagicDamageMod));
+
+            var sheen = ItemData.Sheen.GetItem();
+            var lichbane = ItemData.Lich_Bane.GetItem();
+            var triforce = ItemData.Trinity_Force.GetItem();
+            var ludens = ItemData.Ludens_Echo.GetItem();
+
 
 
             if (Items.HasItem(3153) && Items.CanUseItem(3153))
@@ -635,36 +639,39 @@ namespace BloodMoonAkali
                 Ignite = Player.GetSpellSlot("summonerdot");
                 var qdmg = Q.GetDamage(enemy);
                 var edmg = E.GetDamage(enemy);
-                var rdmg = R.GetDamage(enemy);
-                var aa = Player.GetAutoAttackDamage(enemy, true);
-                var markdmg = Player.CalcDamage(enemy, Damage.DamageType.Magical,
-                (45 + 35 * Q.Level + 0.5 * Player.FlatMagicDamageMod) + aa);
-                var ksrstacks = Config.Item("KSRStacks").GetValue<Slider>().Value;
 
-                var sheendmg = Player.CalcDamage(enemy, Damage.DamageType.Magical, Player.BaseAttackDamage);
-                var lichbanedmg = Player.CalcDamage(enemy, Damage.DamageType.Magical, (Player.BaseAttackDamage * 0.75)
-                    + ((Player.BaseAbilityDamage + Player.FlatMagicDamageMod) * 0.5));
-
-
-                if (Ignite.IsReady() && IgniteDamage(enemy) >= enemy.Health
+                if (IgniteDamage(enemy) >= enemy.Health && Ignite.IsReady()
                     && Config.Item("KSIgnite").GetValue<bool>()
                     && Player.Distance(enemy.Position) <= 600)
+
                     Player.Spellbook.CastSpell(Ignite, enemy);
 
-                if (enemy.Health < qdmg && Q.IsReady() &&
-                    Config.Item("SmartKSQ").GetValue<bool>())
+                if (enemy.Health < qdmg &&
+                    Config.Item("KSQ").GetValue<bool>())
+
                     Q.Cast(enemy);
 
-                if (enemy.Health < edmg && E.IsReady()
-                    && Config.Item("SmartKSE").GetValue<bool>())
+                if (enemy.Health < edmg && Config.Item("KSE").GetValue<bool>())
                     E.Cast(enemy);
 
+                if (enemy.Health < edmg + qdmg
+                    && Config.Item("KSE").GetValue<bool>() && Config.Item("KSE").GetValue<bool>())
+                {
+                    E.Cast(enemy);
+                    Q.Cast(enemy);
+                }
+
+                if (enemy.Health < edmg + qdmg + IgniteDamage(enemy) && Ignite.IsReady()
+                    && Config.Item("KSE").GetValue<bool>() && Config.Item("KSE").GetValue<bool>())
+                {
+                    E.Cast(enemy);
+                    Q.Cast(enemy);
+                }
+
                 if (enemy.Health < ActualDMG(enemy) && R.IsReady()
-                    && Config.Item("SmartKSR").GetValue<bool>()
-                    && Config.Item("SmartKSGapCloser").GetValue<bool>())
+                    && Config.Item("KSR").GetValue<bool>())
                 {
                     R.Cast(enemy);
-                    Gapcloser();
                 }
 
 
