@@ -29,7 +29,7 @@ namespace BloodMoonAkali
             if (Player.ChampionName != ChampName)
                 return;
 
-            Notifications.AddNotification("Bloodmoon Akali V1", 1000);
+            Notifications.AddNotification("Bloodmoon Akali Loaded!", 1000);
 
             Q = new Spell(SpellSlot.Q, 600);
             W = new Spell(SpellSlot.W, 700);
