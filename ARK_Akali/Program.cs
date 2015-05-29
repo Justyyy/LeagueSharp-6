@@ -839,7 +839,6 @@ namespace BloodMoonAkali
                                                                    R.Range * 2))
             {
                 if (Config.Item("rlines").GetValue<bool>() && rstacks > 1 &&
-                    minion.Distance(target.Position) > 100 &&
                     minion.Distance(target.Position) < R.Range && Player.Distance(target.Position) >= R.Range && minion.IsValidTarget(R.Range))
                 {
                     var rdraw = new Geometry.Polygon.Line(Player.Position, minion.Position);
@@ -854,7 +853,7 @@ namespace BloodMoonAkali
                                                                 R.Range * 2))
                 {
                     if (Config.Item("rlines").GetValue<bool>() && rstacks > 1 &&
-                        Player.Distance(target.Position) >= R.Range && h.Distance(target.Position) > 100 && h.Distance(target.Position) < R.Range && h.IsValidTarget(R.Range))
+                        Player.Distance(target.Position) >= R.Range && h.Distance(target.Position) < R.Range && h.IsValidTarget(R.Range))
                     {
                         var rdraw = new Geometry.Polygon.Line(Player.Position, h.Position);
                         var rmdraw = new Geometry.Polygon.Line(h.Position, target.Position);
@@ -877,13 +876,13 @@ namespace BloodMoonAkali
                                                                    minion.Distance(Player.ServerPosition) <=
                                                                    R.Range * 2 + 100))
             {
-                if (Config.Item("miniongapclose").GetValue<bool>() && rstacks > 1 && minion.Distance(target.Position) > 100 &&
+                if (Config.Item("miniongapclose").GetValue<bool>() && rstacks > 1 &&
                     minion.Distance(target.Position) < R.Range && Player.Distance(target.Position) >= R.Range)
                     R.Cast(minion);
 
                 if (Config.Item("miniongapcloseq").GetValue<bool>() && Config.Item("miniongapclose").GetValue<bool>() &&
                     rstacks >= 1 &&
-                    Player.Distance(target.Position) >= R.Range && minion.Distance(target.Position) > 100 &&
+                    Player.Distance(target.Position) >= R.Range &&
                     minion.Distance(target.Position) < Q.Range - 50 && target.Health < Q.GetDamage(Player))
                     R.Cast(minion);
             }
@@ -893,14 +892,14 @@ namespace BloodMoonAkali
                                                             R.Range * 2 + 100))
             {
                 if (Config.Item("herogapclose").GetValue<bool>() && rstacks > 1 &&
-                    Player.Distance(target.Position) >= R.Range && h.Distance(target.Position) > 100 &&
+                    Player.Distance(target.Position) >= R.Range &&
                     h.Distance(target.Position) < R.Range)
                     R.Cast(h);
 
 
                 if (Config.Item("herogapcloseq").GetValue<bool>() && Config.Item("miniongapclose").GetValue<bool>() &&
                     rstacks >= 1 &&
-                    Player.Distance(target.Position) >= R.Range && h.Distance(target.Position) > 100 &&
+                    Player.Distance(target.Position) >= R.Range &&
                     h.Distance(target.Position) < Q.Range - 50 && target.Health < Q.GetDamage(Player))
                     R.Cast(h);
             }
