@@ -830,6 +830,8 @@ namespace BloodMoonAkali
             var rstacks = Player.Buffs.Find(buff => buff.Name == "AkaliShadowDance").Count;
             var target = TargetSelector.GetTarget(R.Range * 2 + 300, TargetSelector.DamageType.Magical);
 
+            if (target.Position.Distance(Player.Position) < R.Range + 75)
+                return;
 
             foreach (var minion in
                 ObjectManager.Get<Obj_AI_Minion>().Where(minion => minion.IsValidTarget() && minion.IsEnemy &&
