@@ -55,11 +55,10 @@ namespace BloodMoonAkali
             //Advanced Settings //[E] Settings
 
             //[W] Settings
-            combo.SubMenu("[Advanced Features W]").AddItem(new MenuItem("WPROC", "Use [W] on Dangerous Spells [BROKEN]").SetValue(true));
             combo.SubMenu("[Advanced Features W]").AddItem(new MenuItem("WHP", "Use [W] on < % HP ").SetValue(true));
             combo.SubMenu("[Advanced Features W]").AddItem(new MenuItem("WHPslider", "% HP").SetValue(new Slider(35, 100, 0)));
             combo.SubMenu("[Advanced Features W]").AddItem(new MenuItem("WHE", "Use [W] X amount of enemies ").SetValue(true));
-            combo.SubMenu("[Advanced Features W]").AddItem(new MenuItem("WHEslider", "Enemy Count").SetValue(new Slider(3, 5, 0)));
+            combo.SubMenu("[Advanced Features W]").AddItem(new MenuItem("WHEslider", "Enemy Count").SetValue(new Slider(3, 5, 1)));
 
             //[R] Settings
             combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("Rkill", "Only use [R] if Killable").SetValue(true));
@@ -201,6 +200,7 @@ namespace BloodMoonAkali
                 case Orbwalking.OrbwalkingMode.Combo:
                     //IF PLAYER WHOULD ENTER COMBO ORBWALKER MODE IT WILL USE SAID COMBO
                     Clogic();
+                    WLogic();
                     Elogic();
                     Rlogic();
                     break;
@@ -244,7 +244,6 @@ namespace BloodMoonAkali
                     "[R] stacks = " + rstacks.ToString());
 
         }
-
 
         //IGNITEDAMAGE
         private static float IgniteDamage(Obj_AI_Hero target)
@@ -449,28 +448,28 @@ namespace BloodMoonAkali
                 float predictedHealtMinionq = HealthPrediction.GetHealthPrediction(minion,
                     (int)(R.Delay + (Player.Distance(minion.ServerPosition) / Q.Speed)));
 
-                //Check 1
+    
                 if (minion.Health <= aa + 20 && minion.HasBuff("AkaliMota") && E.IsReady() && minion.Distance(Player.Position) < Orbwalking.GetRealAutoAttackRange(Player))
                     return;
-                //Check 2
+               
                 if (minion.HasBuff("AkaliMota") && Config.Item("LastHitQA").GetValue<bool>() && minion.Health <= markdmg
                     && minion.Distance(Player.Position) <= Orbwalking.GetRealAutoAttackRange(Player) && E.IsReady())
                     return;
-                //Check 3
+              
                 if (minion.Distance(Player.Position) < Orbwalking.GetRealAutoAttackRange(Player) && Q.IsReady()
                     && Config.Item("LastHitQ").GetValue<bool>() && minion.Health <= aa + 8)
                     return;
-                //Check 4
+            
                 if (minion.Distance(Player.Position) < Orbwalking.GetRealAutoAttackRange(Player) && E.IsReady()
                     && Config.Item("LastHitE").GetValue<bool>() && minion.Health <= aa + 8)
                     return;
-                //Q Cast
+                
                 if (Config.Item("LastHitQ").GetValue<bool>() && predictedHealtMinionq < Q.GetDamage(minion) + 5 && Q.IsReady())
                     Q.Cast(minion);
-                //E Cast
+                
                 if (Config.Item("LastHitE").GetValue<bool>() && E.IsReady() && minion.Health < E.GetDamage(minion))
                     E.Cast(minion);
-                //Q + Mark
+                
                 if (Config.Item("LastHitQA").GetValue<bool>())
                 {
                     if (Config.Item("LastHitQA").GetValue<bool>() && predictedHealtMinionq < Q.GetDamage(minion) + markdmg
@@ -507,23 +506,23 @@ namespace BloodMoonAkali
                     if (minion.Team == GameObjectTeam.Neutral)
                         return;
 
-                    //Check 1
+                  
                     if (minion.Health < aa && Q.IsReady() && Config.Item("LaneClearQ").GetValue<bool>()
                         && minion.Distance(Player.Position) < Orbwalking.GetRealAutoAttackRange(Player))
                         return;
-                    //Check 2 
+                   
                     if (minion.Health <= markdmg && minion.HasBuff("AkaliMota") && E.IsReady() && minion.IsValidTarget(E.Range))
                         return;
-                    //Check 3
+                
                     if (minion.Health <= aa && minion.Distance(Player.Position) < Orbwalking.GetRealAutoAttackRange(Player) + 25
                         && E.IsReady() && Config.Item("LaneClearE").GetValue<bool>())
                         return;
-                    //Q Cast
+              
                     if (Config.Item("LaneClearQ").GetValue<bool>() && Config.Item("LaneClearOnlyQE").GetValue<bool>()
                         && predictedHealtMinionq < Q.GetDamage(minion) + 5 && Q.IsReady())
                         Q.Cast(minion);
 
-                    //Q + Mark
+                 
                     if (Config.Item("LaneClearQA").GetValue<bool>())
                     {
                         if (Config.Item("LaneClearQA").GetValue<bool>() && Config.Item("LaneClearOnlyQE").GetValue<bool>()
@@ -538,7 +537,7 @@ namespace BloodMoonAkali
                             Player.IssueOrder(GameObjectOrder.AutoAttack, minion);
                         }
                     }
-                    //E Cast
+                 
                     if (Config.Item("LaneClearE").GetValue<bool>() && Config.Item("LaneClearOnlyQE").GetValue<bool>()
                         && E.IsReady() && minion.Health < E.GetDamage(minion)
                         && MinionsE.Count >= 1)
@@ -1002,6 +1001,28 @@ namespace BloodMoonAkali
             }
 
         }
+        //WLOGIC
+        private static void WLogic()
+        {                 
+            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>()
+                .Where(x => x.IsValidTarget(Q.Range))
+                .Where(x => !x.IsZombie)
+                .Where(x => !x.IsDead))
+            {
+                if (Config.Item("UseW").GetValue<bool>())
+                {
+                    if (Player.HealthPercent <= Config.Item("WHPslider").GetValue<Slider>().Value)
+
+                        W.Cast(Player);
+
+                    if (enemy.CountEnemiesInRange(600) >= Config.Item("WHEslider").GetValue<Slider>().Value)
+
+                        W.Cast(Player);
+
+                }              
+            }           
+        }
+
         private static void OnReceiveBuff()
         {
 
