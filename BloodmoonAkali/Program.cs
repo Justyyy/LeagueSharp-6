@@ -313,27 +313,20 @@ namespace BloodMoonAkali
             var ludens = ItemData.Ludens_Echo.GetItem();
 
             var sheendmg = Player.CalcDamage(target, Damage.DamageType.Physical,
-                Player.GetAutoAttackDamage(target) * Player.FlatPhysicalDamageMod);
+                (Player.GetAutoAttackDamage(target) * Player.FlatPhysicalDamageMod));
+
             var lichbanedmg = Player.CalcDamage(target, Damage.DamageType.Magical,
-                Player.GetAutoAttackDamage(target) * 0.75 * 0.5 * Player.FlatMagicDamageMod);
+                (Player.GetAutoAttackDamage(target) * 0.75 * 0.5 * Player.FlatMagicDamageMod));
+
             var triforcedmg = Player.CalcDamage(target, Damage.DamageType.Physical,
-                Player.GetAutoAttackDamage(target) * 2 * Player.FlatPhysicalDamageMod);
+                (Player.GetAutoAttackDamage(target) * 2 * Player.FlatPhysicalDamageMod));
+
             var ludensdmg = Player.CalcDamage(target, Damage.DamageType.Magical,
-                Player.GetAutoAttackDamage(target) * Player.FlatMagicDamageMod);
+                (100 * 0.15 * Player.FlatMagicDamageMod));
 
 
-               // At 100 charges, the next instance of ability damage you deal will expend all charges to deal 100 (+ 15% AP) bonus magic damage
-
-
-               // After using an ability, your next basic attack deals 200% base AD bonus physical damage.
-
-                //INITIAL MAGIC DAMAGE: 35 / 55 / 75 / 95 / 115 (+40% AP)
-               //「 DETONATION MAGIC DAMAGE: 45 / 70 / 95 / 120 / 145 (+ 50% AP)
-
-             //After using an ability, your next basic attack deals 75% base AD (+ 50% AP) bonus magic damage. 1.5 second cooldown.
-
-
-
+            //Ludens werkt met Q / E / R , ludens itemID = 3285
+            //Check ludens.count equals 100 && Q.IsReady() {Q.GetDamage(target) + ludensdmg} Same for E and R
 
 
             if (Items.HasItem(3153) && Items.CanUseItem(3153))
