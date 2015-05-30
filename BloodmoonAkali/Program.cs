@@ -245,28 +245,6 @@ namespace BloodMoonAkali
 
         }
 
-        private static void AutoRedTrinketUpgrade()
-        {
-            if (Items.HasItem(3341))
-            {
-                if (Player.InShop() && Player.Level >= Config.Item("AutoRedTrinketUpgradeLevel").GetValue<Slider>().Value
-                    && Player.Gold > 249)
-                {
-                    Player.BuyItem(ItemId.Oracles_Lens_Trinket);
-                }
-            }
-        }
-
-        private static void AutoRedTrinket()
-        {
-            if (Items.HasItem(3341))
-                return;
-
-            if (Player.InShop() && Player.Level >= Config.Item("AutoRedTrinketLevel").GetValue<Slider>().Value)
-            {
-                Player.BuyItem(ItemId.Sweeping_Lens_Trinket);
-            }
-        }
 
         //IGNITEDAMAGE
         private static float IgniteDamage(Obj_AI_Hero target)
@@ -333,6 +311,28 @@ namespace BloodMoonAkali
             var lichbane = ItemData.Lich_Bane.GetItem();
             var triforce = ItemData.Trinity_Force.GetItem();
             var ludens = ItemData.Ludens_Echo.GetItem();
+
+            var sheendmg = Player.CalcDamage(target, Damage.DamageType.Physical,
+                Player.GetAutoAttackDamage(target) * Player.FlatPhysicalDamageMod);
+            var lichbanedmg = Player.CalcDamage(target, Damage.DamageType.Magical,
+                Player.GetAutoAttackDamage(target) * 0.75 * 0.5 * Player.FlatMagicDamageMod);
+            var triforcedmg = Player.CalcDamage(target, Damage.DamageType.Physical,
+                Player.GetAutoAttackDamage(target) * 2 * Player.FlatPhysicalDamageMod);
+            var ludensdmg = Player.CalcDamage(target, Damage.DamageType.Magical,
+                Player.GetAutoAttackDamage(target) * Player.FlatMagicDamageMod);
+
+
+               // At 100 charges, the next instance of ability damage you deal will expend all charges to deal 100 (+ 15% AP) bonus magic damage
+
+
+               // After using an ability, your next basic attack deals 200% base AD bonus physical damage.
+
+                //INITIAL MAGIC DAMAGE: 35 / 55 / 75 / 95 / 115 (+40% AP)
+               //「 DETONATION MAGIC DAMAGE: 45 / 70 / 95 / 120 / 145 (+ 50% AP)
+
+             //After using an ability, your next basic attack deals 75% base AD (+ 50% AP) bonus magic damage. 1.5 second cooldown.
+
+
 
 
 
@@ -472,7 +472,7 @@ namespace BloodMoonAkali
                     && Config.Item("LastHitE").GetValue<bool>() && minion.Health <= aa + 8)
                     return;
                 //Q Cast
-                if (Config.Item("LastHitQ").GetValue<bool>() && predictedHealtMinionq < Q.GetDamage(minion) && Q.IsReady())
+                if (Config.Item("LastHitQ").GetValue<bool>() && predictedHealtMinionq < Q.GetDamage(minion) + 5 && Q.IsReady())
                     Q.Cast(minion);
                 //E Cast
                 if (Config.Item("LastHitE").GetValue<bool>() && E.IsReady() && minion.Health < E.GetDamage(minion))
@@ -527,7 +527,7 @@ namespace BloodMoonAkali
                         return;
                     //Q Cast
                     if (Config.Item("LaneClearQ").GetValue<bool>() && Config.Item("LaneClearOnlyQE").GetValue<bool>()
-                        && predictedHealtMinionq < Q.GetDamage(minion) && Q.IsReady())
+                        && predictedHealtMinionq < Q.GetDamage(minion) + 5 && Q.IsReady())
                         Q.Cast(minion);
 
                     //Q + Mark
@@ -628,6 +628,29 @@ namespace BloodMoonAkali
 
             if (Config.Item("JungleClearE").GetValue<bool>() && E.IsReady() && MinionsE.Count >= 1)
                 E.Cast();
+        }
+
+        private static void AutoRedTrinketUpgrade()
+        {
+            if (Items.HasItem(3341))
+            {
+                if (Player.InShop() && Player.Level >= Config.Item("AutoRedTrinketUpgradeLevel").GetValue<Slider>().Value
+                    && Player.Gold > 249)
+                {
+                    Player.BuyItem(ItemId.Oracles_Lens_Trinket);
+                }
+            }
+        }
+
+        private static void AutoRedTrinket()
+        {
+            if (Items.HasItem(3341))
+                return;
+
+            if (Player.InShop() && Player.Level >= Config.Item("AutoRedTrinketLevel").GetValue<Slider>().Value)
+            {
+                Player.BuyItem(ItemId.Sweeping_Lens_Trinket);
+            }
         }
         private static void SmartKS()
         {
