@@ -55,9 +55,9 @@ namespace BloodMoonAkali
             //Advanced Settings //[E] Settings
 
             //[W] Settings
-            combo.SubMenu("[Advanced Features W]").AddItem(new MenuItem("WHP", "Use [W] on < % HP ").SetValue(true));
+            combo.SubMenu("[Advanced Features W]").AddItem(new MenuItem("WHP", "Use [W] on < % HP ").SetValue(false));
             combo.SubMenu("[Advanced Features W]").AddItem(new MenuItem("WHPslider", "% HP").SetValue(new Slider(35, 100, 0)));
-            combo.SubMenu("[Advanced Features W]").AddItem(new MenuItem("WHE", "Use [W] X amount of enemies ").SetValue(true));
+            combo.SubMenu("[Advanced Features W]").AddItem(new MenuItem("WHE", "Use [W] X amount of enemies ").SetValue(false));
             combo.SubMenu("[Advanced Features W]").AddItem(new MenuItem("WHEslider", "Enemy Count").SetValue(new Slider(3, 5, 1)));
 
             //[R] Settings
@@ -69,9 +69,7 @@ namespace BloodMoonAkali
             combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("Rcheck", "Don't [R] into X amount of enemies").SetValue(false));
             combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("eslider", "Enemy Count").SetValue(new Slider(3, 5, 0)));
             combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("miniongapclose", "Use Minion to gapclose? [Requires 2 R stacks]").SetValue(true));
-            combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("miniongapcloseq", "Minion Gapclose if Q > Target HP [Requires 1 R stack]").SetValue(true));
             combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("herogapclose", "Use Enemy Champion to gapclose? [Requires 2 R stacks]").SetValue(true));
-            combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("herogapcloseq", "Enemy Champion Gapclose if Q > Target HP [Requires 1 R stack]").SetValue(true));
             combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("rangeRslider", "[R] gapclose Range").SetValue(new Slider(200, 600, 0)));
 
             //ITEMS
@@ -110,7 +108,7 @@ namespace BloodMoonAkali
             laneclear.AddItem(new MenuItem("LaneClearE", "Laneclear with E").SetValue(true));
             laneclear.AddItem(new MenuItem("LaneClearCount", "Minion HitCount").SetValue(new Slider(3, 10, 0)));
             laneclear.AddItem(new MenuItem("LaneClearEnergy", "% Energy").SetValue(new Slider(50, 100, 0)));
-            laneclear.AddItem(new MenuItem("LaneClearOnlyQE", "Semi Auto LaneClear").SetValue(true));
+            laneclear.AddItem(new MenuItem("LaneClearOnlyQE", "Only use Abilities if minion is killable").SetValue(true));
             laneclear.AddItem(new MenuItem("LaneClearQA", "Calculate Q Mark damage in LaneClear").SetValue(true));           
 
             jungleclear.AddItem(new MenuItem("JungleClearQ", "Jungleclear with Q").SetValue(true));
@@ -142,10 +140,10 @@ namespace BloodMoonAkali
             misc.AddItem(new MenuItem("AntiGapW", "Anti-Gapcloser [W]").SetValue(true));
             misc.AddItem(new MenuItem("AntiZ", "Anti-Zed Ult [Auto-W]").SetValue(true));
             misc.AddItem(new MenuItem("AntiC", "Anti-Cait Ult [Auto-W]").SetValue(true));
-            misc.AddItem(new MenuItem("AutoRedTrinket", "Auto Buy Sweeper").SetValue(true));
-            misc.AddItem(new MenuItem("AutoRedTrinketLevel", "Buy Sweeper at level").SetValue(new Slider(6, 18, 1)));
-            misc.AddItem(new MenuItem("AutoRedTrinketUpgrade", "Auto upgrade sweeper (Oracle Lens 250 Gold)").SetValue(true));
-            misc.AddItem(new MenuItem("AutoRedTrinketUpgradeLevel", "Upgrade sweeper at level").SetValue(new Slider(9, 18, 9)));
+            misc.SubMenu("Trinket Settings").AddItem(new MenuItem("AutoRedTrinket", "Auto Buy Sweeper").SetValue(false));
+            misc.SubMenu("Trinket Settings").AddItem(new MenuItem("AutoRedTrinketLevel", "Buy Sweeper at level").SetValue(new Slider(6, 18, 1)));
+            misc.SubMenu("Trinket Settings").AddItem(new MenuItem("AutoRedTrinketUpgrade", "Auto upgrade sweeper (Oracle Lens 250 Gold)").SetValue(false));
+            misc.SubMenu("Trinket Settings").AddItem(new MenuItem("AutoRedTrinketUpgradeLevel", "Upgrade sweeper at level").SetValue(new Slider(9, 18, 9)));
 
 
             Config.AddToMainMenu();
@@ -195,6 +193,8 @@ namespace BloodMoonAkali
 
         private static void Game_OnGameUpdate(EventArgs args)
         {        
+
+
             switch (Orbwalker.ActiveMode)
             {
                 case Orbwalking.OrbwalkingMode.Combo:
@@ -236,7 +236,6 @@ namespace BloodMoonAkali
             {
                 AutoRedTrinketUpgrade();
             }
-
             var zpos = Drawing.WorldToScreen(Player.Position);
             var rstacks = Player.Buffs.Find(buff => buff.Name == "AkaliShadowDance").Count;
             if (Config.Item("drawRstacks").GetValue<bool>())
@@ -309,25 +308,34 @@ namespace BloodMoonAkali
             var sheen = ItemData.Sheen.GetItem();
             var lichbane = ItemData.Lich_Bane.GetItem();
             var triforce = ItemData.Trinity_Force.GetItem();
-            var ludens = ItemData.Ludens_Echo.GetItem();
 
             var sheendmg = Player.CalcDamage(target, Damage.DamageType.Physical,
-                (Player.GetAutoAttackDamage(target) * Player.FlatPhysicalDamageMod));
+                (Player.BaseAttackDamage));
 
             var lichbanedmg = Player.CalcDamage(target, Damage.DamageType.Magical,
-                (Player.GetAutoAttackDamage(target) * 0.75 * 0.5 * Player.FlatMagicDamageMod));
+                (Player.BaseAttackDamage * 0.75 + 0.5 * Player.FlatMagicDamageMod));
 
             var triforcedmg = Player.CalcDamage(target, Damage.DamageType.Physical,
-                (Player.GetAutoAttackDamage(target) * 2 * Player.FlatPhysicalDamageMod));
+                (Player.BaseAttackDamage) * 2);
 
-            var ludensdmg = Player.CalcDamage(target, Damage.DamageType.Magical,
-                (100 * 0.15 * Player.FlatMagicDamageMod));
+            if (sheen.IsReady() && !Player.HasBuff("sheen"))
+                damage += sheendmg;
 
+            if (Player.HasBuff("sheen"))
+                damage += sheendmg;
 
-            //Ludens werkt met Q / E / R , ludens itemID = 3285
-            //Check ludens.count equals 100 && Q.IsReady() {Q.GetDamage(target) + ludensdmg} Same for E and R
+            if (lichbane.IsReady() && !Player.HasBuff("lichbane"))
+                damage += lichbanedmg;
 
+            if (Player.HasBuff("lichbane"))
+                damage += lichbanedmg;
 
+            if (triforce.IsReady() && !Player.HasBuff("sheen"))
+                damage += triforcedmg;
+
+            if (Player.HasBuff("sheen"))
+                damage += triforcedmg;
+            
             if (Items.HasItem(3153) && Items.CanUseItem(3153))
                 damage += Player.GetItemDamage(target, Damage.DamageItems.Botrk); //Botrk
             if (Items.HasItem(3077) && Items.CanUseItem(3077))
@@ -342,6 +350,9 @@ namespace BloodMoonAkali
 
             if (E.Level == 1 || E.Level == 2)
                 damage += E.GetDamage(target);
+
+            if (Player.TotalAttackDamage > 180)
+                damage += aa*3;
 
             if (E.Level == 3 || E.Level == 4)
                 damage += E.GetDamage(target) * 2;
@@ -442,12 +453,19 @@ namespace BloodMoonAkali
                 var aa = Player.GetAutoAttackDamage(minion, true);
                 var damage = aa;
                 var markdmg = Player.CalcDamage(minion, Damage.DamageType.Magical,
-                    (45 + 35 * Q.Level + 0.5 * Player.FlatMagicDamageMod) + aa);
+                    (45 + 35 * Q.Level + 0.5 * Player.FlatMagicDamageMod) + aa - 15);
                 var MinionsE = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, E.Range);
 
                 float predictedHealtMinionq = HealthPrediction.GetHealthPrediction(minion,
                     (int)(R.Delay + (Player.Distance(minion.ServerPosition) / Q.Speed)));
 
+
+                if (minion.HasBuff("AkaliMota")
+                    && minion.Health < markdmg)
+                {
+                    Orbwalker.ForceTarget(minion);
+                    Player.IssueOrder(GameObjectOrder.AutoAttack, minion);
+                }
     
                 if (minion.Health <= aa + 20 && minion.HasBuff("AkaliMota") && E.IsReady() && minion.Distance(Player.Position) < Orbwalking.GetRealAutoAttackRange(Player))
                     return;
@@ -476,7 +494,7 @@ namespace BloodMoonAkali
                         && minion.Distance(Player.Position) < Orbwalking.GetRealAutoAttackRange(Player) && Q.IsReady())
                         Q.Cast(minion);
 
-                    if (Config.Item("LastHitQA").GetValue<bool>() && minion.HasBuff("AkaliMota")
+                    if (minion.HasBuff("AkaliMota")
                         && minion.Health < markdmg)
                     {
                         Orbwalker.ForceTarget(minion);
@@ -496,7 +514,7 @@ namespace BloodMoonAkali
                     var aa = Player.GetAutoAttackDamage(minion, true);
                     var damage = aa;
                     var markdmg = Player.CalcDamage(minion, Damage.DamageType.Magical,
-                        (45 + 35 * Q.Level + 0.5 * Player.FlatMagicDamageMod) + aa);
+                        (45 + 35 * Q.Level + 0.5 * Player.FlatMagicDamageMod) + aa - 15);
                     var MinionsE = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, E.Range);
                     var laneE = Config.Item("LaneClearEnergy").GetValue<Slider>().Value;
 
@@ -506,6 +524,12 @@ namespace BloodMoonAkali
                     if (minion.Team == GameObjectTeam.Neutral)
                         return;
 
+                    if (minion.HasBuff("AkaliMota")
+                        && minion.Health < markdmg)
+                    {
+                        Orbwalker.ForceTarget(minion);
+                        Player.IssueOrder(GameObjectOrder.AutoAttack, minion);
+                    }
                   
                     if (minion.Health < aa && Q.IsReady() && Config.Item("LaneClearQ").GetValue<bool>()
                         && minion.Distance(Player.Position) < Orbwalking.GetRealAutoAttackRange(Player))
@@ -806,9 +830,6 @@ namespace BloodMoonAkali
                     return;
                 if (Player.Distance(target.ServerPosition) <= Orbwalking.GetRealAutoAttackRange(Player))
                     return;
-                if (Player.Distance(target.Position) <= 600 && target.HasBuff("summonerdot") &&
-                    target.Health < IgniteDamage(target))
-                    return;
                 if (target.IsValidTarget(E.Range))
                     return;
 
@@ -843,6 +864,11 @@ namespace BloodMoonAkali
 
 
         }
+        public static Obj_AI_Base GetFarthestMinion(Vector3 playerpos, Vector3 enemypos)
+        {
+            return ObjectManager.Get<Obj_AI_Base>().Where(x => x.Distance(playerpos) < x.Distance(enemypos) && !x.IsInvulnerable && x.IsValidTarget(R.Range)).OrderBy(m => m.Distance(playerpos)).LastOrDefault();
+
+        }
         private static void Gapcloserdraw(EventArgs args)
         {
             var rstacks = Player.Buffs.Find(buff => buff.Name == "AkaliShadowDance").Count;
@@ -859,8 +885,8 @@ namespace BloodMoonAkali
                 if (Config.Item("rlines").GetValue<bool>() && rstacks > 1 &&
                     minion.Distance(target.Position) < R.Range && Player.Distance(target.Position) >= R.Range && minion.IsValidTarget(R.Range))
                 {
-                    var rdraw = new Geometry.Polygon.Line(Player.Position, minion.Position);
-                    var rmdraw = new Geometry.Polygon.Line(minion.Position, target.Position);
+                    var rdraw = new Geometry.Polygon.Line(Player.Position, GetFarthestMinion(minion.Position, target.Position).Position);
+                    var rmdraw = new Geometry.Polygon.Line(GetFarthestMinion(minion.Position, target.Position).Position, target.Position);
                     rdraw.Draw(Color.White, 1);
                     rmdraw.Draw(Color.White, 1);
                 }
@@ -896,13 +922,7 @@ namespace BloodMoonAkali
             {
                 if (Config.Item("miniongapclose").GetValue<bool>() && rstacks > 1 &&
                     minion.Distance(target.Position) < R.Range && Player.Distance(target.Position) >= R.Range)
-                    R.Cast(minion);
-
-                if (Config.Item("miniongapcloseq").GetValue<bool>() && Config.Item("miniongapclose").GetValue<bool>() &&
-                    rstacks >= 1 &&
-                    Player.Distance(target.Position) >= R.Range &&
-                    minion.Distance(target.Position) < Q.Range - 50 && target.Health < Q.GetDamage(Player))
-                    R.Cast(minion);
+                    R.Cast(GetFarthestMinion(Player.Position, target.Position));
             }
             foreach (var h in
                 ObjectManager.Get<Obj_AI_Hero>().Where(h => h.IsValidTarget() && h.IsEnemy &&
@@ -912,13 +932,6 @@ namespace BloodMoonAkali
                 if (Config.Item("herogapclose").GetValue<bool>() && rstacks > 1 &&
                     Player.Distance(target.Position) >= R.Range &&
                     h.Distance(target.Position) < R.Range)
-                    R.Cast(h);
-
-
-                if (Config.Item("herogapcloseq").GetValue<bool>() && Config.Item("miniongapclose").GetValue<bool>() &&
-                    rstacks >= 1 &&
-                    Player.Distance(target.Position) >= R.Range &&
-                    h.Distance(target.Position) < Q.Range - 50 && target.Health < Q.GetDamage(Player))
                     R.Cast(h);
             }
         }
@@ -1056,6 +1069,7 @@ namespace BloodMoonAkali
 
             if (Config.Item("Draw_Disabled").GetValue<bool>())
                 return;
+
             //DRAW SPELL RANGES
             if (Config.Item("Qdraw").GetValue<Circle>().Active)
                 if (Q.Level > 0)
