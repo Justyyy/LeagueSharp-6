@@ -138,8 +138,6 @@ namespace BloodMoonAkali
 
             //MISC
             misc.AddItem(new MenuItem("AntiGapW", "Anti-Gapcloser [W]").SetValue(true));
-            misc.AddItem(new MenuItem("AntiZ", "Anti-Zed Ult [Auto-W]").SetValue(true));
-            misc.AddItem(new MenuItem("AntiC", "Anti-Cait Ult [Auto-W]").SetValue(true));
             misc.SubMenu("Trinket Settings").AddItem(new MenuItem("AutoRedTrinket", "Auto Buy Sweeper").SetValue(false));
             misc.SubMenu("Trinket Settings").AddItem(new MenuItem("AutoRedTrinketLevel", "Buy Sweeper at level").SetValue(new Slider(6, 18, 1)));
             misc.SubMenu("Trinket Settings").AddItem(new MenuItem("AutoRedTrinketUpgrade", "Auto upgrade sweeper (Oracle Lens 250 Gold)").SetValue(false));
