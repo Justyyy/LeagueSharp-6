@@ -22,7 +22,6 @@ namespace PewPewCorki
         public static Spell E;
         public static Spell R;
         public static Spell RB;
-        public static int SpellRangeTick;
         private static SpellSlot Ignite;
         private static readonly Obj_AI_Hero player = ObjectManager.Player;
 
@@ -37,21 +36,20 @@ namespace PewPewCorki
                 return;
 
             Notifications.AddNotification("PewPewCorki Loaded!", 5000);
-            Notifications.AddNotification("Latest Changes:", 2500);
-            Notifications.AddNotification("First Release!", 2500);
+            Notifications.AddNotification("Latest Changes:", 5000);
+            Notifications.AddNotification("First Release!", 5000);
 
-            //Ability Information - Range - Variables.
             Q = new Spell(SpellSlot.Q, 800);
-            Q.SetSkillshot(0.50f, 280f, 1300f, false,
+            Q.SetSkillshot(0.50f, 250f, 1135f, false,
                 SkillshotType.SkillshotCircle);
 
 
             //RocketJump Settings//Corki Swag   //Note to self, remember to use castposition - 250/-500 depending on distance target to player.Pos
             W = new Spell(SpellSlot.W, 800);
             W.SetSkillshot(0.25f, 450, 1200, false, SkillshotType.SkillshotLine);
-            
+
             E = new Spell(SpellSlot.E, 600);
-            E.SetSkillshot(0,25f, float.MaxValue, false, SkillshotType.SkillshotCone);
+            E.SetSkillshot(0, 25f, float.MaxValue, false, SkillshotType.SkillshotCone);
 
 
             R = new Spell(SpellSlot.R, 1300);
@@ -106,8 +104,6 @@ namespace PewPewCorki
             combo.SubMenu("[R] Settings").AddItem(new MenuItem("manualr", "Cast R on your target").SetValue(new KeyBind('R', KeyBindType.Press)));
 
 
-
-
             combo.SubMenu("Item Settings")
                 .AddItem(new MenuItem("useGhostblade", "Use Youmuu's Ghostblade").SetValue(true));
             combo.SubMenu("Item Settings")
@@ -121,15 +117,23 @@ namespace PewPewCorki
                 .AddItem(new MenuItem("HLe", "  Enemy HP Percentage").SetValue(new Slider(80, 100, 0)));
             combo.SubMenu("Summoner Settings").AddItem(new MenuItem("UseIgnite", "Use Ignite").SetValue(true));
 
+
+            Config.SubMenu("[PewPew]: Killsteal Settings").AddItem(new MenuItem("smartKS", "Use SmartKS").SetValue(true));
+            Config.SubMenu("[PewPew]: Killsteal Settings").AddItem(new MenuItem("KSQ", "Use [Q] Killsteal").SetValue(true));
+            Config.SubMenu("[PewPew]: Killsteal Settings").AddItem(new MenuItem("KSR", "Use [R] Killsteal").SetValue(true));
+
             //LANECLEARMENU
+            Config.SubMenu("[PewPew]: Laneclear Settings").AddItem(new MenuItem("Lasthitonly", "Only use Abilities to last hit").SetValue(false));
             Config.SubMenu("[PewPew]: Laneclear Settings").AddItem(new MenuItem("laneQ", "Use Q").SetValue(true));
             Config.SubMenu("[PewPew]: Laneclear Settings").SubMenu("[Q] Settings").AddItem(new MenuItem("laneQhit", "Q Hitcount").SetValue(new Slider(3, 10, 0)));
             Config.SubMenu("[PewPew]: Laneclear Settings").AddItem(new MenuItem("laneE", "Use E").SetValue(true));
             Config.SubMenu("[PewPew]: Laneclear Settings").AddItem(new MenuItem("laneR", "Use R").SetValue(true));
             Config.SubMenu("[PewPew]: Laneclear Settings").SubMenu("[R] Settings").AddItem(new MenuItem("laneRhit", "R Hitcount").SetValue(new Slider(2, 10, 0)));
             Config.SubMenu("[PewPew]: Laneclear Settings").SubMenu("[R] Settings").AddItem(new MenuItem("lanerockets", "Use [R] if Rocket Ammo >").SetValue(new Slider(0, 7, 0)));
-
             Config.SubMenu("[PewPew]: Laneclear Settings").AddItem(new MenuItem("laneclearmana", "Mana Percentage").SetValue(new Slider(30, 100, 0)));
+
+
+            Config.SubMenu("[PewPew]: Laneclear Settings").AddItem(new MenuItem("playerlevel", "Don't use abilities till level").SetValue(new Slider(12, 18, 0)));
 
             //JUNGLEFARMMENU
             Config.SubMenu("[PewPew]: Jungle Settings").AddItem(new MenuItem("jungleQ", "Use [Q]").SetValue(true));
@@ -149,6 +153,7 @@ namespace PewPewCorki
             drawing.AddItem(new MenuItem("Rdraw", "Draw R Range").SetValue(new Circle(true, Color.LawnGreen)));
             drawing.AddItem(new MenuItem("CircleThickness", "Circle Thickness").SetValue(new Slider(7, 30, 0)));
 
+            harass.AddItem(new MenuItem("AutoHarass", "AutoHarass (TOGGLE)").SetValue(new KeyBind('L', KeyBindType.Toggle)));
             harass.AddItem(new MenuItem("harassQ", "Use Q").SetValue(true));
             harass.AddItem(new MenuItem("harassE", "Use E").SetValue(true));
 
@@ -392,6 +397,10 @@ namespace PewPewCorki
                     Jungleclear();
                     break;
             }
+            if (Config.Item("AutoHarass").GetValue<KeyBind>().Active)
+                harass();
+            if (Config.Item("SmartKS").GetValue<bool>())
+                killsteal();
         }
 
         private static void harass()
@@ -425,8 +434,79 @@ namespace PewPewCorki
                 R.Cast(target);
         }
 
+        private static void killsteal()
+        {
+            foreach (var enemy in
+                ObjectManager.Get<Obj_AI_Hero>()
+                    .Where(x => x.IsValidTarget(R.Range))
+                    .Where(x => !x.IsZombie)
+                    .Where(x => !x.IsDead))
+            {
+                var qdmg = Q.GetDamage(enemy);
+                var rdmg = R.GetDamage(enemy);
+
+
+                if (Config.Item("KSQ").GetValue<bool>() && Q.IsReady() && enemy.Health < qdmg &&
+                    enemy.IsValidTarget(Q.Range) && Q.GetPrediction(enemy).Hitchance >= PewPewPredQ("HitchanceQ"))
+                    Q.Cast(enemy);
+
+                if (Config.Item("KSR").GetValue<bool>() && R.IsReady() && enemy.Health < rdmg &&
+                    enemy.IsValidTarget(R.Range) && R.GetPrediction(enemy).Hitchance >= PewPewPredQ("HitchanceQ"))
+                    R.Cast(enemy);
+
+                if (Config.Item("KSQ").GetValue<bool>() && Config.Item("KSR").GetValue<bool>() && Q.IsReady() &&
+                    enemy.Health < qdmg + rdmg && enemy.IsValidTarget(Q.Range) &&
+                    Q.GetPrediction(enemy).Hitchance >= PewPewPredQ("HitchanceQ")
+                    && Q.GetPrediction(enemy).Hitchance >= PewPewPredQ("HitchanceR"))
+                {
+                    Q.Cast(enemy);
+                    R.Cast(enemy);
+                }
+            }
+        }
+
+        private static void Laneclear2()
+        {
+            if (player.Level < Config.Item("playerlevel").GetValue<Slider>().Value)
+                return;
+            var lanemana = Config.Item("laneclearmana").GetValue<Slider>().Value;
+            var allMinionsQ = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, Q.Range + Q.Width);
+            var allMinionsR = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, R.Range + R.Width);
+
+            var Qfarmpos = Q.GetCircularFarmLocation(allMinionsQ, Q.Width);
+            var Rfarmpos = R.GetCircularFarmLocation(allMinionsR, R.Width);
+
+            if (player.IsWindingUp)
+                return;
+
+            foreach (var minion in allMinionsQ)
+            {
+                float predictedHealtMinionq = HealthPrediction.GetHealthPrediction(minion,
+                    (int) (Q.Delay + (player.Distance(minion.ServerPosition)/Q.Speed)));
+
+                if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear
+                 && Qfarmpos.MinionsHit >= Config.Item("laneQhit").GetValue<Slider>().Value && allMinionsQ.Count >= 1
+                 && Config.Item("laneQ").GetValue<bool>()
+                 && player.ManaPercent >= lanemana && Q.GetDamage(minion) > predictedHealtMinionq && Qfarmpos.Position.Distance(minion.Position) < Q.Width)
+                    Q.Cast(Qfarmpos.Position);
+            }
+
+            if (player.Spellbook.GetSpell(SpellSlot.R).Ammo < Config.Item("lanerockets").GetValue<Slider>().Value)
+                return;
+
+            foreach (var minionR in allMinionsR)
+                if (Rfarmpos.MinionsHit >= Config.Item("laneRhit").GetValue<Slider>().Value
+                    && allMinionsR.Count >= 1 && Config.Item("laneR").GetValue<bool>()
+                    && player.ManaPercent >= lanemana && R.GetPrediction(minionR).Hitchance >= PewPewPredR("HitchanceR") && R.GetDamage(minionR) > minionR.Health 
+                    && Rfarmpos.Position.Distance(minionR.Position) < Q.Width)
+                    R.Cast(minionR);
+        }
         private static void Laneclear()
         {
+            if (player.Level < Config.Item("playerlevel").GetValue<Slider>().Value)
+                return;
+            if (player.IsWindingUp)
+                return;
             var lanemana = Config.Item("laneclearmana").GetValue<Slider>().Value;
             var allMinionsQ = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, Q.Range + Q.Width);
             var allMinionsR = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, R.Range + R.Width);
@@ -435,6 +515,12 @@ namespace PewPewCorki
             var Qfarmpos = Q.GetCircularFarmLocation(allMinionsQ, Q.Width);
             var Efarmpos = E.GetCircularFarmLocation(allMinionsE, E.Width);
             var Rfarmpos = R.GetCircularFarmLocation(allMinionsR, R.Width);
+
+            if (Config.Item("Lasthitonly").GetValue<bool>())
+                Laneclear2();
+
+            if (Config.Item("Lasthitonly").GetValue<bool>())
+                return;
 
 
             if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear
@@ -456,8 +542,8 @@ namespace PewPewCorki
                    return;
 
                foreach (var minionR in allMinionsR)
-                   if (Rfarmpos.MinionsHit >= 2
-                       && allMinionsR.Count >= Config.Item("laneRhit").GetValue<Slider>().Value && Config.Item("laneR").GetValue<bool>()
+                   if (Rfarmpos.MinionsHit >= Config.Item("laneRhit").GetValue<Slider>().Value
+                       && allMinionsR.Count >= 1 && Config.Item("laneR").GetValue<bool>()
                        && player.ManaPercent >= lanemana && R.GetPrediction(minionR).Hitchance >= PewPewPredR("HitchanceR"))
                        R.Cast(minionR);
 
@@ -535,10 +621,14 @@ namespace PewPewCorki
                         R.IsReady() ? Config.Item("Rdraw").GetValue<Circle>().Color : Color.Red,
                                                         Config.Item("CircleThickness").GetValue<Slider>().Value);
 
+            var pos = Drawing.WorldToScreen(ObjectManager.Player.Position);
+            if (Config.Item("AutoHarass").GetValue<KeyBind>().Active)
+                Drawing.DrawText(pos.X - 50, pos.Y + 30, System.Drawing.Color.Plum, "AutoHarass Enabled");
+
             var zpos = Drawing.WorldToScreen(player.Position);
             var rstacks = player.Spellbook.GetSpell(SpellSlot.R).Ammo;
             if (Config.Item("drawRstacks").GetValue<bool>() && R.Level >= 1)
-                Drawing.DrawText(zpos.X - 50, zpos.Y + 50, System.Drawing.Color.HotPink,
+                Drawing.DrawText(zpos.X - 50, zpos.Y + 50, System.Drawing.Color.Gold,
                     "[R] stacks = " + rstacks.ToString());
 
             //var target = TargetSelector.GetTarget(R.Range * 2,
