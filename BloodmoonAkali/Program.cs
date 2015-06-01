@@ -495,9 +495,10 @@ namespace BloodMoonAkali
                         Q.Cast(minion);
 
                     if (minion.HasBuff("AkaliMota")
-                        && minion.Health < markdmg)
+                        && minion.Health < markdmg && minion.Position.Distance(Player.Position) < Orbwalking.GetRealAutoAttackRange(Player))
                     {
                         Orbwalker.ForceTarget(minion);
+                        Orbwalker.SetMovement(false);                
                         Player.IssueOrder(GameObjectOrder.AutoAttack, minion);
                     }
                 }
@@ -511,6 +512,10 @@ namespace BloodMoonAkali
                ObjectManager.Get<Obj_AI_Minion>().Where(minion => minion.IsValidTarget() && minion.IsEnemy &&
                                                                   minion.Distance(Player.ServerPosition) <= Q.Range))
                 {
+                    var MinionsAll = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, R.Range*2);
+                    if (MinionsAll.Count == 0)
+                        return;                   
+
                     var aa = Player.GetAutoAttackDamage(minion, true);
                     var damage = aa;
                     var markdmg = Player.CalcDamage(minion, Damage.DamageType.Magical,
@@ -550,7 +555,7 @@ namespace BloodMoonAkali
                     if (Config.Item("LaneClearQA").GetValue<bool>())
                     {
                         if (Config.Item("LaneClearQA").GetValue<bool>() && Config.Item("LaneClearOnlyQE").GetValue<bool>()
-                            && predictedHealtMinionq < Q.GetDamage(minion) + markdmg
+                            && minion.Health < Q.GetDamage(minion) + markdmg
                             && minion.Distance(Player.Position) < Orbwalking.GetRealAutoAttackRange(Player) && Q.IsReady())
                             Q.Cast(minion);
 
@@ -564,7 +569,7 @@ namespace BloodMoonAkali
                  
                     if (Config.Item("LaneClearE").GetValue<bool>() && Config.Item("LaneClearOnlyQE").GetValue<bool>()
                         && E.IsReady() && minion.Health < E.GetDamage(minion)
-                        && MinionsE.Count >= 1)
+                        && MinionsE.Count >= Config.Item("LaneClearCount").GetValue<Slider>().Value)
                         E.Cast(minion);
                 }
             }
