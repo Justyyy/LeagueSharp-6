@@ -70,7 +70,7 @@ namespace BloodMoonAkali
             combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("eslider", "Enemy Count").SetValue(new Slider(3, 5, 0)));
             combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("miniongapclose", "Use Minion to gapclose? [Requires 2 R stacks]").SetValue(true));
             combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("herogapclose", "Use Enemy Champion to gapclose? [Requires 2 R stacks]").SetValue(true));
-            combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("rangeRslider", "[R] gapclose Range").SetValue(new Slider(200, 600, 0)));
+            combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("rangeRslider", "[R] gapclose Range").SetValue(new Slider(350, 600, 0)));
 
             //ITEMS
             combo.SubMenu("[Item Settings]").AddItem(new MenuItem("UseItems", "Use Offensive Items").SetValue(true));
@@ -118,7 +118,7 @@ namespace BloodMoonAkali
             killsteal.AddItem(new MenuItem("KS", "Use Smart Killsteal").SetValue(true));
             killsteal.AddItem(new MenuItem("KSQ", "Use Q").SetValue(true));
             killsteal.AddItem(new MenuItem("KSE", "Use E").SetValue(true));
-            killsteal.AddItem(new MenuItem("KSR", "Use R").SetValue(true));
+            killsteal.AddItem(new MenuItem("KSR", "Use R").SetValue(false));
             killsteal.AddItem(new MenuItem("KSIngite", "Use Ingite").SetValue(true));
 
             //DRAWING
@@ -131,7 +131,6 @@ namespace BloodMoonAkali
             drawing.SubMenu("Spell Drawings").AddItem(new MenuItem("CircleThickness", "Circle Thickness").SetValue(new Slider(7, 30, 0)));
             drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawdmg", "Draw Damage on Enemy HPbar").SetValue(true));
             drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawpotential", "Draw Potential Combo DMG").SetValue(true));
-            drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawreal", "Draw Potential Combo DMG").SetValue(true));
             drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawRstacks", "Draw R stacks").SetValue(true));
             drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("rlines", "Draw R Gapclose Lines").SetValue(true));
             drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawRend", "Draw R End Position").SetValue(true));
@@ -1034,7 +1033,7 @@ namespace BloodMoonAkali
 
                         W.Cast(Player);
 
-                    if (enemy.CountEnemiesInRange(600) >= Config.Item("WHEslider").GetValue<Slider>().Value)
+                    if (enemy.CountEnemiesInRange(700) >= Config.Item("WHEslider").GetValue<Slider>().Value)
 
                         W.Cast(Player);
 
