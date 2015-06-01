@@ -494,8 +494,7 @@ namespace BloodMoonAkali
                     if (minion.HasBuff("AkaliMota")
                         && minion.Health < markdmg && minion.Position.Distance(Player.Position) < Orbwalking.GetRealAutoAttackRange(Player))
                     {
-                        Orbwalker.ForceTarget(minion);
-                        Orbwalker.SetMovement(false);                
+                        Orbwalker.ForceTarget(minion);           
                         Player.IssueOrder(GameObjectOrder.AutoAttack, minion);
                     }
                 }
@@ -1112,9 +1111,9 @@ namespace BloodMoonAkali
                 if (Config.Item("drawpotential").GetValue<bool>())
                     Drawing.DrawText(epos.X - 50, epos.Y + 50, System.Drawing.Color.Gold,
                         "Potential DMG = " + PotentialDmg(enemy).ToString());
-                if (Config.Item("drawreal").GetValue<bool>())
-                    Drawing.DrawText(epos.X - 50, epos.Y + 75, System.Drawing.Color.Gold,
-                        "Actual DMG = " + ActualDMG(enemy).ToString());
+              //  if (Config.Item("drawreal").GetValue<bool>())
+                 //   Drawing.DrawText(epos.X - 50, epos.Y + 75, System.Drawing.Color.Gold,
+                   //     "Actual DMG = " + ActualDMG(enemy).ToString());
             }
             var target = TargetSelector.GetTarget(R.Range * 2 + 500, TargetSelector.DamageType.Magical);
             var DRendPos = Player.ServerPosition.Extend(target.Position, Player.ServerPosition.Distance(target.Position) + 175);
