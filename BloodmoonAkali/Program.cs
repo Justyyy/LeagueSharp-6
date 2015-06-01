@@ -1074,6 +1074,9 @@ namespace BloodMoonAkali
 
         private static void OnDraw(EventArgs args)
         {
+            var pos = Drawing.WorldToScreen(ObjectManager.Player.Position);
+            if (Config.Item("HarassToggle").GetValue<KeyBind>().Active)
+                Drawing.DrawText(pos.X - 50, pos.Y + 30, System.Drawing.Color.Plum, "AutoHarass Enabled");
 
             if (Config.Item("Draw_Disabled").GetValue<bool>())
                 return;
