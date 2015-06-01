@@ -137,10 +137,10 @@ namespace BloodMoonAkali
 
             //MISC
             misc.AddItem(new MenuItem("AntiGapW", "Anti-Gapcloser [W]").SetValue(true));
-            misc.SubMenu("Trinket Settings").AddItem(new MenuItem("AutoRedTrinket", "Auto Buy Sweeper").SetValue(false));
-            misc.SubMenu("Trinket Settings").AddItem(new MenuItem("AutoRedTrinketLevel", "Buy Sweeper at level").SetValue(new Slider(6, 18, 1)));
-            misc.SubMenu("Trinket Settings").AddItem(new MenuItem("AutoRedTrinketUpgrade", "Auto upgrade sweeper (Oracle Lens 250 Gold)").SetValue(false));
-            misc.SubMenu("Trinket Settings").AddItem(new MenuItem("AutoRedTrinketUpgradeLevel", "Upgrade sweeper at level").SetValue(new Slider(9, 18, 9)));
+            //misc.SubMenu("Trinket Settings").AddItem(new MenuItem("AutoRedTrinket", "Auto Buy Sweeper").SetValue(false));
+            //misc.SubMenu("Trinket Settings").AddItem(new MenuItem("AutoRedTrinketLevel", "Buy Sweeper at level").SetValue(new Slider(6, 18, 1)));
+            //misc.SubMenu("Trinket Settings").AddItem(new MenuItem("AutoRedTrinketUpgrade", "Auto upgrade sweeper (Oracle Lens 250 Gold)").SetValue(false));
+            //misc.SubMenu("Trinket Settings").AddItem(new MenuItem("AutoRedTrinketUpgradeLevel", "Upgrade sweeper at level").SetValue(new Slider(9, 18, 9)));
 
 
             Config.AddToMainMenu();
@@ -225,14 +225,14 @@ namespace BloodMoonAkali
             {
                 OnReceiveBuff();
             }
-            if (Config.Item("AutoRedTrinket").GetValue<bool>())
-            {
-                AutoRedTrinket();
-            }
-            if (Config.Item("AutoRedTrinketUpgrade").GetValue<bool>())
-            {
-                AutoRedTrinketUpgrade();
-            }
+            //if (Config.Item("AutoRedTrinket").GetValue<bool>())
+            //{
+            //    AutoRedTrinket();
+           // }
+            //if (Config.Item("AutoRedTrinketUpgrade").GetValue<bool>())
+            //{
+             //   AutoRedTrinketUpgrade();
+            //}
             var zpos = Drawing.WorldToScreen(Player.Position);
             var rstacks = Player.Buffs.Find(buff => buff.Name == "AkaliShadowDance").Count;
             if (Config.Item("drawRstacks").GetValue<bool>())
@@ -651,28 +651,6 @@ namespace BloodMoonAkali
                 E.Cast();
         }
 
-        private static void AutoRedTrinketUpgrade()
-        {
-            if (Items.HasItem(3341))
-            {
-                if (Player.InShop() && Player.Level >= Config.Item("AutoRedTrinketUpgradeLevel").GetValue<Slider>().Value
-                    && Player.Gold > 249)
-                {
-                    Player.BuyItem(ItemId.Oracles_Lens_Trinket);
-                }
-            }
-        }
-
-        private static void AutoRedTrinket()
-        {
-            if (Items.HasItem(3341))
-                return;
-
-            if (Player.InShop() && Player.Level >= Config.Item("AutoRedTrinketLevel").GetValue<Slider>().Value)
-            {
-                Player.BuyItem(ItemId.Sweeping_Lens_Trinket);
-            }
-        }
         private static void SmartKS()
         {
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>()
