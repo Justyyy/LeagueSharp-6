@@ -105,7 +105,7 @@ namespace BloodMoonAkali
 
             //LANECLEAR
             laneclear.AddItem(new MenuItem("LaneClearQ", "Laneclear with Q").SetValue(true));
-            laneclear.AddItem(new MenuItem("LaneClearE", "Laneclear with E").SetValue(true));
+            laneclear.AddItem(new MenuItem("LaneClearE", "Laneclear with E").SetValue(false));
             laneclear.AddItem(new MenuItem("LaneClearCount", "Minion HitCount").SetValue(new Slider(3, 10, 0)));
             laneclear.AddItem(new MenuItem("LaneClearEnergy", "% Energy").SetValue(new Slider(50, 100, 0)));
             laneclear.AddItem(new MenuItem("LaneClearOnlyQE", "Only use Abilities if minion is killable").SetValue(true));
@@ -529,6 +529,9 @@ namespace BloodMoonAkali
                     if (minion.Team == GameObjectTeam.Neutral)
                         return;
 
+                    if (Player.IsWindingUp)
+                        return;
+
                     if (minion.HasBuff("AkaliMota")
                         && minion.Health < markdmg)
                     {
@@ -569,7 +572,7 @@ namespace BloodMoonAkali
                  
                     if (Config.Item("LaneClearE").GetValue<bool>() && Config.Item("LaneClearOnlyQE").GetValue<bool>()
                         && E.IsReady() && minion.Health < E.GetDamage(minion)
-                        && MinionsE.Count >= Config.Item("LaneClearCount").GetValue<Slider>().Value)
+                        && MinionsE.Count  >= Config.Item("LaneClearCount").GetValue<Slider>().Value)
                         E.Cast(minion);
                 }
             }
