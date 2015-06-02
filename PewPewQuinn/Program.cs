@@ -438,6 +438,8 @@ namespace PewPewQuinn
                                                                    minion.Distance(player.ServerPosition) <=
                                                                    E.Range))
             {
+                if (player.HasBuff("quinnrtimeout") || player.HasBuff("QuinnRForm"))
+                    return;
                 var ecastpos = player.ServerPosition.Extend(minion.Position,
                     player.ServerPosition.Distance(minion.Position) - (Orbwalking.GetRealAutoAttackRange(player) - player.Distance(minion.Position)));
 
