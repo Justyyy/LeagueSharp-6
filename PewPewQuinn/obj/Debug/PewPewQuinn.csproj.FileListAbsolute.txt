@@ -1,0 +1,12 @@
+C:\Users\HAF911\Documents\GitHub\ScientificQuinn\bin\Release\PewPewQuinn.exe.config
+C:\Users\HAF911\Documents\GitHub\ScientificQuinn\bin\Release\PewPewQuinn.exe
+C:\Users\HAF911\Documents\GitHub\ScientificQuinn\bin\Release\PewPewQuinn.pdb
+C:\Users\HAF911\Documents\GitHub\ScientificQuinn\bin\Release\LeagueSharp.Common.dll
+C:\Users\HAF911\Documents\GitHub\ScientificQuinn\bin\Release\LeagueSharp.dll
+C:\Users\HAF911\Documents\GitHub\ScientificQuinn\bin\Release\SharpDX.Direct3D9.dll
+C:\Users\HAF911\Documents\GitHub\ScientificQuinn\bin\Release\SharpDX.dll
+C:\Users\HAF911\Documents\GitHub\ScientificQuinn\bin\Release\clipper_library.dll
+C:\Users\HAF911\Documents\GitHub\ScientificQuinn\bin\Release\LeagueSharp.Sandbox.dll
+C:\Users\HAF911\Documents\GitHub\ScientificQuinn\obj\Debug\PewPewQuinn.csprojResolveAssemblyReference.cache
+C:\Users\HAF911\Documents\GitHub\ScientificQuinn\obj\Debug\PewPewQuinn.exe
+C:\Users\HAF911\Documents\GitHub\ScientificQuinn\obj\Debug\PewPewQuinn.pdb
