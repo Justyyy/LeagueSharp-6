@@ -467,8 +467,8 @@ namespace PewPewQuinn
                 if (Config.Item("donteinturret").GetValue<bool>() && ecastpos.UnderTurret(true))
                     return;
 
-                if (ecastpos.Distance(target.Position) < Orbwalking.GetRealAutoAttackRange(player) - 50 
-                    && target.Distance(player.Position) > Orbwalking.GetRealAutoAttackRange(player) && target.Health < CalcDamage(target) && Config.Item("emgapcloser").GetValue<bool>() && minion.Distance(player.Position) < 105)
+                if (ecastpos.Distance(target.Position) < Orbwalking.GetRealAutoAttackRange(player)
+                    && target.Distance(player.Position) > Orbwalking.GetRealAutoAttackRange(player) && target.Health < CalcDamage(target) && Config.Item("emgapcloser").GetValue<bool>() && !player.IsFacing(minion))
                     E.Cast(minion);
             }
 
