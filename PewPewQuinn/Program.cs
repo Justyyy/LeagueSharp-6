@@ -468,7 +468,7 @@ namespace PewPewQuinn
                     return;
 
                 if (ecastpos.Distance(target.Position) < Orbwalking.GetRealAutoAttackRange(player) - 50 
-                    && target.Distance(player.Position) > Orbwalking.GetRealAutoAttackRange(player) && target.Health < CalcDamage(target) && Config.Item("emgapcloser").GetValue<bool>())
+                    && target.Distance(player.Position) > Orbwalking.GetRealAutoAttackRange(player) && target.Health < CalcDamage(target) && Config.Item("emgapcloser").GetValue<bool>() && minion.Distance(player.Position) < 105)
                     E.Cast(minion);
             }
 
