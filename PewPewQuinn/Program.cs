@@ -547,7 +547,7 @@ namespace PewPewQuinn
         {
                 Ignite = player.GetSpellSlot("summonerdot");
                 var aa = player.GetAutoAttackDamage(target, true) * (1 + player.Crit);
-                var damage = aa * 2;
+                var damage = aa;
 
             if (Ignite.IsReady())
                 damage += player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite);
@@ -572,7 +572,7 @@ namespace PewPewQuinn
             
 
             if (Config.Item("UseRD").GetValue<bool>() && R.IsReady()) // rdamage              
-                        damage += R.Level * 125 + aa*3;
+                        damage += R.Level * 125 + aa;
                     
                         return (int) damage;
                 }
