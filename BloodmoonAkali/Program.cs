@@ -784,9 +784,9 @@ namespace BloodMoonAkali
 
                 if (Player.Distance(target.ServerPosition) < Orbwalking.GetRealAutoAttackRange(Player) && target.HasBuff("AkaliMota"))        
                     return;
-                if (Player.Distance(target.ServerPosition) < Orbwalking.GetRealAutoAttackRange(Player) && E.IsReady())
+                if (Player.Distance(target.ServerPosition) < E.Range && E.IsReady())
                     return;
-                if (Player.Distance(target.ServerPosition) < Orbwalking.GetRealAutoAttackRange(Player) && Q.IsReady())
+                if (Player.Distance(target.ServerPosition) < Q.Range && Q.IsReady())
                     return;
 
             if (target.IsFacing(Player) && target.IsMoving && !target.HasBuff("AkaliMota") && target.Health > R.GetDamage(target) && target.Health > PotentialDmg(target) && Config.Item("endposcheck").GetValue<bool>())
