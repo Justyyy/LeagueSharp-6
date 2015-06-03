@@ -111,6 +111,8 @@ namespace PewPewQuinn
             Config.SubMenu("[PewPew]: Misc Settings").AddItem(new MenuItem("DrawD", "Damage Indicator").SetValue(true));
             Config.SubMenu("[PewPew]: Misc Settings").AddItem(new MenuItem("interrupt", "Interrupt Spells").SetValue(true));
             Config.SubMenu("[PewPew]: Misc Settings").AddItem(new MenuItem("antigap", "AntiGapCloser").SetValue(true));
+            Config.SubMenu("[PewPew]: Misc Settings").AddItem(new MenuItem("AntiRengar", "Anti-Rengar Leap").SetValue(true));
+            Config.SubMenu("[PewPew]: Misc Settings").AddItem(new MenuItem("AntiKhazix", "Anti-Khazix Leap").SetValue(true));
 
             Config.AddItem(new MenuItem("PewPew", "            PewPew Prediction Settings"));
 
@@ -124,11 +126,29 @@ namespace PewPewQuinn
             Drawing.OnDraw += OnDraw;
             Drawing.OnDraw += Drawings;
             Drawing.OnEndScene += OnEndScene;
+            GameObject.OnCreate += GameObject_OnCreate;
             Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
             AntiGapcloser.OnEnemyGapcloser += AntiGapCloser_OnEnemyGapcloser;
             QuinnRanges();
         }
+        private static void GameObject_OnCreate(GameObject sender, EventArgs args)
+        {
 
+            var rengar = HeroManager.Enemies.Find(h => h.ChampionName.Equals("Rengar")); //<---- Credits to Asuna (Couldn't figure out how to cast R to Sender so I looked at his vayne ^^
+            if (rengar != null)
+
+                if (sender.Name == ("Rengar_LeapSound.troy") && Config.Item("AntiRengar").GetValue<bool>() &&
+                    sender.Position.Distance(player.Position) < R.Range)
+                    R.Cast(rengar);
+
+            var khazix = HeroManager.Enemies.Find(h => h.ChampionName.Equals("Khazix"));
+            if (khazix != null)
+
+                if (sender.Name == ("Khazix_Base_E_Tar.troy") && Config.Item("AntiKhazix").GetValue<bool>() &&
+                   sender.Position.Distance(player.Position) <= 300)
+                    R.Cast(khazix);
+
+        }
         private static void Drawings(EventArgs args)
         {
             if (Config.Item("Draw_Disabled").GetValue<bool>())
