@@ -498,7 +498,7 @@ namespace PewPewQuinn
                 return;
 
             if (E.IsReady() && R.IsReady() && player.Distance(target) < 1600
-                && target.CountEnemiesInRange(600) <= Config.Item("enear").GetValue<Slider>().Value &&
+                && target.CountEnemiesInRange(600) <= Config.Item("enear").GetValue<Slider>().Value && target.Health < CalcDamage(target) &&
                 player.ManaPercent >= rmana)
                 R.Cast();
         }
@@ -538,15 +538,6 @@ namespace PewPewQuinn
             if (R.IsReady() && Ignite.IsReady() && ultignite > target.Health &&
                 player.Position.CountEnemiesInRange(500) > 0)
                 R.Cast(player);
-
-            if (target.Health < player.GetAutoAttackDamage(target)*2 && player.Distance(target.Position) <= Orbwalking.GetRealAutoAttackRange(target))
-                return;
-            if (target.Health < player.GetAutoAttackDamage(target) * 1 + Q.GetDamage(target) && player.Distance(target.Position) <= Orbwalking.GetRealAutoAttackRange(target))
-                return;
-            if (target.Health < player.GetAutoAttackDamage(target) + Q.GetDamage(target) && player.Distance(target.Position) <= Orbwalking.GetRealAutoAttackRange(target))
-                return;
-            if (target.Health < player.GetAutoAttackDamage(target) * 1 + E.GetDamage(target) && E.IsReady() && target.IsValidTarget(E.Range))
-                return;
 
             if (R.IsReady() && ultfinisher > target.Health && player.Position.CountEnemiesInRange(500) > 0)
                 R.Cast(player);

@@ -61,16 +61,17 @@ namespace BloodMoonAkali
             combo.SubMenu("[Advanced Features W]").AddItem(new MenuItem("WHEslider", "Enemy Count").SetValue(new Slider(3, 5, 1)));
 
             //[R] Settings
-            combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("Rkill", "Only use [R] if Killable").SetValue(true));
-            combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("rturret", "Don't R into Turret Range if HP below %").SetValue(true));
+            //combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("Rkill", "Only use [R] if Killable").SetValue(true));
+            combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("rendposcheck", "Use [R] End Position Check").SetValue(true));
+            combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("rturret", "Don't R into Turret Range if HP below %").SetValue(false));
             combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("rturrethp", "% HP").SetValue(new Slider(70, 100, 0)));
-            combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("rturrete", "Don't R into Turret Range if target HP above %").SetValue(true));
+            combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("rturrete", "Don't R into Turret Range if target HP above %").SetValue(false));
             combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("rturrethpe", "% HP").SetValue(new Slider(40, 100, 0)));
-            combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("Rcheck", "Don't [R] into X amount of enemies").SetValue(false));
-            combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("eslider", "Enemy Count").SetValue(new Slider(3, 5, 0)));
+            //combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("Rcheck", "Don't [R] into X amount of enemies").SetValue(false));
+            //combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("eslider", "Enemy Count").SetValue(new Slider(3, 5, 0)));
             combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("miniongapclose", "Use Minion to gapclose? [Requires 2 R stacks]").SetValue(true));
             combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("herogapclose", "Use Enemy Champion to gapclose? [Requires 2 R stacks]").SetValue(true));
-            combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("rangeRslider", "[R] gapclose Range").SetValue(new Slider(350, 600, 0)));
+            //combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("rangeRslider", "[R] gapclose Range").SetValue(new Slider(350, 600, 0)));
 
             //ITEMS
             combo.SubMenu("[Item Settings]").AddItem(new MenuItem("UseItems", "Use Offensive Items").SetValue(true));
@@ -127,7 +128,7 @@ namespace BloodMoonAkali
             drawing.SubMenu("Spell Drawings").AddItem(new MenuItem("Wdraw", "Draw W Range").SetValue(new Circle(true, System.Drawing.Color.IndianRed)));
             drawing.SubMenu("Spell Drawings").AddItem(new MenuItem("Edraw", "Draw E Range").SetValue(new Circle(true, System.Drawing.Color.IndianRed)));
             drawing.SubMenu("Spell Drawings").AddItem(new MenuItem("Rdraw", "Draw R Range").SetValue(new Circle(true, System.Drawing.Color.IndianRed)));
-            drawing.SubMenu("Spell Drawings").AddItem(new MenuItem("RGdraw", "Draw R Gapclose Range").SetValue(new Circle(true, System.Drawing.Color.IndianRed)));
+            //drawing.SubMenu("Spell Drawings").AddItem(new MenuItem("RGdraw", "Draw R Gapclose Range").SetValue(new Circle(true, System.Drawing.Color.IndianRed)));
             drawing.SubMenu("Spell Drawings").AddItem(new MenuItem("CircleThickness", "Circle Thickness").SetValue(new Slider(7, 30, 0)));
             drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawdmg", "Draw Damage on Enemy HPbar").SetValue(true));
             drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawpotential", "Draw Potential Combo DMG").SetValue(true));
@@ -759,90 +760,45 @@ namespace BloodMoonAkali
             var target = TargetSelector.GetTarget(R.Range * 2 + 150, TargetSelector.DamageType.Magical);
             if (target == null || !target.IsValidTarget())
                 return;
-            var edmg = E.GetDamage(target);
-            var rdmg = R.GetDamage(target);
-            var qdmg = Q.GetDamage(target);
-            var thp = target.Health;
-            var RendPos = Player.ServerPosition.Extend(target.Position, Player.ServerPosition.Distance(target.Position) + 175);
             var DRendPos = Player.ServerPosition.Extend(target.Position, Player.ServerPosition.Distance(target.Position) + 175);
             Ignite = Player.GetSpellSlot("summonerdot");
 
             Item();
             IgniteLogic();
 
-            var rrange = Config.Item("rangeRslider").GetValue<Slider>().Value;
 
-            if (target.IsMoving && target.IsFacing(Player))
-                DRendPos = Player.ServerPosition.Extend(target.Position, Player.ServerPosition.Distance(target.Position) + 200);
-            if (target.IsMoving && !target.IsFacing(Player))
-                DRendPos = Player.ServerPosition.Extend(target.Position, Player.ServerPosition.Distance(target.Position) + 75);
-            if (!target.IsMoving)
-                DRendPos = Player.ServerPosition.Extend(target.Position, Player.ServerPosition.Distance(target.Position) + 150);
-            if (target.HasBuff("AkaliMota") && !target.IsMoving)
-                DRendPos = Player.ServerPosition.Extend(target.Position, Player.ServerPosition.Distance(target.Position) + 100);
-            if (target.HasBuff("AkaliMota") && target.IsMoving && !target.IsFacing(Player))
-                DRendPos = Player.ServerPosition.Extend(target.Position, Player.ServerPosition.Distance(target.Position) + 50);
-            if (target.HasBuff("AkaliMota") && !target.IsFacing(Player) && target.IsMoving)
-                DRendPos = Player.ServerPosition.Extend(target.Position, Player.ServerPosition.Distance(target.Position) + 100);
+            //TURRET CHECK          
+                //if (target.CountEnemiesInRange(1200) > Config.Item("eslider").GetValue<Slider>().Value &&
+                  //  Config.Item("Rcheck").GetValue<bool>())
+                   // return;
 
-            //TURRET CHECK
-
-            if (R.IsReady() && Config.Item("UseR").GetValue<bool>())
-            {
-                if (target.CountEnemiesInRange(1200) > Config.Item("eslider").GetValue<Slider>().Value &&
-                    Config.Item("Rcheck").GetValue<bool>())
-                    return;
-
-                if (RendPos.UnderTurret(true) && Config.Item("rturrete").GetValue<bool>() &&
+                if (DRendPos.UnderTurret(true) && Config.Item("rturrete").GetValue<bool>() &&
                      target.HealthPercent > Config.Item("rturrethpe").GetValue<Slider>().Value)
-                    return;
-
-
-                if (RendPos.UnderTurret(true) && Config.Item("rturret").GetValue<bool>() &&
-                    Player.HealthPercent < Config.Item("rturrethp").GetValue<Slider>().Value)
-                    return;
+                     return;
+                if (DRendPos.UnderTurret(true) && Config.Item("rturret").GetValue<bool>() &&
+                     Player.HealthPercent < Config.Item("rturrethp").GetValue<Slider>().Value)
+                     return;
 
 
                 //When not to use R
-                if (Player.Distance(target.ServerPosition) <= Orbwalking.GetRealAutoAttackRange(Player) && Player.HealthPercent > 30 && thp > rdmg)
+
+                if (Player.Distance(target.ServerPosition) < Orbwalking.GetRealAutoAttackRange(Player) && target.HasBuff("AkaliMota"))        
                     return;
-                if (Player.Distance(target.ServerPosition) <= E.Width - 15 && E.IsReady() && Player.HealthPercent > 40 && thp > edmg)
+                if (Player.Distance(target.ServerPosition) < Orbwalking.GetRealAutoAttackRange(Player) && E.IsReady())
                     return;
-                if (Player.Distance(target.ServerPosition) <= Q.Range && Q.IsReady() && thp < qdmg)
+                if (Player.Distance(target.ServerPosition) < Orbwalking.GetRealAutoAttackRange(Player) && Q.IsReady())
                     return;
-                if (Player.Distance(target.ServerPosition) <= Orbwalking.GetRealAutoAttackRange(Player))
-                    return;
-                if (target.IsValidTarget(E.Range))
-                    return;
+
+            if (target.IsFacing(Player) && target.IsMoving && !target.HasBuff("AkaliMota") && target.Health > R.GetDamage(target) && target.Health > PotentialDmg(target) && Config.Item("endposcheck").GetValue<bool>())
+                return;
 
 
                 //When to use R
-                if (thp < PotentialDmg(target) + 15 * Player.Level)
-                {
-                    if (Config.Item("UseR").GetValue<bool>() && DRendPos.Distance(target.ServerPosition) <= 175 || Config.Item("UseR").GetValue<bool>() && IsWall(DRendPos))
-                    {
-                        R.Cast(target, true);
-                    }
-
-                    //GAPCLOSE
-                    if (Player.Distance(target.ServerPosition) >= rrange && DRendPos.Distance(target.ServerPosition) <= 175 || Player.Distance(target.ServerPosition) >=rrange && IsWall(DRendPos))
-
-                        R.Cast(target, true);
-
-                    Gapcloser();
-
-                }
-            }
-
-            //IF RKILL DISABLED
-
-            //Turret check for enemy count
-            if (!Config.Item("Rkill").GetValue<bool>() && Player.Distance(target.ServerPosition) >= rrange && DRendPos.Distance(target.ServerPosition) <= 175 || !Config.Item("Rkill").GetValue<bool>() && Player.Distance(target.ServerPosition) >= rrange && IsWall(DRendPos))
-
+            if (Config.Item("UseR").GetValue<bool>() && DRendPos.Distance(target.Position) < 180)
+            {
                 R.Cast(target, true);
-
-            if (!Config.Item("Rkill").GetValue<bool>())
                 Gapcloser();
+            }
 
 
         }
@@ -896,16 +852,11 @@ namespace BloodMoonAkali
 
             if (target.Position.Distance(Player.Position) < R.Range + 75)
                 return;
-
-            foreach (var minion in
-                ObjectManager.Get<Obj_AI_Minion>().Where(minion => minion.IsValidTarget() && minion.IsEnemy &&
-                                                                   minion.Distance(Player.ServerPosition) <=
-                                                                   R.Range * 2 + 100))
-            {
+            
                 if (Config.Item("miniongapclose").GetValue<bool>() && rstacks > 1 &&
-                    minion.Distance(target.Position) < R.Range && Player.Distance(target.Position) >= R.Range)
+                    GetFarthestMinion(Player.Position, target.Position).Distance(target.Position) < R.Range && Player.Distance(target.Position) >= R.Range)
                     R.Cast(GetFarthestMinion(Player.Position, target.Position));
-            }
+            
             foreach (var h in
                 ObjectManager.Get<Obj_AI_Hero>().Where(h => h.IsValidTarget() && h.IsEnemy &&
                                                             h.Distance(Player.ServerPosition) <=
@@ -1006,11 +957,11 @@ namespace BloodMoonAkali
             {
                 if (Config.Item("UseW").GetValue<bool>())
                 {
-                    if (Player.HealthPercent <= Config.Item("WHPslider").GetValue<Slider>().Value)
+                    if (Player.HealthPercent <= Config.Item("WHPslider").GetValue<Slider>().Value && Config.Item("WHP").GetValue<bool>())
 
                         W.Cast(Player);
 
-                    if (enemy.CountEnemiesInRange(700) >= Config.Item("WHEslider").GetValue<Slider>().Value)
+                    if (enemy.CountEnemiesInRange(700) >= Config.Item("WHEslider").GetValue<Slider>().Value && Config.Item("WHE").GetValue<bool>())
 
                         W.Cast(Player);
 
