@@ -349,9 +349,10 @@ namespace PewPewQuinn
 
             if (E.IsReady() && Config.Item("harassE").GetValue<bool>() && target.IsValidTarget(E.Range) &&
                 player.ManaPercent >= harassmana)
-
+            {
                 E.CastOnUnit(target);
                 player.IssueOrder(GameObjectOrder.AutoAttack, target);
+            }
         }
         private static float IgniteDamage(Obj_AI_Hero target)
         {
