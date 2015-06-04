@@ -488,7 +488,7 @@ namespace BloodMoonAkali
                 
                 if (Config.Item("LastHitQA").GetValue<bool>())
                 {
-                    if (Config.Item("LastHitQA").GetValue<bool>() && predictedHealtMinionq < Q.GetDamage(minion) + markdmg
+                    if (Config.Item("LastHitQA").GetValue<bool>() && minion.Health < Q.GetDamage(minion) + markdmg
                         && minion.Distance(Player.Position) < Orbwalking.GetRealAutoAttackRange(Player) && Q.IsReady())
                         Q.Cast(minion);
 
