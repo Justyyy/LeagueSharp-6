@@ -138,15 +138,15 @@ namespace PewPewQuinn
             if (rengar != null)
 
                 if (sender.Name == ("Rengar_LeapSound.troy") && Config.Item("AntiRengar").GetValue<bool>() &&
-                    sender.Position.Distance(player.Position) < R.Range)
-                    R.Cast(rengar);
+                    sender.Position.Distance(player.Position) < E.Range)
+                    E.Cast(rengar);
 
             var khazix = HeroManager.Enemies.Find(h => h.ChampionName.Equals("Khazix"));
             if (khazix != null)
 
                 if (sender.Name == ("Khazix_Base_E_Tar.troy") && Config.Item("AntiKhazix").GetValue<bool>() &&
-                   sender.Position.Distance(player.Position) <= 300)
-                    R.Cast(khazix);
+                   sender.Position.Distance(player.Position) < E.Range)
+                    E.Cast(khazix);
 
         }
         private static void Drawings(EventArgs args)
