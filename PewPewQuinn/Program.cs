@@ -312,7 +312,7 @@ namespace PewPewQuinn
                 if (minion.HasBuff("QuinnW"))
                 {
                     Orbwalker.ForceTarget(minion);
-                    Orbwalking.Orbwalk(minion, Game.CursorPos);
+                    player.IssueOrder(GameObjectOrder.AutoAttack, minion);
                 }
 
             if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear && Qfarmpos.MinionsHit >= Config.Item("laneQhit").GetValue<Slider>().Value &&
@@ -322,7 +322,8 @@ namespace PewPewQuinn
                 Q.Cast(Qfarmpos.Position);
 
             foreach (var minion in AA)
-                if (minion.HasBuff("QuinnW"))
+                if (minion.HasBuff("QuinnW") && minion.Health < player.CalcDamage(minion, Damage.DamageType.Physical,
+                    15 + (player.Level*10) + (player.FlatPhysicalDamageMod*0.5)))
                 {
                     Orbwalker.ForceTarget(minion);
                     player.IssueOrder(GameObjectOrder.AutoAttack, minion);
@@ -552,9 +553,6 @@ namespace PewPewQuinn
 
             if (Q.IsReady() && target.IsValidTarget(225) && player.Position.CountEnemiesInRange(250) > 0)
                 Q.Cast(target);
-
-            if (Q.IsReady())
-                return;
 
             if (R.IsReady() && Ignite.IsReady() && ultignite > target.Health &&
                 player.Position.CountEnemiesInRange(500) > 0)
