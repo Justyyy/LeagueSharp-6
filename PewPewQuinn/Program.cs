@@ -323,7 +323,7 @@ namespace PewPewQuinn
 
             foreach (var minion in AA)
                 if (minion.HasBuff("QuinnW") && minion.Health < player.CalcDamage(minion, Damage.DamageType.Physical,
-                    15 + (player.Level*10) + (player.FlatPhysicalDamageMod*0.5)))
+                    15 + (player.Level*10) + (player.FlatPhysicalDamageMod*0.5) + player.GetAutoAttackDamage(minion)))
                 {
                     Orbwalker.ForceTarget(minion);
                     player.IssueOrder(GameObjectOrder.AutoAttack, minion);
