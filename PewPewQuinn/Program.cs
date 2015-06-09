@@ -260,6 +260,9 @@ namespace PewPewQuinn
                 case Orbwalking.OrbwalkingMode.LaneClear:
                     Laneclear();
                     break;
+                case Orbwalking.OrbwalkingMode.LastHit:
+                    Lasthit();
+                    break;
             }
 
             if (Config.Item("AutoHarass").GetValue<KeyBind>().Active)
@@ -283,6 +286,18 @@ namespace PewPewQuinn
                     return HitChance.VeryHigh;
             }
             return HitChance.VeryHigh;
+        }
+
+        private static void Lasthit()
+        {
+            var AA = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, Orbwalking.GetRealAutoAttackRange(player));
+            foreach (var minion in AA)
+                if (minion.HasBuff("QuinnW") && minion.Health < player.CalcDamage(minion, Damage.DamageType.Physical,
+                    15 + (player.Level * 10) + (player.FlatPhysicalDamageMod * 0.5) + player.GetAutoAttackDamage(minion)))
+                {
+                    Orbwalker.ForceTarget(minion);
+                    player.IssueOrder(GameObjectOrder.AutoAttack, minion);
+                }
         }
         private static void Laneclear()
         {
