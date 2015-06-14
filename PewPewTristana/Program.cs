@@ -3,6 +3,7 @@ using System.Diagnostics.Eventing.Reader;
 using System.Drawing.Printing;
 using System.Linq;
 using System.Runtime.Remoting.Channels;
+using System.Security.AccessControl;
 using LeagueSharp;
 using LeagueSharp.Common;
 using LeagueSharp.Common.Data;
@@ -82,12 +83,9 @@ namespace PewPewTristana
             combo.SubMenu("[E] Settings").AddItem(new MenuItem("ohp", "Own HP %").SetValue(new Slider(65, 100, 0)));
 
             combo.SubMenu("[R] Settings")
-            .AddItem(
-        new MenuItem("UseR", "Use R [FINISHER] (TOGGLE) ").SetValue(new KeyBind('K', KeyBindType.Toggle)));
-            combo.SubMenu("[R] Settings")
-                .AddItem(new MenuItem("UseRE", "Use ER [FINISHER]").SetValue(true));
-            combo.SubMenu("[R] Settings")
-                .AddItem(new MenuItem("manualr", "Cast R on your target").SetValue(new KeyBind('R', KeyBindType.Press)));
+            .AddItem(new MenuItem("UseR", "Use R [FINISHER] (TOGGLE) ").SetValue(new KeyBind('K', KeyBindType.Toggle)));
+            combo.SubMenu("[R] Settings").AddItem(new MenuItem("UseRE", "Use ER [FINISHER]").SetValue(true));
+            combo.SubMenu("[R] Settings").AddItem(new MenuItem("manualr", "Cast R on your target").SetValue(new KeyBind('R', KeyBindType.Press)));
 
 
 
@@ -103,6 +101,7 @@ namespace PewPewTristana
             combo.SubMenu("Item Settings")
                 .AddItem(new MenuItem("HLe", "  Enemy HP Percentage").SetValue(new Slider(80, 100, 0)));
             combo.SubMenu("Summoner Settings").AddItem(new MenuItem("UseIgnite", "Use Ignite").SetValue(true));
+
 
             //LANECLEARMENU
             Config.SubMenu("[PPT]: Laneclear Settings")
@@ -121,6 +120,9 @@ namespace PewPewTristana
                 .AddItem(new MenuItem("jungleclearmana", "Mana Percentage").SetValue(new Slider(30, 100, 0)));
 
             drawing.AddItem(new MenuItem("Draw_Disabled", "Disable All Spell Drawings").SetValue(false));
+            drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawRtoggle", "Draw R finisher toggle").SetValue(true));
+            drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawtargetcircle", "Draw Orbwalker target circle").SetValue(true));
+
             drawing.AddItem(new MenuItem("Qdraw", "Draw Q Range").SetValue(new Circle(true, Color.Orange)));
             drawing.AddItem(new MenuItem("Wdraw", "Draw W Range").SetValue(new Circle(true, Color.DarkOrange)));
             drawing.AddItem(new MenuItem("Edraw", "Draw E Range").SetValue(new Circle(true, Color.AntiqueWhite)));
@@ -131,7 +133,8 @@ namespace PewPewTristana
             harass.AddItem(new MenuItem("harassE", "Use E").SetValue(true));
             harass.AddItem(new MenuItem("harassmana", "Mana Percentage").SetValue(new Slider(30, 100, 0)));
 
-            Config.SubMenu("[PPT]: Misc Settings").AddItem(new MenuItem("DrawD", "Damage Indicator").SetValue(true));
+            drawing.AddItem(new MenuItem("dmgdrawer", "[Damage Indicator]:", true).SetValue(new StringList(new[] { "Custom", "Common" })));
+
             Config.SubMenu("[PPT]: Misc Settings").AddItem(new MenuItem("interrupt", "Interrupt Spells").SetValue(true));
             Config.SubMenu("[PPT]: Misc Settings").AddItem(new MenuItem("antigap", "Antigapcloser").SetValue(true));
             Config.SubMenu("[PPT]: Misc Settings").AddItem(new MenuItem("AntiRengar", "Anti-Rengar Leap").SetValue(true));
@@ -148,7 +151,10 @@ namespace PewPewTristana
             GameObject.OnCreate += GameObject_OnCreate;
 
 
+
         }
+
+
 
         private static void GameObject_OnCreate(GameObject sender, EventArgs args)
         {
@@ -183,14 +189,23 @@ namespace PewPewTristana
 
         private static void OnEndScene(EventArgs args)
         {
-            if (Config.SubMenu("[PPT]: Misc Settings").Item("DrawD").GetValue<bool>())
+            int mode = Config.Item("dmgdrawer", true).GetValue<StringList>().SelectedIndex;
+            if (mode == 0)
             {
                 foreach (var enemy in
                     ObjectManager.Get<Obj_AI_Hero>().Where(ene => !ene.IsDead && ene.IsEnemy && ene.IsVisible))
                 {
                     Hpi.unit = enemy;
                     Hpi.drawDmg(CalcDamage(enemy), Color.Green);
-                }
+                    Utility.HpBarDamageIndicator.Enabled = false;
+                }             
+            }
+            if (mode == 1)
+            {
+                Utility.HpBarDamageIndicator.DamageToUnit = CalcDamage;
+                Utility.HpBarDamageIndicator.Color = Color.Aqua;
+                Utility.HpBarDamageIndicator.Enabled = true;
+
             }
         }
 
@@ -241,21 +256,21 @@ namespace PewPewTristana
 
                 W.Cast(target.Position);
         }
-        private static int CalcDamage(Obj_AI_Base target)
+        public static float CalcDamage(Obj_AI_Base target)
         {
             //Calculate Combo Damage
-            var aa = player.GetAutoAttackDamage(target, true) * (1 + player.Crit);
-            var damage = aa;
+            float damage = (float)player.GetAutoAttackDamage(target, true) * (1 + player.Crit);
+
             Ignite = player.GetSpellSlot("summonerdot");
 
             if (Ignite.IsReady())
-                damage += player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite);
+                damage += (float)player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite);
 
             if (Items.HasItem(3153) && Items.CanUseItem(3153))
-                damage += player.GetItemDamage(target, Damage.DamageItems.Botrk); //ITEM BOTRK
+                damage += (float)player.GetItemDamage(target, Damage.DamageItems.Botrk); //ITEM BOTRK
 
             if (Items.HasItem(3144) && Items.CanUseItem(3144))
-                damage += player.GetItemDamage(target, Damage.DamageItems.Bilgewater); //ITEM BOTRK
+                damage += (float)player.GetItemDamage(target, Damage.DamageItems.Bilgewater); //ITEM BOTRK
 
             if (Config.Item("UseE").GetValue<bool>()) // edamage
             {
@@ -275,7 +290,7 @@ namespace PewPewTristana
             {
                 damage += W.GetDamage(target);
             }
-            return (int)damage;
+            return damage;
 
 
         }
@@ -320,7 +335,8 @@ namespace PewPewTristana
         {
             var rmana = Config.Item("rmana").GetValue<Slider>().Value;
             var target = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Magical);
-            var erdamage = E.GetDamage(target) + R.GetDamage(target);
+            var estacks = target.Buffs.Find(buff => buff.Name == "tristanaecharge").Count;
+            var erdamage = (E.GetDamage(target)*(0.30*estacks + 1) - target.MagicShield - target.AttackShield);
             if (target == null || !target.IsValidTarget())
                 return;
 
@@ -339,6 +355,7 @@ namespace PewPewTristana
                 R.GetDamage(target) >= target.Health - 45 &&
                 player.ManaPercent >= rmana)
                 R.CastOnUnit(target);
+
         }
         private static float IgniteDamage(Obj_AI_Hero target)
         {
@@ -500,7 +517,7 @@ namespace PewPewTristana
             //Draw Skill Cooldown on Champ
             var pos = Drawing.WorldToScreen(ObjectManager.Player.Position);
 
-            if (Config.Item("UseR").GetValue<KeyBind>().Active)
+            if (Config.Item("UseR").GetValue<KeyBind>().Active && Config.Item("drawRtoggle").GetValue<bool>())
                 Drawing.DrawText(pos.X - 50, pos.Y + 50, Color.Gold, "[R] Finisher is Enabled!");
 
 
@@ -531,7 +548,9 @@ namespace PewPewTristana
                                                         Config.Item("CircleThickness").GetValue<Slider>().Value);
 
             var orbtarget = Orbwalker.GetTarget();
+            if (Config.Item("drawtargetcircle").GetValue<bool>())
             Render.Circle.DrawCircle(orbtarget.Position, 100, Color.DarkOrange, 10);
+
         }
     }
 }
