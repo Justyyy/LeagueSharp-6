@@ -107,6 +107,8 @@ namespace PewPewTristana
             Config.SubMenu("[PPT]: Laneclear Settings")
                 .AddItem(new MenuItem("laneE", "Use E").SetValue(true));
             Config.SubMenu("[PPT]: Laneclear Settings")
+                .AddItem(new MenuItem("efocus", "Prioritize Minions with E buff").SetValue(true));
+            Config.SubMenu("[PPT]: Laneclear Settings")
                 .AddItem(new MenuItem("laneclearmana", "Mana Percentage").SetValue(new Slider(30, 100, 0)));
 
             //JUNGLEFARMMENU
@@ -465,16 +467,19 @@ namespace PewPewTristana
 
                     E.CastOnUnit(minion);
 
-            foreach (var minion in AA)
-                if (minion.Health < player.GetAutoAttackDamage(player))
-                    return;
-
                         foreach (var minion in AA)
-                            if (minion.HasBuff("tristanaecharge"))
+                            if (minion.HasBuff("tristanaecharge") && Config.Item("efocus").GetValue<bool>())
                             {
                                 Orbwalker.ForceTarget(minion);
                                 player.IssueOrder(GameObjectOrder.AutoAttack, minion);
                             }
+
+            foreach (var turret in
+                ObjectManager.Get<Obj_AI_Turret>().Where(t => t.IsValidTarget() && player.Distance(t.Position) < Orbwalking.GetRealAutoAttackRange(player)))
+            {
+                E.Cast(turret);
+            }
+
         }
         private static void Jungleclear()
         {
@@ -503,11 +508,7 @@ namespace PewPewTristana
                     E.CastOnUnit(minion);
 
             foreach (var minion in AA)
-                if (minion.Health < player.GetAutoAttackDamage(player))
-                    return;
-
-            foreach (var minion in AA)
-                if (minion.HasBuff("tristanaecharge"))
+                if (minion.HasBuff("tristanaecharge") && Config.Item("efocus").GetValue<bool>())
                 {
                     Orbwalker.ForceTarget(minion);
                     player.IssueOrder(GameObjectOrder.AutoAttack, minion);
