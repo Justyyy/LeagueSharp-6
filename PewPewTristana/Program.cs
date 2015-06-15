@@ -37,8 +37,6 @@ namespace PewPewTristana
                 return;
 
             Notifications.AddNotification("PewPewTristana Loaded!", 5000);
-            Notifications.AddNotification("Latest Changes:", 2500);
-            Notifications.AddNotification("Anti-Rengar/Khazix Added", 2500);
 
             //Ability Information - Range - Variables.
             Q = new Spell(SpellSlot.Q);
@@ -446,6 +444,7 @@ namespace PewPewTristana
             var lanemana = Config.Item("laneclearmana").GetValue<Slider>().Value;
             var allMinionsQ = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, W.Range + W.Width + 30);
             var allMinionsE = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, E.Range);
+            var AA = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, Orbwalking.GetRealAutoAttackRange(player));
 
             var Qfarmpos = W.GetLineFarmLocation(allMinionsQ, W.Width);
             var Efarmpos = W.GetCircularFarmLocation(allMinionsE, 200);
@@ -466,15 +465,15 @@ namespace PewPewTristana
 
                     E.CastOnUnit(minion);
 
-            foreach (var minion in allMinionsE)
+            foreach (var minion in AA)
                 if (minion.Health < player.GetAutoAttackDamage(player))
                     return;
 
-                        foreach (var minion in allMinionsE)
+                        foreach (var minion in AA)
                             if (minion.HasBuff("tristanaecharge"))
                             {
                                 Orbwalker.ForceTarget(minion);
-                                player.IssueOrder(GameObjectOrder.AttackUnit, minion);
+                                player.IssueOrder(GameObjectOrder.AutoAttack, minion);
                             }
         }
         private static void Jungleclear()
@@ -485,7 +484,7 @@ namespace PewPewTristana
 
             var Qfarmpos = W.GetLineFarmLocation(MinionsQ, W.Width + 100);
             var Efarmpos = W.GetCircularFarmLocation(MinionsE, W.Width - +100);
-
+            var AA = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, Orbwalking.GetRealAutoAttackRange(player));
 
             if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear
                 && Qfarmpos.MinionsHit >= 1
@@ -503,15 +502,15 @@ namespace PewPewTristana
 
                     E.CastOnUnit(minion);
 
-            foreach (var minion in MinionsE)
+            foreach (var minion in AA)
                 if (minion.Health < player.GetAutoAttackDamage(player))
                     return;
 
-            foreach (var minion in MinionsE)
+            foreach (var minion in AA)
                 if (minion.HasBuff("tristanaecharge"))
                 {
                     Orbwalker.ForceTarget(minion);
-                    player.IssueOrder(GameObjectOrder.AttackUnit, minion);
+                    player.IssueOrder(GameObjectOrder.AutoAttack, minion);
                 }
 
         }
