@@ -448,7 +448,7 @@ namespace PewPewTristana
             var allMinionsE = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, E.Range);
 
             var Qfarmpos = W.GetLineFarmLocation(allMinionsQ, W.Width);
-            var Efarmpos = W.GetCircularFarmLocation(allMinionsE, W.Width);
+            var Efarmpos = W.GetCircularFarmLocation(allMinionsE, 200);
 
 
             if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear
@@ -502,6 +502,17 @@ namespace PewPewTristana
                     && player.ManaPercent >= jlanemana)
 
                     E.CastOnUnit(minion);
+
+            foreach (var minion in MinionsE)
+                if (minion.Health < player.GetAutoAttackDamage(player))
+                    return;
+
+            foreach (var minion in MinionsE)
+                if (minion.HasBuff("tristanaecharge"))
+                {
+                    Orbwalker.ForceTarget(minion);
+                    player.IssueOrder(GameObjectOrder.AttackUnit, minion);
+                }
 
         }
         private static void TristSpellRanges()
