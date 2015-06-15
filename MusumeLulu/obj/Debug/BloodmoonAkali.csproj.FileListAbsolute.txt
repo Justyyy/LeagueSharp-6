@@ -1,0 +1,16 @@
+C:\Users\larsk_000\Documents\GitHub\LeagueSharp\BloodmoonAkali\bin\Release\[ARK] Blood Moon Akali.exe.config
+C:\Users\larsk_000\Documents\GitHub\LeagueSharp\BloodmoonAkali\bin\Release\[ARK] Blood Moon Akali.exe
+C:\Users\larsk_000\Documents\GitHub\LeagueSharp\BloodmoonAkali\bin\Release\[ARK] Blood Moon Akali.pdb
+C:\Users\larsk_000\Documents\GitHub\LeagueSharp\BloodmoonAkali\bin\Release\LeagueSharp.Common.dll
+C:\Users\larsk_000\Documents\GitHub\LeagueSharp\BloodmoonAkali\bin\Release\LeagueSharp.dll
+C:\Users\larsk_000\Documents\GitHub\LeagueSharp\BloodmoonAkali\bin\Release\SharpDX.Direct3D9.dll
+C:\Users\larsk_000\Documents\GitHub\LeagueSharp\BloodmoonAkali\bin\Release\SharpDX.dll
+C:\Users\larsk_000\Documents\GitHub\LeagueSharp\BloodmoonAkali\bin\Release\clipper_library.dll
+C:\Users\larsk_000\Documents\GitHub\LeagueSharp\BloodmoonAkali\bin\Release\LeagueSharp.Sandbox.dll
+C:\Users\larsk_000\Documents\GitHub\LeagueSharp\BloodmoonAkali\bin\Release\LeagueSharp.xml
+C:\Users\larsk_000\Documents\GitHub\LeagueSharp\BloodmoonAkali\obj\Debug\[ARK] Blood Moon Akali.exe
+C:\Users\larsk_000\Documents\GitHub\LeagueSharp\BloodmoonAkali\obj\Debug\[ARK] Blood Moon Akali.pdb
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeLulu\bin\Release\[ARK] Blood Moon Akali.exe.config
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeLulu\obj\Debug\[ARK] Blood Moon Akali.exe
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeLulu\obj\Debug\[ARK] Blood Moon Akali.pdb
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeLulu\bin\Release\MusumeLulu.exe.config

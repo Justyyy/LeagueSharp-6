@@ -445,7 +445,7 @@ namespace PewPewTristana
         {
             var lanemana = Config.Item("laneclearmana").GetValue<Slider>().Value;
             var allMinionsQ = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, W.Range + W.Width + 30);
-            var allMinionsE = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, E.Range + W.Width - 50);
+            var allMinionsE = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, E.Range);
 
             var Qfarmpos = W.GetLineFarmLocation(allMinionsQ, W.Width);
             var Efarmpos = W.GetCircularFarmLocation(allMinionsE, W.Width);
@@ -460,12 +460,22 @@ namespace PewPewTristana
 
             foreach (var minion in allMinionsE)
                 if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear
-                    && minion.IsValidTarget(E.Range) && Efarmpos.MinionsHit >= 2
+                    && minion.IsValidTarget(E.Range) && Efarmpos.MinionsHit > 2
                     && allMinionsE.Count >= 2 && Config.Item("laneE").GetValue<bool>()
                     && player.ManaPercent >= lanemana)
 
                     E.CastOnUnit(minion);
 
+            foreach (var minion in allMinionsE)
+                if (minion.Health < player.GetAutoAttackDamage(player))
+                    return;
+
+                        foreach (var minion in allMinionsE)
+                            if (minion.HasBuff("tristanaecharge"))
+                            {
+                                Orbwalker.ForceTarget(minion);
+                                player.IssueOrder(GameObjectOrder.AttackUnit, minion);
+                            }
         }
         private static void Jungleclear()
         {
