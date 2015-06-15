@@ -19,7 +19,6 @@ namespace PewPewQuinn
         public static Spell E;
         public static Spell W;
         public static Spell R;
-        public static int SpellRangeTick;
         private static SpellSlot Ignite;
         private static readonly Obj_AI_Hero player = ObjectManager.Player;
         private static void Main(string[] args)
@@ -65,7 +64,7 @@ namespace PewPewQuinn
             combo.SubMenu("[E] Settings").AddItem(new MenuItem("donteinturret", "Don't E minion gapclose into turret range").SetValue(true));
             combo.SubMenu("[E] Settings").AddItem(new MenuItem("UseEC", "Only use E if target gets too close").SetValue(false));
             combo.SubMenu("[E] Settings").AddItem(new MenuItem("UseECs", "Target Distance").SetValue(new Slider(150, 650, 50)));
-
+            combo.SubMenu("[E] Settings").AddItem(new MenuItem("manuale", "Semi-Manual E cast").SetValue(new KeyBind('E', KeyBindType.Press)));
 
 
             combo.SubMenu("Item Settings").AddItem(new MenuItem("useGhostblade", "Use Youmuu's Ghostblade").SetValue(true));
@@ -459,6 +458,9 @@ namespace PewPewQuinn
                 player.ManaPercent >= emana)
                 E.CastOnUnit(target);
 
+            if (Config.Item("manuale").GetValue<KeyBind>().Active)
+                E.Cast(target);
+
             if (Config.Item("UseEC").GetValue<bool>())
                 return;
 
@@ -469,7 +471,7 @@ namespace PewPewQuinn
                player.ManaPercent >= emana)
                 E.CastOnUnit(target);
 
-            //ACROBAT QUINN MUTHAFUKKA ayylmao kek.
+
             foreach (var minion in
                 ObjectManager.Get<Obj_AI_Minion>().Where(minion => minion.IsValidTarget() && minion.IsEnemy &&
                                                                    minion.Distance(player.ServerPosition) <=
