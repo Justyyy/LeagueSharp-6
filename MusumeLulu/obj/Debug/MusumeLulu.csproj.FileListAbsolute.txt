@@ -1,6 +1,0 @@
-C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeLulu\bin\Release\MusumeLulu.exe.config
-C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeLulu\bin\Release\MusumeLulu.exe
-C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeLulu\bin\Release\MusumeLulu.pdb
-C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeLulu\bin\Release\LeagueSharp.xml
-C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeLulu\obj\Debug\MusumeLulu.exe
-C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeLulu\obj\Debug\MusumeLulu.pdb

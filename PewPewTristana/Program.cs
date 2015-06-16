@@ -123,7 +123,7 @@ namespace PewPewTristana
             drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawRtoggle", "Draw R finisher toggle").SetValue(true));
             drawing.SubMenu("Misc Drawings").AddItem(new MenuItem("drawtargetcircle", "Draw Orbwalker target circle").SetValue(true));
 
-            drawing.AddItem(new MenuItem("Qdraw", "Draw Q Range").SetValue(new Circle(true, Color.Orange)));
+            //drawing.AddItem(new MenuItem("Qdraw", "Draw Q Range").SetValue(new Circle(true, Color.Orange)));
             drawing.AddItem(new MenuItem("Wdraw", "Draw W Range").SetValue(new Circle(true, Color.DarkOrange)));
             drawing.AddItem(new MenuItem("Edraw", "Draw E Range").SetValue(new Circle(true, Color.AntiqueWhite)));
             drawing.AddItem(new MenuItem("Rdraw", "Draw R Range").SetValue(new Circle(true, Color.LawnGreen)));
@@ -143,7 +143,7 @@ namespace PewPewTristana
             Config.AddToMainMenu();
 
             Drawing.OnDraw += OnDraw;
-            TristSpellRanges();
+            //TristSpellRanges();
             Game.OnUpdate += Game_OnGameUpdate;
             Drawing.OnEndScene += OnEndScene;
             Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
@@ -336,7 +336,7 @@ namespace PewPewTristana
             var rmana = Config.Item("rmana").GetValue<Slider>().Value;
             var target = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Magical);
             var estacks = target.Buffs.Find(buff => buff.Name == "tristanaecharge").Count;
-            var erdamage = (E.GetDamage(target)*(0.30*estacks + 1) - target.MagicShield - target.AttackShield);
+            var erdamage = (E.GetDamage(target)*((0.30*estacks) + 1) - target.MagicShield - target.AttackShield) + R.GetDamage(target);
             if (target == null || !target.IsValidTarget())
                 return;
 
@@ -346,14 +346,12 @@ namespace PewPewTristana
             if (Config.Item("UseRE").GetValue<bool>()
                 && R.IsReady()
                 && Config.Item("UseR").GetValue<KeyBind>().Active
-                && target.HasBuff("tristanaecharge") && erdamage > target.Health &&
-                player.ManaPercent >= rmana)
+                && target.HasBuff("tristanaecharge") && erdamage - 2*target.Level > target.Health)
 
                 R.CastOnUnit(target);
 
             else if (Config.Item("UseR").GetValue<KeyBind>().Active && R.IsReady() &&
-                R.GetDamage(target) >= target.Health - 45 &&
-                player.ManaPercent >= rmana)
+                R.GetDamage(target) > target.Health)
                 R.CastOnUnit(target);
 
         }
@@ -515,8 +513,8 @@ namespace PewPewTristana
                 SpellRangeTick = Environment.TickCount;
 
                 Q.Range = 600 + (7 * (ObjectManager.Player.Level - 1));
-                E.Range = 550 + (7 * (ObjectManager.Player.Level - 1));
-                R.Range = 550 + (7 * (ObjectManager.Player.Level - 1));
+                E.Range = 630 + (7 * (ObjectManager.Player.Level - 1));
+                R.Range = 630 + (7 * (ObjectManager.Player.Level - 1));
             }
         }
 
@@ -536,10 +534,10 @@ namespace PewPewTristana
             if (Config.Item("Draw_Disabled").GetValue<bool>())
                 return;
 
-            if (Config.Item("Qdraw").GetValue<Circle>().Active)
-                if (Q.Level > 0)
-                    Render.Circle.DrawCircle(ObjectManager.Player.Position, Q.Range, Q.IsReady() ? Config.Item("Qdraw").GetValue<Circle>().Color : Color.Red,
-                                                        Config.Item("CircleThickness").GetValue<Slider>().Value);
+           // if (Config.Item("Qdraw").GetValue<Circle>().Active)
+              //  if (Q.Level > 0)
+                //    Render.Circle.DrawCircle(ObjectManager.Player.Position, Q.Range, Q.IsReady() ? Config.Item("Qdraw").GetValue<Circle>().Color : Color.Red,
+                      //                                  Config.Item("CircleThickness").GetValue<Slider>().Value);
 
 
             if (Config.Item("Wdraw").GetValue<Circle>().Active)
@@ -549,13 +547,13 @@ namespace PewPewTristana
 
             if (Config.Item("Edraw").GetValue<Circle>().Active)
                 if (E.Level > 0)
-                    Render.Circle.DrawCircle(ObjectManager.Player.Position, E.Range - 1,
+                    Render.Circle.DrawCircle(ObjectManager.Player.Position, 550 + 7 * player.Level,
                         E.IsReady() ? Config.Item("Edraw").GetValue<Circle>().Color : Color.Red,
                                                         Config.Item("CircleThickness").GetValue<Slider>().Value);
 
             if (Config.Item("Rdraw").GetValue<Circle>().Active)
                 if (R.Level > 0)
-                    Render.Circle.DrawCircle(ObjectManager.Player.Position, R.Range - 2,
+                    Render.Circle.DrawCircle(ObjectManager.Player.Position, 550 + 7 * player.Level,
                         R.IsReady() ? Config.Item("Rdraw").GetValue<Circle>().Color : Color.Red,
                                                         Config.Item("CircleThickness").GetValue<Slider>().Value);
 

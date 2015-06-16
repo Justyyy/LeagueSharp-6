@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Channels;
 using LeagueSharp;
 using LeagueSharp.Common;
 using LeagueSharp.Common.Data;
@@ -101,8 +102,23 @@ namespace MusumeLulu
             Config.AddToMainMenu();
 
             Game.OnUpdate += Game_OnGameUpdate;
+            Drawing.OnDraw += OnDraw;
 
 
+        }
+
+        private static void OnDraw(EventArgs args)
+        {
+            Render.Circle.DrawCircle(PixPosition(), 20, Color.Blue, 5);
+        }
+
+        private static Vector3 PixPosition()
+        {
+            foreach (var pix in ObjectManager.Get<Obj_AI_Minion>().Where(pix => pix.Name == "RobotBuddy" && pix.IsAlly))
+            {
+                return pix.Position;
+            }
+            return ObjectManager.Player.Position;
         }
 
         private static void Game_OnGameUpdate(EventArgs args)
@@ -112,12 +128,14 @@ namespace MusumeLulu
             switch (Orbwalker.ActiveMode)
             {
                 case Orbwalking.OrbwalkingMode.Combo:
+                    Combo();
                     break;
                 case Orbwalking.OrbwalkingMode.Mixed:
                     break;
                 case Orbwalking.OrbwalkingMode.LastHit:
                     break;
                 case Orbwalking.OrbwalkingMode.LaneClear:
+                    Laneclear();
                     break;
             }
         }
@@ -157,6 +175,7 @@ namespace MusumeLulu
 
             if (Q.IsReady() && Config.Item("UseQ").GetValue<bool>())
                 Qlogic();
+
             // Remember to get prediction from Minion position and not player position if using E-Q.
 
            // if (E.IsReady() && Config.Item("UseE").GetValue<bool>())
@@ -181,8 +200,50 @@ namespace MusumeLulu
 
         private static void Qlogic()
         {
-            //var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
-            //if (Config.Item("UseQ").GetValue<bool>() && PewPewPred.Hitchance)
+            var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
+            if (Config.Item("UseQ").GetValue<bool>())
+                 Q.Cast(target);
+
+
+            foreach (var minion in
+                ObjectManager.Get<Obj_AI_Minion>().Where(minion => minion.IsValidTarget() && minion.IsEnemy &&
+                                                                   minion.Distance(Player.ServerPosition) <= E.Range ||
+                                                                   minion.IsAlly &&
+                                                                   Player.Distance(minion.Position) <= E.Range))
+            {
+                if (E.IsReady() && target.Distance(Player.Position) > Q.Range && minion.Distance(target) < Q.Range)
+                {
+                    E.Cast(minion);
+                    Q.Cast(target);
+                }
+            }
+            if (PixPosition().Distance(target.Position) < Q.Range)
+            {
+                Q.SetSkillshot(0.25f, 70, 1450, false, SkillshotType.SkillshotLine, PixPosition(), PixPosition());   
+            }
+
+
+        }
+        public static Obj_AI_Base GetFarthestMinion(Vector3 playerpos, Vector3 enemypos)
+        {
+            return ObjectManager.Get<Obj_AI_Base>().Where(x => x.Distance(playerpos) < x.Distance(enemypos) && !x.IsInvulnerable && x.IsValidTarget(R.Range)).OrderBy(m => m.Distance(playerpos)).LastOrDefault();
+
+        }
+        private static HitChance PredictionQ(string name)
+        {
+            var qpred = Config.Item(name).GetValue<StringList>();
+            switch (qpred.SList[qpred.SelectedIndex])
+            {
+                case "Low":
+                    return HitChance.Low;
+                case "Medium":
+                    return HitChance.Medium;
+                case "High":
+                    return HitChance.High;
+                case "Very High":
+                    return HitChance.VeryHigh;
+            }
+            return HitChance.VeryHigh;
         }
     }
 }
