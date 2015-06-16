@@ -1,0 +1,12 @@
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeLulu\bin\Release\MusumeSoraka.exe.config
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeLulu\bin\Release\MusumeSoraka.exe
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeLulu\bin\Release\MusumeSoraka.pdb
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeLulu\bin\Release\LeagueSharp.Common.dll
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeLulu\bin\Release\LeagueSharp.dll
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeLulu\bin\Release\SharpDX.Direct3D9.dll
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeLulu\bin\Release\SharpDX.dll
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeLulu\bin\Release\clipper_library.dll
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeLulu\bin\Release\LeagueSharp.Sandbox.dll
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeLulu\obj\Debug\MusumeSoraka.csprojResolveAssemblyReference.cache
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeLulu\obj\Debug\MusumeSoraka.exe
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeLulu\obj\Debug\MusumeSoraka.pdb

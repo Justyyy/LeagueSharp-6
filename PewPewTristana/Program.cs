@@ -336,7 +336,7 @@ namespace PewPewTristana
             var rmana = Config.Item("rmana").GetValue<Slider>().Value;
             var target = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Magical);
             var estacks = target.Buffs.Find(buff => buff.Name == "tristanaecharge").Count;
-            var erdamage = (E.GetDamage(target)*((0.30*estacks) + 1) - target.MagicShield - target.AttackShield) + R.GetDamage(target);
+            var erdamage = (E.GetDamage(target) * ((0.30 * estacks) + 1) + R.GetDamage(target) - target.MagicShield - target.AttackShield);
             if (target == null || !target.IsValidTarget())
                 return;
 
