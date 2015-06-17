@@ -75,7 +75,7 @@ namespace MLGSORAKA
                 combo.SubMenu("[Advanced Settings W]")
                     .AddItem(
                         new MenuItem("allyhp." + hero.ChampionName, hero.ChampionName + " Health %").SetValue(
-                            new Slider(70, 100, 0)));
+                            new Slider(65, 100, 0)));
 
             }
             combo.SubMenu("[Advanced Settings W]").AddItem(new MenuItem("priority", "Heal Priority").SetValue(
@@ -99,7 +99,7 @@ namespace MLGSORAKA
             harass.AddItem(new MenuItem("harassmana", "Mana Percentage").SetValue(new Slider(30, 100, 0)));
 
 
-            laneclear.AddItem(new MenuItem("laneq", "Use Q").SetValue(true));
+            laneclear.AddItem(new MenuItem("laneq", "Use Q").SetValue(false));
             laneclear.AddItem(new MenuItem("killq", "Use Q on >= Amount of Minions").SetValue(new Slider(2, 10, 0)));
             laneclear.AddItem(new MenuItem("lanemana", "Mana Percentage").SetValue(new Slider(75, 100, 0)));
 
