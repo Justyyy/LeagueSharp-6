@@ -7,5 +7,6 @@ C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeSoraka\bin\Release\SharpDX.Di
 C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeSoraka\bin\Release\SharpDX.dll
 C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeSoraka\bin\Release\clipper_library.dll
 C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeSoraka\bin\Release\LeagueSharp.Sandbox.dll
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeSoraka\obj\Debug\MusumeSoraka.csprojResolveAssemblyReference.cache
 C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeSoraka\obj\Debug\MusumeSoraka.exe
 C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeSoraka\obj\Debug\MusumeSoraka.pdb

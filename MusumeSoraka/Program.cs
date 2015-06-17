@@ -110,9 +110,9 @@ namespace MusumeLulu
             {
                 combo.SubMenu("[Advanced Settings R]")
                     .SubMenu("Whitelist")
-                    .AddItem(new MenuItem("allybr." + hero.ChampionName, hero.ChampionName).SetValue(false));
+                    .AddItem(new MenuItem("allybr." + hero.ChampionName, hero.ChampionName).SetValue(true));
             }
-            combo.SubMenu("[Advanced Settings R]").AddItem(new MenuItem("ronhp", "Use [R] on <= % HP ").SetValue(false));
+            combo.SubMenu("[Advanced Settings R]").AddItem(new MenuItem("ronhp", "Use [R] on <= % HP ").SetValue(true));
             foreach (var hero in HeroManager.Allies)
             {
                 combo.SubMenu("[Advanced Settings R]")
@@ -124,7 +124,6 @@ namespace MusumeLulu
 
 
             //ITEMS
-            combo.SubMenu("[Item Settings]").AddItem(new MenuItem("UseItems", "Items Usage").SetValue(true));
             //Use dat blue support item thing
             //uhm something something zhonyas
 
@@ -239,7 +238,6 @@ namespace MusumeLulu
         private static void AntiObject(GameObject sender, EventArgs args)
         {
 
-            foreach (var enemy in HeroManager.Enemies)
                 if (sender.Name.Contains("Thresh_Base_Lantern") && Player.Distance(sender.Position) < E.Range &&
                     sender.IsEnemy)
                 {
@@ -261,19 +259,19 @@ namespace MusumeLulu
 
             if (Config.Item("Qdraw").GetValue<Circle>().Active)
                 if (Q.Level > 0)
-                    Render.Circle.DrawCircle(ObjectManager.Player.Position, Q.Range,
+                    Render.Circle.DrawCircle(ObjectManager.Player.Position, Q.Range - 75,
                         Q.IsReady() ? Config.Item("Qdraw").GetValue<Circle>().Color : Color.Red,
                         Config.Item("CircleThickness").GetValue<Slider>().Value);
 
             if (Config.Item("Wdraw").GetValue<Circle>().Active)
                 if (W.Level > 0)
-                    Render.Circle.DrawCircle(ObjectManager.Player.Position, W.Range,
+                    Render.Circle.DrawCircle(ObjectManager.Player.Position, W.Range - 50,
                         W.IsReady() ? Config.Item("Wdraw").GetValue<Circle>().Color : Color.Red,
                         Config.Item("CircleThickness").GetValue<Slider>().Value);
 
             if (Config.Item("Edraw").GetValue<Circle>().Active)
                 if (E.Level > 0)
-                    Render.Circle.DrawCircle(ObjectManager.Player.Position, E.Range,
+                    Render.Circle.DrawCircle(ObjectManager.Player.Position, E.Range - 75,
                         E.IsReady() ? Config.Item("Edraw").GetValue<Circle>().Color : Color.Red,
                         Config.Item("CircleThickness").GetValue<Slider>().Value);
 
