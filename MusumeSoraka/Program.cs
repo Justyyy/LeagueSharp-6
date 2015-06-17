@@ -35,13 +35,16 @@ namespace MusumeLulu
             Notifications.AddNotification("MusumeSoraka Loaded!", 1000);
 
             Q = new Spell(SpellSlot.Q, 970);
+            Q2 = new Spell(SpellSlot.Q, 970);
             W = new Spell(SpellSlot.W, 550);
             E = new Spell(SpellSlot.E, 925);
             R = new Spell(SpellSlot.R);
 
-            //Apply SpellData
-            Q.SetSkillshot(0.5f, 300, 1750, false, SkillshotType.SkillshotCircle);
-            E.SetSkillshot(0.5f, 70f, 1750, false, SkillshotType.SkillshotCircle);
+
+            Q.SetSkillshot(0.5f, 300, 1800, false, SkillshotType.SkillshotCircle);
+            Q2.SetSkillshot(0.5f, 150, 1800, false, SkillshotType.SkillshotCircle);
+            E.SetSkillshot(0.25f, 70f, 1750, false, SkillshotType.SkillshotCircle);
+
 
             Config = new Menu("MusumeSoraka", "Soraka", true);
             Orbwalker = new Orbwalking.Orbwalker(Config.AddSubMenu(new Menu("Orbwalker", "Orbwalker")));
@@ -49,6 +52,7 @@ namespace MusumeLulu
 
             var combo = Config.AddSubMenu(new Menu("Spell Menu", "Spell Menu"));
             var harass = Config.AddSubMenu(new Menu("Harass Settings", "Harass Settings"));
+            var laneclear = Config.AddSubMenu(new Menu("Laneclear Settings", "Laneclear Settings"));
             var misc = Config.AddSubMenu(new Menu("Misc Settings", "Misc Settings"));
             var drawing = Config.AddSubMenu(new Menu("Draw Settings", "Draw Settings"));
 
@@ -60,42 +64,61 @@ namespace MusumeLulu
             foreach (var hero in HeroManager.Allies)
             {
 
-                    combo.SubMenu("[Advanced Features W]")
-                        .SubMenu("Whitelist")
-                        .AddItem(new MenuItem("allywhitelist." + hero.ChampionName, hero.ChampionName).SetValue(true));
-                
+                combo.SubMenu("[Advanced Settings W]")
+                    .SubMenu("Whitelist")
+                    .AddItem(new MenuItem("allywhitelist." + hero.ChampionName, hero.ChampionName).SetValue(true));
+
             }
-            combo.SubMenu("[Advanced Features W]").AddItem(new MenuItem("wonhp", "Use [W] on <= % HP ").SetValue(true));
+            combo.SubMenu("[Advanced Settings W]").AddItem(new MenuItem("wonhp", "Use [W] on <= % HP ").SetValue(true));
 
             foreach (var hero in HeroManager.Allies)
             {
-                    combo.SubMenu("[Advanced Features W]")
-                        .AddItem(
-                            new MenuItem("allyhp." + hero.ChampionName, hero.ChampionName + " Health %").SetValue(
-                                new Slider(70, 100, 0)));
-                
+                combo.SubMenu("[Advanced Settings W]")
+                    .AddItem(
+                        new MenuItem("allyhp." + hero.ChampionName, hero.ChampionName + " Health %").SetValue(
+                            new Slider(70, 100, 0)));
+
             }
+            combo.SubMenu("[Advanced Settings W]").AddItem(new MenuItem("priority", "Heal Priority").SetValue(
+            new StringList(new[] { "Most AD", "Most AP", "Lowest HP" })));
 
-            combo.SubMenu("[Advanced Features W]").AddItem(new MenuItem("playerhp", "Don't Use W if player HP % <= ").SetValue(new Slider(35, 100, 0)));
+            combo.SubMenu("[Advanced Settings W]")
+                .AddItem(new MenuItem("playerhp", "Don't Use W if player HP % <= ").SetValue(new Slider(35, 100, 0)));
 
-            combo.SubMenu("[Advanced Features E]").AddItem(new MenuItem("interrupt", "Use [E] on interruptable spells").SetValue(true));
-            combo.SubMenu("[Advanced Features E]").AddItem(new MenuItem("Einterrupt", "Use [E] on immobile targets").SetValue(true));
+            combo.SubMenu("[Advanced Settings E]")
+                .AddItem(new MenuItem("interrupt", "Use [E] on interruptable spells").SetValue(true));
+            combo.SubMenu("[Advanced Settings E]")
+                .AddItem(new MenuItem("Einterrupt", "Use [E] on immobile targets").SetValue(true));
+            combo.SubMenu("[Advanced Settings E]")
+                .AddItem(new MenuItem("AutoE", "Use [E] on CC'd targets").SetValue(true));
+            combo.SubMenu("[Advanced Settings E]")
+                .AddItem(new MenuItem("antigap", "Use [E] on gapclosers").SetValue(true));
 
 
-            harass.AddItem(new MenuItem("harassQ", "Use Q").SetValue(true));
-            harass.AddItem(new MenuItem("harassE", "Use E").SetValue(true));
+            harass.AddItem(new MenuItem("HarassQ", "Use Q").SetValue(true));
+            harass.AddItem(new MenuItem("HarassE", "Use E").SetValue(true));
             harass.AddItem(new MenuItem("harassmana", "Mana Percentage").SetValue(new Slider(30, 100, 0)));
 
 
+            laneclear.AddItem(new MenuItem("laneq", "Use Q").SetValue(true));
+            laneclear.AddItem(new MenuItem("killq", "Use Q on >= Amount of Minions").SetValue(new Slider(2, 10, 0)));
+            laneclear.AddItem(new MenuItem("lanemana", "Mana Percentage").SetValue(new Slider(75, 100, 0)));
+
+
 
             foreach (var hero in HeroManager.Allies)
             {
-                combo.SubMenu("[Advanced Features R]").SubMenu("Whitelist").AddItem(new MenuItem("allybr." + hero.ChampionName, hero.ChampionName).SetValue(false));
+                combo.SubMenu("[Advanced Settings R]")
+                    .SubMenu("Whitelist")
+                    .AddItem(new MenuItem("allybr." + hero.ChampionName, hero.ChampionName).SetValue(false));
             }
-            combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("ronhp", "Use [R] on <= % HP ").SetValue(false));
+            combo.SubMenu("[Advanced Settings R]").AddItem(new MenuItem("ronhp", "Use [R] on <= % HP ").SetValue(false));
             foreach (var hero in HeroManager.Allies)
             {
-                combo.SubMenu("[Advanced Features R]").AddItem(new MenuItem("allyr." + hero.ChampionName, hero.ChampionName + " Health %").SetValue(new Slider(20, 100, 0)));
+                combo.SubMenu("[Advanced Settings R]")
+                    .AddItem(
+                        new MenuItem("allyr." + hero.ChampionName, hero.ChampionName + " Health %").SetValue(
+                            new Slider(20, 100, 0)));
             }
 
 
@@ -113,37 +136,56 @@ namespace MusumeLulu
 
             //DRAWING
             drawing.AddItem(new MenuItem("Draw_Disabled", "Disable All Spell Drawings").SetValue(false));
-            drawing.SubMenu("Spell Drawings").AddItem(new MenuItem("Qdraw", "Draw Q Range").SetValue(new Circle(true, System.Drawing.Color.IndianRed)));
-            drawing.SubMenu("Spell Drawings").AddItem(new MenuItem("Wdraw", "Draw W Range").SetValue(new Circle(true, System.Drawing.Color.IndianRed)));
-            drawing.SubMenu("Spell Drawings").AddItem(new MenuItem("Edraw", "Draw E Range").SetValue(new Circle(true, System.Drawing.Color.IndianRed)));        
-            drawing.SubMenu("Spell Drawings").AddItem(new MenuItem("CircleThickness", "Circle Thickness").SetValue(new Slider(7, 30, 0)));
+            drawing.SubMenu("Spell Drawings")
+                .AddItem(new MenuItem("Qdraw", "Draw Q Range").SetValue(new Circle(true, System.Drawing.Color.IndianRed)));
+            drawing.SubMenu("Spell Drawings")
+                .AddItem(new MenuItem("Wdraw", "Draw W Range").SetValue(new Circle(true, System.Drawing.Color.IndianRed)));
+            drawing.SubMenu("Spell Drawings")
+                .AddItem(new MenuItem("Edraw", "Draw E Range").SetValue(new Circle(true, System.Drawing.Color.IndianRed)));
+            drawing.SubMenu("Spell Drawings")
+                .AddItem(new MenuItem("CircleThickness", "Circle Thickness").SetValue(new Slider(7, 30, 0)));
 
 
             Config.AddItem(new MenuItem("PewPew", "            Prediction Settings"));
 
             Config.AddItem(new MenuItem("hitchanceQ", "[Q] Hitchance").SetValue(new StringList
-                (new[] { HitChance.Low.ToString(), HitChance.Medium.ToString(), HitChance.High.ToString(), HitChance.VeryHigh.ToString() }, 3)));
+                (new[]
+                {
+                    HitChance.Low.ToString(), HitChance.Medium.ToString(), HitChance.High.ToString(),
+                    HitChance.VeryHigh.ToString()
+                }, 3)));
             Config.AddItem(new MenuItem("hitchanceE", "[E] Hitchance").SetValue(new StringList
-                (new[] { HitChance.Low.ToString(), HitChance.Medium.ToString(), HitChance.High.ToString(), HitChance.VeryHigh.ToString() }, 3)));
+                (new[]
+                {
+                    HitChance.Low.ToString(), HitChance.Medium.ToString(), HitChance.High.ToString(),
+                    HitChance.VeryHigh.ToString()
+                }, 3)));
 
             misc.AddItem(new MenuItem("skinhax", "Skin Manager").SetValue(true));
-            misc.AddItem(new MenuItem("sorakaskin", "Skin Name").SetValue(new StringList(new[] { "Classic Soraka", "Dryad Soraka", "Divine Soraka", "Celestine Soraka", "Reaper Soraka", "Order of the Banana Soraka" })));
+            misc.AddItem(
+                new MenuItem("sorakaskin", "Skin Name").SetValue(
+                    new StringList(new[]
+                    {
+                        "Classic Soraka", "Dryad Soraka", "Divine Soraka", "Celestine Soraka", "Reaper Soraka",
+                        "Order of the Banana Soraka"
+                    })));
 
             Config.AddToMainMenu();
 
             Game.OnUpdate += Game_OnGameUpdate;
             Drawing.OnDraw += OnDraw;
             AntiGapcloser.OnEnemyGapcloser += AntiGapCloser_OnEnemyGapcloser;
-            GameObject.OnCreate += AntiLeap;
+            GameObject.OnCreate += AntiObject;
             Obj_AI_Base.OnProcessSpellCast += InterrupterSc;
             Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
 
         }
 
-        private static void Interrupter2_OnInterruptableTarget(Obj_AI_Hero sender, Interrupter2.InterruptableTargetEventArgs args)
+        private static void Interrupter2_OnInterruptableTarget(Obj_AI_Hero sender,
+            Interrupter2.InterruptableTargetEventArgs args)
         {
             if (E.IsReady() && sender.IsValidTarget(E.Range) && Config.Item("interrupt").GetValue<bool>())
-                E.CastOnUnit(sender);
+                E.Cast(sender);
         }
 
 
@@ -151,51 +193,51 @@ namespace MusumeLulu
         {
             if (sender.Team != Player.Team)
             {
-                    if (args.SData.Name == "KatarinaR" || args.SData.Name == "AlZaharNetherGrasp" ||
-                        args.SData.Name == "LucianR" ||
-                        args.SData.Name == "CaitlynPiltoverPeacemaker" || args.SData.Name == "RivenMatyr" ||
-                        args.SData.Name == "VarusQ" ||
-                        args.SData.Name == "AbsoluteZero" || args.SData.Name == "Drain" ||
-                        args.SData.Name == "InfiniteDuress" ||
-                        args.SData.Name == "MissFortuneBulletTime" || args.SData.Name == "ThreshQ" ||
-                        args.SData.Name == "RocketGrabMissile")
-                    {
-                        if (E.IsReady() && Config.Item("Einterrupt").GetValue<bool>() &&
-                            sender.Distance(Player.Position) <= E.Range)
-                            E.Cast(sender);                                          
+                if (args.SData.Name == "KatarinaR" || args.SData.Name == "AlZaharNetherGrasp" ||
+                    args.SData.Name == "LucianR" ||
+                    args.SData.Name == "CaitlynPiltoverPeacemaker" || args.SData.Name == "RivenMatyr" ||
+                    args.SData.Name == "VarusQ" ||
+                    args.SData.Name == "AbsoluteZero" || args.SData.Name == "Drain" ||
+                    args.SData.Name == "InfiniteDuress" ||
+                    args.SData.Name == "MissFortuneBulletTime" || args.SData.Name == "ThreshQ" ||
+                    args.SData.Name == "RocketGrabMissile")
+                {
+                    if (E.IsReady() && Config.Item("Einterrupt").GetValue<bool>() &&
+                        sender.Distance(Player.Position) <= E.Range)
+                        E.Cast(sender);
                 }
                 if (ThreshGameObject.Position.CountEnemiesInRange(250) >= 1)
                     E.Cast(ThreshGameObject.Position);
             }
-            foreach (var Object in ObjectManager.Get<Obj_AI_Base>().Where(Obj => Obj.Distance(Player.ServerPosition) < E.Range 
-                && Obj.Team != Player.Team && (Obj.HasBuff("teleport_target", true) || Obj.HasBuff("Pantheon_GrandSkyfall_Jump", true))))
+
+            //teleport arrival fuck up //Credits to Sebby. I 
+            foreach (
+                var Object in
+                    ObjectManager.Get<Obj_AI_Base>().Where(Obj => Obj.Distance(Player.ServerPosition) < E.Range
+                                                                  && Obj.Team != Player.Team &&
+                                                                  (Obj.HasBuff("teleport_target", true) ||
+                                                                   Obj.HasBuff("Pantheon_GrandSkyfall_Jump", true))))
             {
                 Utility.DelayAction.Add(2500, () => { E.Cast(Object.Position); });
             }
         }
 
-
-        private static void AntiLeap(GameObject sender, EventArgs args)
+        private static void AutoE()
         {
-            var rengar = HeroManager.Enemies.Find(h => h.ChampionName.Equals("Rengar"));
-            //<---- Credits to Asuna (Couldn't figure out how to cast R to Sender so I looked at his vayne ^^
-            if (rengar != null)
+            foreach (var hero in HeroManager.Enemies)
+            {
+                var cc = hero.HasBuffOfType(BuffType.Snare) ||
+                         hero.HasBuffOfType(BuffType.Suppression) || hero.HasBuffOfType(BuffType.Taunt) ||
+                         hero.HasBuffOfType(BuffType.Stun) || hero.HasBuffOfType(BuffType.Charm) ||
+                         hero.HasBuffOfType(BuffType.Fear);
+                if (hero.IsValidTarget(E.Range) && E.IsReady() && cc)
+                    E.Cast(hero);
+            }
+        }
 
-                if (sender.Name == ("Rengar_LeapSound.troy") && Config.Item("AntiRengar").GetValue<bool>() &&
-                    sender.Position.Distance(Player.Position) <= W.Range)
-                {
-                    E.Cast(rengar);
-                }
 
-            var khazix = HeroManager.Enemies.Find(h => h.ChampionName.Equals("Khazix"));
-
-            if (khazix != null)
-
-                if (sender.Name == ("Khazix_Base_E_Tar.troy") && Config.Item("AntiKhazix").GetValue<bool>() &&
-                    sender.Position.Distance(Player.Position) <= W.Range)
-                {
-                    E.Cast(khazix);
-                }
+        private static void AntiObject(GameObject sender, EventArgs args)
+        {
 
             foreach (var enemy in HeroManager.Enemies)
                 if (sender.Name.Contains("Thresh_Base_Lantern") && Player.Distance(sender.Position) < E.Range &&
@@ -209,7 +251,7 @@ namespace MusumeLulu
         private static void AntiGapCloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
             if (E.IsReady() && gapcloser.Sender.IsValidTarget(E.Range) && Config.Item("antigap").GetValue<bool>())
-                E.CastOnUnit(gapcloser.Sender);
+                Utility.DelayAction.Add(50, () => { E.Cast(gapcloser.Sender); });
         }
 
         private static void OnDraw(EventArgs args)
@@ -217,23 +259,25 @@ namespace MusumeLulu
             if (Config.Item("Draw_Disabled").GetValue<bool>())
                 return;
 
-             if (Config.Item("Qdraw").GetValue<Circle>().Active)
-              if (Q.Level > 0)
-                Render.Circle.DrawCircle(ObjectManager.Player.Position, Q.Range, Q.IsReady() ? Config.Item("Qdraw").GetValue<Circle>().Color : Color.Red,
-                      Config.Item("CircleThickness").GetValue<Slider>().Value);
+            if (Config.Item("Qdraw").GetValue<Circle>().Active)
+                if (Q.Level > 0)
+                    Render.Circle.DrawCircle(ObjectManager.Player.Position, Q.Range,
+                        Q.IsReady() ? Config.Item("Qdraw").GetValue<Circle>().Color : Color.Red,
+                        Config.Item("CircleThickness").GetValue<Slider>().Value);
 
             if (Config.Item("Wdraw").GetValue<Circle>().Active)
                 if (W.Level > 0)
-                    Render.Circle.DrawCircle(ObjectManager.Player.Position, W.Range, W.IsReady() ? Config.Item("Wdraw").GetValue<Circle>().Color : Color.Red,
-                                                        Config.Item("CircleThickness").GetValue<Slider>().Value);
+                    Render.Circle.DrawCircle(ObjectManager.Player.Position, W.Range,
+                        W.IsReady() ? Config.Item("Wdraw").GetValue<Circle>().Color : Color.Red,
+                        Config.Item("CircleThickness").GetValue<Slider>().Value);
 
             if (Config.Item("Edraw").GetValue<Circle>().Active)
                 if (E.Level > 0)
                     Render.Circle.DrawCircle(ObjectManager.Player.Position, E.Range,
                         E.IsReady() ? Config.Item("Edraw").GetValue<Circle>().Color : Color.Red,
-                                                        Config.Item("CircleThickness").GetValue<Slider>().Value);
+                        Config.Item("CircleThickness").GetValue<Slider>().Value);
 
-           Render.Circle.DrawCircle(ThreshGameObject.Position, 100, Color.Blue, 300);
+            Render.Circle.DrawCircle(ThreshGameObject.Position, 100, Color.Blue, 300);
 
         }
 
@@ -244,6 +288,7 @@ namespace MusumeLulu
             {
                 case Orbwalking.OrbwalkingMode.Combo:
                     Combo();
+                    healhp();
                     break;
                 case Orbwalking.OrbwalkingMode.Mixed:
                     Harass();
@@ -254,69 +299,124 @@ namespace MusumeLulu
                     Laneclear();
                     break;
             }
+            Player.SetSkin(Player.BaseSkinName, Config.Item("skinhax").GetValue<bool>()
+            ? Config.Item("sorakaskin").GetValue<StringList>().SelectedIndex
+                : Player.BaseSkinId);
+            //healstuff
+            if (Config.Item("AutoE").GetValue<bool>())
+                AutoE();
+
+            if (Config.Item("UseW").GetValue<bool>())
+                healhp();
+
+            //SkinChanger
 
 
-                foreach (var hero in HeroManager.Allies)
-                {
-                    if (hero.Position.CountEnemiesInRange(800) >= 1 &&
-                        Config.Item("allyr." + hero.ChampionName).GetValue<Slider>().Value >= hero.HealthPercent
-                        && Config.Item("allybr." + hero.ChampionName).GetValue<bool>() &&
-                        Config.Item("ronhp").GetValue<bool>() && !hero.IsDead && R.IsReady())
-                    {
-                        R.Cast(hero);
-                    }
-                }
+        }
+                private static Obj_AI_Hero GetHealTarget()
+        {
+            switch (Config.Item("priority").GetValue<StringList>().SelectedIndex)
+            {
+                case 0: // MostAD
+                    return
+                        HeroManager.Allies.Where(ally => ally.IsValidTarget(W.Range , false) && !ally.IsMe)
+                            .OrderByDescending(dmg => dmg.TotalAttackDamage())
+                            .First();
+                case 1: // MostAP
+                    return
+                        HeroManager.Allies.Where(ally => ally.IsValidTarget(W.Range, false))
+                            .OrderByDescending(ap => ap.TotalMagicalDamage())
+                            .First();
 
-                foreach (var hero in HeroManager.Allies)
-                {
-                    if (!hero.IsDead && hero.Distance(Player.Position) < W.Range && hero.HealthPercent  <= Config.Item("allyhp." + hero.ChampionName).GetValue<Slider>().Value &&
-                        Config.Item("wonhp").GetValue<bool>() &&
-                        Config.Item("allywhitelist." + hero.ChampionName).GetValue<bool>() && Player.HealthPercent >= Config.Item("playerhp").GetValue<Slider>().Value && !hero.InFountain())
-                    {
-                        W.Cast(hero);
-                    }
-                }
-
-                //SkinChanger
-                Player.SetSkin(Player.BaseSkinName, Config.Item("skinhax").GetValue<bool>()
-                    ? Config.Item("sorakaskin").GetValue<StringList>().SelectedIndex
-                    : Player.BaseSkinId);
-
-            
+                case 2: //LowestHP
+                    return
+                        HeroManager.Allies.Where(ally => ally.IsValidTarget(W.Range, false) && !ally.IsDead && !ally.IsMe)
+                            .OrderBy(health => health.HealthPercent)
+                            .First();
+            }
+            return null;
         }
 
+        private static void healhp()
+        {
+
+            foreach (var hero in HeroManager.Allies)
+            {
+                if (hero.Position.CountEnemiesInRange(800) >= 1 &&
+                    Config.Item("allyr." + hero.ChampionName).GetValue<Slider>().Value >= hero.HealthPercent
+                    && Config.Item("allybr." + hero.ChampionName).GetValue<bool>() &&
+                    Config.Item("ronhp").GetValue<bool>() && !hero.IsDead && R.IsReady())
+                {
+                    R.Cast(hero);
+                }
+            }
+
+
+            if (!GetHealTarget().IsDead && GetHealTarget().Distance(Player.Position) < W.Range &&
+                GetHealTarget().HealthPercent <=
+                Config.Item("allyhp." + GetHealTarget().ChampionName).GetValue<Slider>().Value &&
+                Config.Item("wonhp").GetValue<bool>() &&
+                Config.Item("allywhitelist." + GetHealTarget().ChampionName).GetValue<bool>() &&
+                Player.HealthPercent >= Config.Item("playerhp").GetValue<Slider>().Value &&
+                !GetHealTarget().InFountain())
+            {
+                W.Cast(GetHealTarget());
+            }
+        
+    
+        }
 
 
         private static void Laneclear()
         {
+            //Why the fuck would you want to laneclear with soraka?????? idk toplane/midlane kek
+            var allMinionsQ = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, Q.Range + Q.Width);
+            var lanemana = Config.Item("lanemana").GetValue<Slider>().Value;
+            var Qfarmpos = E.GetCircularFarmLocation(allMinionsQ, E.Width);
 
-            
+            if (Player.ManaPercent < lanemana || !Config.Item("laneq").GetValue<bool>())
+                return;
+
+            if (Qfarmpos.MinionsHit >= Config.Item("killq").GetValue<Slider>().Value && Config.Item("laneq").GetValue<bool>() &&
+               Player.ManaPercent >= lanemana)
+            {
+                Q.Cast(Qfarmpos.Position, true);
+            }
+
+
+
         }
+
         private static void Harass()
         {
             var harassmana = Config.Item("harassmana").GetValue<Slider>().Value;
             var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
 
-            if (Q.IsReady() && Config.Item("UseQ").GetValue<bool>() && Q.GetPrediction(target).Hitchance >= PredictionQ("hitchanceQ") && Player.ManaPercent >= harassmana)
+            if (Q.IsReady() && Config.Item("HarassQ").GetValue<bool>() &&
+                Q.GetPrediction(target).Hitchance >= PredictionQ("hitchanceQ") && Player.ManaPercent >= harassmana)
                 Q.Cast(target);
 
-            if (E.IsReady() && Config.Item("UseE").GetValue<bool>() && E.GetPrediction(target).Hitchance >= PredictionE("hitchanceE") && Player.ManaPercent >= harassmana)
+            if (E.IsReady() && Config.Item("HarassE").GetValue<bool>() &&
+                E.GetPrediction(target).Hitchance >= PredictionE("hitchanceE") && Player.ManaPercent >= harassmana)
                 E.Cast(target);
         }
+
         private static void Combo()
         {
             var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
             if (!target.IsValid && target.IsInvulnerable)
                 return;
 
-            if (Q.IsReady() && Config.Item("UseQ").GetValue<bool>() && Q.GetPrediction(target).Hitchance >= PredictionQ("hitchanceQ"))
+            if (Q.IsReady() && Config.Item("UseQ").GetValue<bool>() &&
+                Q.GetPrediction(target).Hitchance >= PredictionQ("hitchanceQ"))
                 Q.Cast(target);
 
-            if (E.IsReady() && Config.Item("UseE").GetValue<bool>() && E.GetPrediction(target).Hitchance >= PredictionE("hitchanceE"))
+            if (E.IsReady() && Config.Item("UseE").GetValue<bool>() &&
+                E.GetPrediction(target).Hitchance >= PredictionE("hitchanceE"))
                 E.Cast(target);
 
         }
-      
+
         private static HitChance PredictionQ(string name)
         {
             var qpred = Config.Item(name).GetValue<StringList>();
@@ -333,6 +433,7 @@ namespace MusumeLulu
             }
             return HitChance.VeryHigh;
         }
+
         private static HitChance PredictionE(string name)
         {
             var qpred = Config.Item(name).GetValue<StringList>();
