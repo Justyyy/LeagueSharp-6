@@ -10,3 +10,4 @@ C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeSoraka\bin\Release\LeagueShar
 C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeSoraka\obj\Debug\MusumeSoraka.csprojResolveAssemblyReference.cache
 C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeSoraka\obj\Debug\MusumeSoraka.exe
 C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeSoraka\obj\Debug\MusumeSoraka.pdb
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeSoraka\bin\Release\MLGSORAKA.exe.config

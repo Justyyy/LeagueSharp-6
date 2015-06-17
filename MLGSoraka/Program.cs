@@ -9,7 +9,7 @@ using LeagueSharp.Common.Data;
 using SharpDX;
 using Color = System.Drawing.Color;
 
-namespace MusumeLulu
+namespace MLGSORAKA
 {
     internal class Program
     {
@@ -17,7 +17,6 @@ namespace MusumeLulu
         public static Menu Config;
         public static Orbwalking.Orbwalker Orbwalker;
         public static Spell Q, W, E, R, Q2;
-        public static HpBarIndicator Hpi = new HpBarIndicator();
         private static readonly Obj_AI_Hero Player = ObjectManager.Player;
         public static GameObject ThreshGameObject;
 
@@ -32,7 +31,7 @@ namespace MusumeLulu
             if (Player.ChampionName != ChampName)
                 return;
 
-            Notifications.AddNotification("MusumeSoraka Loaded!", 1000);
+            Notifications.AddNotification("420 SORAKA Loaded!", 1000);
 
             Q = new Spell(SpellSlot.Q, 970);
             Q2 = new Spell(SpellSlot.Q, 970);
@@ -46,7 +45,7 @@ namespace MusumeLulu
             E.SetSkillshot(0.25f, 70f, 1750, false, SkillshotType.SkillshotCircle);
 
 
-            Config = new Menu("MusumeSoraka", "Soraka", true);
+            Config = new Menu("MLGSoraka", "Soraka", true);
             Orbwalker = new Orbwalking.Orbwalker(Config.AddSubMenu(new Menu("Orbwalker", "Orbwalker")));
             TargetSelector.AddToMenu(Config.AddSubMenu(new Menu("Target Selector", "Target Selector")));
 

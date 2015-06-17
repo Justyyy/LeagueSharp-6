@@ -7,8 +7,8 @@
     <ProjectGuid>{B27C9730-9033-48DF-8DE2-E145E6297E75}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MusumeSoraka</RootNamespace>
-    <AssemblyName>MusumeSoraka</AssemblyName>
+    <RootNamespace>MLGSORAKA</RootNamespace>
+    <AssemblyName>MLGSORAKA</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <PreBuildEvent />
@@ -58,7 +58,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HpBarIndicator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
