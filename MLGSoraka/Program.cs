@@ -49,7 +49,8 @@ namespace MLGSORAKA
             Orbwalker = new Orbwalking.Orbwalker(Config.AddSubMenu(new Menu("Orbwalker", "Orbwalker")));
             TargetSelector.AddToMenu(Config.AddSubMenu(new Menu("Target Selector", "Target Selector")));
 
-            var combo = Config.AddSubMenu(new Menu("Spell Menu", "Spell Menu"));
+            var healing = Config.AddSubMenu(new Menu("Healing Manager", "Healing Manager"));
+            var combo = Config.AddSubMenu(new Menu("Combo Settings", "Combo Settings"));
             var harass = Config.AddSubMenu(new Menu("Harass Settings", "Harass Settings"));
             var laneclear = Config.AddSubMenu(new Menu("Laneclear Settings", "Laneclear Settings"));
             var misc = Config.AddSubMenu(new Menu("Misc Settings", "Misc Settings"));
@@ -63,34 +64,34 @@ namespace MLGSORAKA
             foreach (var hero in HeroManager.Allies)
             {
 
-                combo.SubMenu("[Advanced Settings W]")
+                healing.SubMenu("[W Settings]")
                     .SubMenu("Whitelist")
                     .AddItem(new MenuItem("allywhitelist." + hero.ChampionName, hero.ChampionName).SetValue(true));
 
             }
-            combo.SubMenu("[Advanced Settings W]").AddItem(new MenuItem("wonhp", "Use [W] on <= % HP ").SetValue(true));
+            healing.SubMenu("[W Settings]").AddItem(new MenuItem("wonhp", "Use [W] on <= % HP ").SetValue(true));
 
             foreach (var hero in HeroManager.Allies)
             {
-                combo.SubMenu("[Advanced Settings W]")
+                healing.SubMenu("[W Settings]")
                     .AddItem(
                         new MenuItem("allyhp." + hero.ChampionName, hero.ChampionName + " Health %").SetValue(
                             new Slider(65, 100, 0)));
 
             }
-            combo.SubMenu("[Advanced Settings W]").AddItem(new MenuItem("priority", "Heal Priority").SetValue(
-            new StringList(new[] { "Most AD", "Most AP", "Lowest HP" })));
+            healing.SubMenu("[W Settings]").AddItem(new MenuItem("priority", "Heal Priority").SetValue(
+            new StringList(new[] { "Most AD", "Most AP", "Lowest HP", "Closest" }, 3)));
 
-            combo.SubMenu("[Advanced Settings W]")
+            healing.SubMenu("[W Settings]")
                 .AddItem(new MenuItem("playerhp", "Don't Use W if player HP % <= ").SetValue(new Slider(35, 100, 0)));
 
-            combo.SubMenu("[Advanced Settings E]")
+            misc.SubMenu("[E Settings]")
                 .AddItem(new MenuItem("interrupt", "Use [E] on interruptable spells").SetValue(true));
-            combo.SubMenu("[Advanced Settings E]")
+            misc.SubMenu("[E Settings]")
                 .AddItem(new MenuItem("Einterrupt", "Use [E] on immobile targets").SetValue(true));
-            combo.SubMenu("[Advanced Settings E]")
+            misc.SubMenu("[E Settings]")
                 .AddItem(new MenuItem("AutoE", "Use [E] on CC'd targets").SetValue(true));
-            combo.SubMenu("[Advanced Settings E]")
+            misc.SubMenu("[E Settings]")
                 .AddItem(new MenuItem("antigap", "Use [E] on gapclosers").SetValue(true));
 
 
@@ -107,14 +108,14 @@ namespace MLGSORAKA
 
             foreach (var hero in HeroManager.Allies)
             {
-                combo.SubMenu("[Advanced Settings R]")
+                healing.SubMenu("[R Settings]")
                     .SubMenu("Whitelist")
                     .AddItem(new MenuItem("allybr." + hero.ChampionName, hero.ChampionName).SetValue(true));
             }
-            combo.SubMenu("[Advanced Settings R]").AddItem(new MenuItem("ronhp", "Use [R] on <= % HP ").SetValue(true));
+            healing.SubMenu("[R Settings]").AddItem(new MenuItem("ronhp", "Use [R] on <= % HP ").SetValue(true));
             foreach (var hero in HeroManager.Allies)
             {
-                combo.SubMenu("[Advanced Settings R]")
+                healing.SubMenu("[R Settings]")
                     .AddItem(
                         new MenuItem("allyr." + hero.ChampionName, hero.ChampionName + " Health %").SetValue(
                             new Slider(20, 100, 0)));
@@ -316,20 +317,29 @@ namespace MLGSORAKA
             {
                 case 0: // MostAD
                     return
-                        HeroManager.Allies.Where(ally => ally.IsValidTarget(W.Range , false) && !ally.IsMe)
+                        HeroManager.Allies.Where(ally => ally.IsValidTarget(W.Range, false) && ally.IsDead && ally.HealthPercent <=
+                    Config.Item("allyhp." + ally.ChampionName).GetValue<Slider>().Value && !ally.IsMe && Config.Item("allywhitelist." + ally.ChampionName).GetValue<bool>())
                             .OrderByDescending(dmg => dmg.TotalAttackDamage())
                             .First();
                 case 1: // MostAP
                     return
-                        HeroManager.Allies.Where(ally => ally.IsValidTarget(W.Range, false))
+                        HeroManager.Allies.Where(ally => ally.IsValidTarget(W.Range, false) && !ally.IsDead && ally.HealthPercent <=
+                    Config.Item("allyhp." + ally.ChampionName).GetValue<Slider>().Value && !ally.IsMe && Config.Item("allywhitelist." + ally.ChampionName).GetValue<bool>())
                             .OrderByDescending(ap => ap.TotalMagicalDamage())
                             .First();
 
                 case 2: //LowestHP
                     return
-                        HeroManager.Allies.Where(ally => ally.IsValidTarget(W.Range, false) && !ally.IsDead && !ally.IsMe)
+                        HeroManager.Allies.Where(ally => ally.IsValidTarget(W.Range, false) && !ally.IsDead && ally.HealthPercent <=
+                    Config.Item("allyhp." + ally.ChampionName).GetValue<Slider>().Value && !ally.IsMe && Config.Item("allywhitelist." + ally.ChampionName).GetValue<bool>())
                             .OrderBy(health => health.HealthPercent)
                             .First();
+                case 3: //Closest - ScienceARK please add
+                    return
+                        HeroManager.Allies.Where(ally => ally.IsValidTarget(W.Range, false) && !ally.IsDead && ally.HealthPercent <=
+                    Config.Item("allyhp." + ally.ChampionName).GetValue<Slider>().Value && !ally.IsMe && Config.Item("allywhitelist." + ally.ChampionName).GetValue<bool>())
+                            .OrderBy(a => a.Distance(Player.Position)).FirstOrDefault();
+
             }
             return null;
         }

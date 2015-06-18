@@ -1,18 +1,4 @@
-C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeSoraka\bin\Release\MLGSORAKA.exe.config
-C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeSoraka\bin\Release\MLGSORAKA.exe
-C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeSoraka\bin\Release\MLGSORAKA.pdb
-C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeSoraka\bin\Release\LeagueSharp.Common.dll
-C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeSoraka\bin\Release\LeagueSharp.dll
-C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeSoraka\bin\Release\SharpDX.Direct3D9.dll
-C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeSoraka\bin\Release\SharpDX.dll
-C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeSoraka\bin\Release\clipper_library.dll
-C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeSoraka\bin\Release\LeagueSharp.Sandbox.dll
-C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeSoraka\obj\Debug\MLGSORAKA.exe
-C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeSoraka\obj\Debug\MLGSORAKA.pdb
-C:\Users\HAF911\Documents\GitHub\LeagueSharp\MusumeSoraka\obj\Debug\MLGSORAKA.csprojResolveAssemblyReference.cache
 C:\Users\HAF911\Documents\GitHub\LeagueSharp\MLGSoraka\bin\Release\MLGSORAKA.exe.config
-C:\Users\HAF911\Documents\GitHub\LeagueSharp\MLGSoraka\obj\Debug\MLGSORAKA.exe
-C:\Users\HAF911\Documents\GitHub\LeagueSharp\MLGSoraka\obj\Debug\MLGSORAKA.pdb
 C:\Users\HAF911\Documents\GitHub\LeagueSharp\MLGSoraka\bin\Release\MLGSORAKA.exe
 C:\Users\HAF911\Documents\GitHub\LeagueSharp\MLGSoraka\bin\Release\MLGSORAKA.pdb
 C:\Users\HAF911\Documents\GitHub\LeagueSharp\MLGSoraka\bin\Release\LeagueSharp.Common.dll
@@ -21,3 +7,6 @@ C:\Users\HAF911\Documents\GitHub\LeagueSharp\MLGSoraka\bin\Release\SharpDX.Direc
 C:\Users\HAF911\Documents\GitHub\LeagueSharp\MLGSoraka\bin\Release\SharpDX.dll
 C:\Users\HAF911\Documents\GitHub\LeagueSharp\MLGSoraka\bin\Release\clipper_library.dll
 C:\Users\HAF911\Documents\GitHub\LeagueSharp\MLGSoraka\bin\Release\LeagueSharp.Sandbox.dll
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\MLGSoraka\obj\Debug\MLGSORAKA.csprojResolveAssemblyReference.cache
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\MLGSoraka\obj\Debug\MLGSORAKA.exe
+C:\Users\HAF911\Documents\GitHub\LeagueSharp\MLGSoraka\obj\Debug\MLGSORAKA.pdb
