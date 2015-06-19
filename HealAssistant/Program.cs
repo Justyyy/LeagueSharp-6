@@ -249,7 +249,33 @@ namespace HealAssistant
 
             Game.OnUpdate += HealManager;
             Drawing.OnDraw += healdraw;
+            Game.OnUpdate += Mikaels;
 
+        }
+
+        private static void Mikaels(EventArgs args)
+        {
+            var mikael = ItemData.Mikaels_Crucible.GetItem();
+            if (Config.Item("UseMik").GetValue<bool>())
+            {
+                foreach (var hero in HeroManager.Allies)
+                {
+                    if (Config.Item("mikael." + hero.ChampionName).GetValue<bool>() &&
+                        Player.Distance(hero) <= 750)
+                    {
+                        if (hero.HasBuffOfType(BuffType.Stun) && Config.Item("stuns").GetValue<bool>() ||
+                            hero.HasBuffOfType(BuffType.Charm) && Config.Item("charms").GetValue<bool>() ||
+                            hero.HasBuffOfType(BuffType.Fear) && Config.Item("fears").GetValue<bool>() ||
+                            hero.HasBuffOfType(BuffType.Snare) && Config.Item("snares").GetValue<bool>() ||
+                            hero.HasBuffOfType(BuffType.Taunt) && Config.Item("taunts").GetValue<bool>() ||
+                            hero.HasBuffOfType(BuffType.Slow) && Config.Item("slows").GetValue<bool>() ||
+                            hero.HasBuffOfType(BuffType.CombatDehancer) && Config.Item("exh").GetValue<bool>())
+                        {
+                            mikael.Cast(hero);
+                        }
+                    }
+                }
+            }
         }
 
         private static void healdraw(EventArgs args)
@@ -263,27 +289,6 @@ namespace HealAssistant
             
         }
 
-        private static void Mikael()
-        {
-            var mikael = ItemData.Mikaels_Crucible.GetItem();
-
-            foreach (var hero in HeroManager.Allies)
-            {
-                if (Config.Item("mikael." + hero.ChampionName).GetValue<bool>() && hero.IsValidTarget(mikael.Range))
-                {
-                    if (hero.HasBuffOfType(BuffType.Stun) && Config.Item("stuns").GetValue<bool>() ||
-                        hero.HasBuffOfType(BuffType.Charm) && Config.Item("charms").GetValue<bool>() ||
-                        hero.HasBuffOfType(BuffType.Fear) && Config.Item("fears").GetValue<bool>() ||
-                        hero.HasBuffOfType(BuffType.Snare) && Config.Item("snares").GetValue<bool>() ||
-                        hero.HasBuffOfType(BuffType.Taunt) && Config.Item("taunts").GetValue<bool>() ||
-                        hero.HasBuffOfType(BuffType.Slow) && Config.Item("slows").GetValue<bool>() || 
-                        hero.HasBuffOfType(BuffType.CombatDehancer) && Config.Item("exh").GetValue<bool>())
-
-                        mikael.Cast(hero);
-                }
-            }
-
-        }
         private static void CheckSpells()
         {
             if (Player.Spellbook.GetSpell(SpellSlot.Q).Name == "JavelinToss" ||
@@ -303,9 +308,6 @@ namespace HealAssistant
         private static void HealManager(EventArgs args)
         {
             CheckSpells();
-
-            if (Config.Item("UseMik").GetValue<bool>())
-                Mikael();
 
             if (Player.ChampionName == ChampName1) //Soraka
             {

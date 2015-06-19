@@ -191,9 +191,9 @@ namespace MLGSORAKA
 
             Config.AddToMainMenu();
 
+            Game.OnUpdate += Mikaels;
             Game.OnUpdate += Game_OnGameUpdate;
             Game.OnUpdate += Mode_Switch;
-            Game.OnUpdate += Mikaels;
             Drawing.OnDraw += OnDraw;
             AntiGapcloser.OnEnemyGapcloser += AntiGapCloser_OnEnemyGapcloser;
             GameObject.OnCreate += AntiObject;
@@ -210,7 +210,7 @@ namespace MLGSORAKA
                 foreach (var hero in HeroManager.Allies)
                 {
                     if (Config.Item("mikael." + hero.ChampionName).GetValue<bool>() &&
-                        Player.Distance(hero) <= mikael.Range)
+                        Player.Distance(hero) <= 750)
                     {
                         if (hero.HasBuffOfType(BuffType.Stun) && Config.Item("stuns").GetValue<bool>() ||
                             hero.HasBuffOfType(BuffType.Charm) && Config.Item("charms").GetValue<bool>() ||
@@ -219,8 +219,9 @@ namespace MLGSORAKA
                             hero.HasBuffOfType(BuffType.Taunt) && Config.Item("taunts").GetValue<bool>() ||
                             hero.HasBuffOfType(BuffType.Slow) && Config.Item("slows").GetValue<bool>() ||
                             hero.HasBuffOfType(BuffType.CombatDehancer) && Config.Item("exh").GetValue<bool>())
-
+                        {
                             mikael.Cast(hero);
+                        }
                     }
                 }
             }
