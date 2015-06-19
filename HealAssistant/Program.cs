@@ -419,7 +419,7 @@ namespace HealAssistant
             {
                 case 0: // MostAD
                     return
-                        HeroManager.Allies.Where(ally => ally.IsValidTarget(E.Range, false) && ally.IsDead && ally.HealthPercent <=
+                        HeroManager.Allies.Where(ally => ally.IsValidTarget(E.Range, false) && !ally.IsDead && ally.HealthPercent <=
                     Config.Item("allyhp." + ally.ChampionName).GetValue<Slider>().Value && Config.Item("allywhitelist." + ally.ChampionName).GetValue<bool>())
                             .OrderByDescending(dmg => dmg.TotalAttackDamage())
                             .First();
@@ -484,7 +484,7 @@ namespace HealAssistant
                 case 0: // MostAD
                     return
                         HeroManager.Allies.Where(ally => ally.IsValidTarget(Q.Range, false) && ally.HealthPercent <=
-                    Config.Item("allyhp." + ally.ChampionName).GetValue<Slider>().Value && ally.IsDead && Config.Item("allywhitelist." + ally.ChampionName).GetValue<bool>())
+                    Config.Item("allyhp." + ally.ChampionName).GetValue<Slider>().Value && !ally.IsDead && Config.Item("allywhitelist." + ally.ChampionName).GetValue<bool>())
                             .OrderByDescending(dmg => dmg.TotalAttackDamage())
                             .First();
                 case 1: // MostAP
@@ -517,7 +517,7 @@ namespace HealAssistant
                 case 0: // MostAD
                     return
                         HeroManager.Allies.Where(ally => ally.IsValidTarget(W.Range, false) && ally.HealthPercent <=
-                    Config.Item("allyhp." + ally.ChampionName).GetValue<Slider>().Value && ally.IsDead && Config.Item("allywhitelist." + ally.ChampionName).GetValue<bool>())
+                    Config.Item("allyhp." + ally.ChampionName).GetValue<Slider>().Value && !ally.IsDead && Config.Item("allywhitelist." + ally.ChampionName).GetValue<bool>())
                             .OrderByDescending(dmg => dmg.TotalAttackDamage())
                             .First();
                 case 1: // MostAP

@@ -172,12 +172,39 @@ namespace MLGSORAKA
             Config.AddToMainMenu();
 
             Game.OnUpdate += Game_OnGameUpdate;
+            Game.OnUpdate += Mode_Switch;
             Drawing.OnDraw += OnDraw;
             AntiGapcloser.OnEnemyGapcloser += AntiGapCloser_OnEnemyGapcloser;
             GameObject.OnCreate += AntiObject;
             Obj_AI_Base.OnProcessSpellCast += InterrupterSc;
             Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
+            Orbwalking.BeforeAttack += Orbwalking_BeforeAttack;
+        }
 
+        private static void Mode_Switch(EventArgs args)
+        {
+            switch (Orbwalker.ActiveMode)
+            {
+                case Orbwalking.OrbwalkingMode.Combo:
+                    Combo();
+                    break;
+                case Orbwalking.OrbwalkingMode.Mixed:
+                    Harass();
+                    break;
+                case Orbwalking.OrbwalkingMode.LastHit:
+                    break;
+                case Orbwalking.OrbwalkingMode.LaneClear:
+                    Laneclear();
+                    break;
+            }
+        }
+
+        private static void Orbwalking_BeforeAttack(Orbwalking.BeforeAttackEventArgs args)
+        {
+            if ((Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed || Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit))
+            {
+                if (((Obj_AI_Base)Orbwalker.GetTarget()).IsMinion) args.Process = false;
+            }
         }
 
         private static void Interrupter2_OnInterruptableTarget(Obj_AI_Hero sender,
@@ -278,46 +305,75 @@ namespace MLGSORAKA
             Render.Circle.DrawCircle(ThreshGameObject.Position, 100, Color.Blue, 300);
 
         }
-
         private static void Game_OnGameUpdate(EventArgs args)
         {
-
-            switch (Orbwalker.ActiveMode)
-            {
-                case Orbwalking.OrbwalkingMode.Combo:
-                    Combo();
-                    healhp();
-                    break;
-                case Orbwalking.OrbwalkingMode.Mixed:
-                    Harass();
-                    break;
-                case Orbwalking.OrbwalkingMode.LastHit:
-                    break;
-                case Orbwalking.OrbwalkingMode.LaneClear:
-                    Laneclear();
-                    break;
-            }
             Player.SetSkin(Player.BaseSkinName, Config.Item("skinhax").GetValue<bool>()
             ? Config.Item("sorakaskin").GetValue<StringList>().SelectedIndex
                 : Player.BaseSkinId);
+
             //healstuff
             if (Config.Item("AutoE").GetValue<bool>())
                 AutoE();
 
-            if (Config.Item("UseW").GetValue<bool>())
-                healhp();
+            //Healing
+            foreach (var hero in HeroManager.Allies)
+            {
+                if (hero.Position.CountEnemiesInRange(800) >= 1 &&
+                    Config.Item("allyr." + hero.ChampionName).GetValue<Slider>().Value >= hero.HealthPercent
+                    && Config.Item("allybr." + hero.ChampionName).GetValue<bool>() &&
+                    Config.Item("ronhp").GetValue<bool>() && !hero.IsDead && R.IsReady())
+                {
+                    R.Cast(hero);
+                }
+            }
 
-            //SkinChanger
+
+            if (!GetHealTarget().IsDead && GetHealTarget().Distance(Player.Position) < W.Range &&
+                GetHealTarget().HealthPercent <=
+                Config.Item("allyhp." + GetHealTarget().ChampionName).GetValue<Slider>().Value &&
+                Config.Item("wonhp").GetValue<bool>() &&
+                Config.Item("allywhitelist." + GetHealTarget().ChampionName).GetValue<bool>() &&
+                Player.HealthPercent >= Config.Item("playerhp").GetValue<Slider>().Value &&
+                !GetHealTarget().InFountain())
+            {
+                W.Cast(GetHealTarget());
+            }
 
 
         }
-                private static Obj_AI_Hero GetHealTarget()
+
+        public static void HealingManager()
+        {
+            foreach (var hero in HeroManager.Allies)
+            {
+                if (hero.Position.CountEnemiesInRange(800) >= 1 &&
+                    Config.Item("allyr." + hero.ChampionName).GetValue<Slider>().Value >= hero.HealthPercent
+                    && Config.Item("allybr." + hero.ChampionName).GetValue<bool>() &&
+                    Config.Item("ronhp").GetValue<bool>() && !hero.IsDead && R.IsReady())
+                {
+                    R.Cast(hero);
+                }
+            }
+
+
+            if (!GetHealTarget().IsDead && GetHealTarget().Distance(Player.Position) < W.Range &&
+                GetHealTarget().HealthPercent <=
+                Config.Item("allyhp." + GetHealTarget().ChampionName).GetValue<Slider>().Value &&
+                Config.Item("wonhp").GetValue<bool>() &&
+                Config.Item("allywhitelist." + GetHealTarget().ChampionName).GetValue<bool>() &&
+                Player.HealthPercent >= Config.Item("playerhp").GetValue<Slider>().Value &&
+                !GetHealTarget().InFountain())
+            {
+                W.Cast(GetHealTarget());
+            }
+        }
+        private static Obj_AI_Hero GetHealTarget()
         {
             switch (Config.Item("priority").GetValue<StringList>().SelectedIndex)
             {
                 case 0: // MostAD
                     return
-                        HeroManager.Allies.Where(ally => ally.IsValidTarget(W.Range, false) && ally.IsDead && ally.HealthPercent <=
+                        HeroManager.Allies.Where(ally => ally.IsValidTarget(W.Range, false) && !ally.IsDead && ally.HealthPercent <=
                     Config.Item("allyhp." + ally.ChampionName).GetValue<Slider>().Value && !ally.IsMe && Config.Item("allywhitelist." + ally.ChampionName).GetValue<bool>())
                             .OrderByDescending(dmg => dmg.TotalAttackDamage())
                             .First();
@@ -344,35 +400,6 @@ namespace MLGSORAKA
             return null;
         }
 
-        private static void healhp()
-        {
-
-            foreach (var hero in HeroManager.Allies)
-            {
-                if (hero.Position.CountEnemiesInRange(800) >= 1 &&
-                    Config.Item("allyr." + hero.ChampionName).GetValue<Slider>().Value >= hero.HealthPercent
-                    && Config.Item("allybr." + hero.ChampionName).GetValue<bool>() &&
-                    Config.Item("ronhp").GetValue<bool>() && !hero.IsDead && R.IsReady())
-                {
-                    R.Cast(hero);
-                }
-            }
-
-
-            if (!GetHealTarget().IsDead && GetHealTarget().Distance(Player.Position) < W.Range &&
-                GetHealTarget().HealthPercent <=
-                Config.Item("allyhp." + GetHealTarget().ChampionName).GetValue<Slider>().Value &&
-                Config.Item("wonhp").GetValue<bool>() &&
-                Config.Item("allywhitelist." + GetHealTarget().ChampionName).GetValue<bool>() &&
-                Player.HealthPercent >= Config.Item("playerhp").GetValue<Slider>().Value &&
-                !GetHealTarget().InFountain())
-            {
-                W.Cast(GetHealTarget());
-            }
-        
-    
-        }
-
 
         private static void Laneclear()
         {
@@ -396,6 +423,7 @@ namespace MLGSORAKA
 
         private static void Harass()
         {
+
             var harassmana = Config.Item("harassmana").GetValue<Slider>().Value;
             var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
 
