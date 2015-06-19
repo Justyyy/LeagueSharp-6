@@ -346,12 +346,18 @@ namespace MLGSORAKA
                         E.IsReady() ? Config.Item("Edraw").GetValue<Circle>().Color : Color.Red,
                         Config.Item("CircleThickness").GetValue<Slider>().Value);
 
+        
             foreach (var hero in HeroManager.Allies)
             {
                 var pos = hero.HPBarPosition;
-                if (!hero.IsDead && !hero.IsMe && Config.Item("drawhp").GetValue<bool>())
+                if (!hero.IsDead && !hero.IsMe && Config.Item("drawhp").GetValue<bool>() && hero.HealthPercent >
+                    Config.Item("allyhp." + hero.ChampionName).GetValue<Slider>().Value)
                     Drawing.DrawText(pos.X + 40, pos.Y - 25, Color.LawnGreen, hero.HealthPercent.ToString("#.#") + "% HP");
-            }
+                if (!hero.IsDead && !hero.IsMe && Config.Item("drawhp").GetValue<bool>() && hero.HealthPercent <=
+                    Config.Item("allyhp." + hero.ChampionName).GetValue<Slider>().Value)
+                    Drawing.DrawText(pos.X + 40, pos.Y - 25, Color.Tomato, hero.HealthPercent.ToString("#.#") + "% HP");
+              }
+            
 
         }
         private static void Game_OnGameUpdate(EventArgs args)
