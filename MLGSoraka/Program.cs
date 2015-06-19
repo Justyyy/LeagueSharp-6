@@ -133,6 +133,24 @@ namespace MLGSORAKA
             combo.AddItem(new MenuItem("UseE", "Use E").SetValue(true));
             combo.AddItem(new MenuItem("UseR", "Use R").SetValue(true));
 
+            var mikael = healing.AddSubMenu(new Menu("Mikael's Crucible", "Mikael's Crucible"));
+            foreach (var hero in HeroManager.Allies)
+                mikael.SubMenu("Whitelist")
+                 .AddItem(new MenuItem("mikael." + hero.ChampionName, hero.ChampionName).SetValue(true));
+            var mikaelz = mikael.AddSubMenu(new Menu("CC List", "CC List"));
+
+            var mikaelz1 = mikael.AddSubMenu(new Menu("Special Debuffs", "Special Debuffs"));
+            mikaelz1.AddItem(new MenuItem("exh", "Exhaust").SetValue(true));
+            mikael.AddItem(new MenuItem("UseMik", "[Use Mikael's Crucible on CC/Debuffs]").SetValue(false));
+
+            mikaelz.AddItem(new MenuItem("stuns", "Stuns").SetValue(true));
+            mikaelz.AddItem(new MenuItem("charms", "Charms").SetValue(true));
+            mikaelz.AddItem(new MenuItem("taunts", "Taunts").SetValue(true));
+            mikaelz.AddItem(new MenuItem("fears", "Fears").SetValue(true));
+            mikaelz.AddItem(new MenuItem("snares", "Snares").SetValue(true));
+            mikaelz.AddItem(new MenuItem("slows", "Slows").SetValue(false));
+
+
             //DRAWING
             drawing.AddItem(new MenuItem("Draw_Disabled", "Disable All Spell Drawings").SetValue(false));
             drawing.SubMenu("Spell Drawings")
@@ -173,12 +191,37 @@ namespace MLGSORAKA
 
             Game.OnUpdate += Game_OnGameUpdate;
             Game.OnUpdate += Mode_Switch;
+            Game.OnUpdate += Mikaels;
             Drawing.OnDraw += OnDraw;
             AntiGapcloser.OnEnemyGapcloser += AntiGapCloser_OnEnemyGapcloser;
             GameObject.OnCreate += AntiObject;
             Obj_AI_Base.OnProcessSpellCast += InterrupterSc;
             Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
             Orbwalking.BeforeAttack += Orbwalking_BeforeAttack;
+        }
+
+        private static void Mikaels(EventArgs args)
+        {
+            var mikael = ItemData.Mikaels_Crucible.GetItem();
+            if (Config.Item("UseMik").GetValue<bool>())
+            {
+                foreach (var hero in HeroManager.Allies)
+                {
+                    if (Config.Item("mikael." + hero.ChampionName).GetValue<bool>() &&
+                        Player.Distance(hero) <= mikael.Range)
+                    {
+                        if (hero.HasBuffOfType(BuffType.Stun) && Config.Item("stuns").GetValue<bool>() ||
+                            hero.HasBuffOfType(BuffType.Charm) && Config.Item("charms").GetValue<bool>() ||
+                            hero.HasBuffOfType(BuffType.Fear) && Config.Item("fears").GetValue<bool>() ||
+                            hero.HasBuffOfType(BuffType.Snare) && Config.Item("snares").GetValue<bool>() ||
+                            hero.HasBuffOfType(BuffType.Taunt) && Config.Item("taunts").GetValue<bool>() ||
+                            hero.HasBuffOfType(BuffType.Slow) && Config.Item("slows").GetValue<bool>() ||
+                            hero.HasBuffOfType(BuffType.CombatDehancer) && Config.Item("exh").GetValue<bool>())
+
+                            mikael.Cast(hero);
+                    }
+                }
+            }
         }
 
         private static void Mode_Switch(EventArgs args)
@@ -225,8 +268,7 @@ namespace MLGSORAKA
                     args.SData.Name == "VarusQ" ||
                     args.SData.Name == "AbsoluteZero" || args.SData.Name == "Drain" ||
                     args.SData.Name == "InfiniteDuress" ||
-                    args.SData.Name == "MissFortuneBulletTime" || args.SData.Name == "ThreshQ" ||
-                    args.SData.Name == "RocketGrabMissile")
+                    args.SData.Name == "MissFortuneBulletTime" || args.SData.Name == "ThreshQ")
                 {
                     if (E.IsReady() && Config.Item("Einterrupt").GetValue<bool>() &&
                         sender.Distance(Player.Position) <= E.Range)
@@ -260,7 +302,6 @@ namespace MLGSORAKA
                     E.Cast(hero);
             }
         }
-
 
         private static void AntiObject(GameObject sender, EventArgs args)
         {
@@ -311,7 +352,6 @@ namespace MLGSORAKA
             ? Config.Item("sorakaskin").GetValue<StringList>().SelectedIndex
                 : Player.BaseSkinId);
 
-            //healstuff
             if (Config.Item("AutoE").GetValue<bool>())
                 AutoE();
 
