@@ -307,9 +307,6 @@ namespace HealAssistant
             if (Config.Item("UseMik").GetValue<bool>())
                 Mikael();
 
-            if (Player.ManaPercent <= Config.Item("mana").GetValue<Slider>().Value &&
-                Config.Item("manaz").GetValue<bool>())
-                return;
             if (Player.ChampionName == ChampName1) //Soraka
             {
                 foreach (var hero in HeroManager.Allies)
@@ -335,6 +332,10 @@ namespace HealAssistant
                     W.Cast(GetHealTargetSor());
                 }   
             }
+            if (Player.ManaPercent <= Config.Item("mana").GetValue<Slider>().Value &&
+            Config.Item("manaz").GetValue<bool>())
+                return;
+
             if (Player.ChampionName == ChampName2) //Alistar
             {
                 foreach (var hero in HeroManager.Allies)
