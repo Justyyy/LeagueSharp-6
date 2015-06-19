@@ -86,13 +86,17 @@ namespace MLGSORAKA
                 .AddItem(new MenuItem("playerhp", "Don't Use W if player HP % <= ").SetValue(new Slider(35, 100, 0)));
 
             misc.SubMenu("[E Settings]")
-                .AddItem(new MenuItem("interrupt", "Use [E] on interruptable spells").SetValue(true));
+                .AddItem(new MenuItem("interrupt", "Auto [E] on interruptable spells").SetValue(true));
             misc.SubMenu("[E Settings]")
-                .AddItem(new MenuItem("Einterrupt", "Use [E] on immobile targets").SetValue(true));
+                .AddItem(new MenuItem("Einterrupt", "Auto [E] on immobile targets").SetValue(true));
             misc.SubMenu("[E Settings]")
-                .AddItem(new MenuItem("AutoE", "Use [E] on CC'd targets").SetValue(true));
+                .AddItem(new MenuItem("AutoE", "Auto [E] on CC'd targets").SetValue(true));
             misc.SubMenu("[E Settings]")
-                .AddItem(new MenuItem("antigap", "Use [E] on gapclosers").SetValue(true));
+                .AddItem(new MenuItem("antigap", "Auto [E] on gapclosers").SetValue(true));
+            misc.SubMenu("[E Settings]")
+                .AddItem(new MenuItem("AutoEx", "Auto [E] if it hits X amount of enemies").SetValue(true));
+            misc.SubMenu("[E Settings]")
+                .AddItem(new MenuItem("Eslider", "Enemy Count").SetValue(new Slider(2, 5, 0)));
 
 
             harass.AddItem(new MenuItem("HarassQ", "Use Q").SetValue(true));
@@ -295,15 +299,21 @@ namespace MLGSORAKA
 
         private static void AutoE()
         {
-            foreach (var hero in HeroManager.Enemies)
+            foreach (var hero in HeroManager.Enemies.Where(e => e.IsEnemy && e.IsValidTarget(E.Range) && !e.IsDead))
             {
                 var cc = hero.HasBuffOfType(BuffType.Snare) ||
                          hero.HasBuffOfType(BuffType.Suppression) || hero.HasBuffOfType(BuffType.Taunt) ||
                          hero.HasBuffOfType(BuffType.Stun) || hero.HasBuffOfType(BuffType.Charm) ||
                          hero.HasBuffOfType(BuffType.Fear);
-                if (hero.IsValidTarget(E.Range) && E.IsReady() && cc)
+                if (hero.IsValidTarget(E.Range) && E.IsReady() && cc && Config.Item("AutoE").GetValue<bool>())
                     E.Cast(hero);
             }
+            foreach (var hero in HeroManager.Enemies.Where(e => e.IsEnemy && e.IsValidTarget(E.Range) && !e.IsDead))
+            {
+                if (Config.Item("AutoEx").GetValue<bool>() && E.IsReady())
+                    E.CastIfWillHit(hero, Config.Item("Eslider").GetValue<Slider>().Value);
+            }
+
         }
 
         private static void AntiObject(GameObject sender, EventArgs args)
@@ -366,7 +376,7 @@ namespace MLGSORAKA
             ? Config.Item("sorakaskin").GetValue<StringList>().SelectedIndex
                 : Player.BaseSkinId);
 
-            if (Config.Item("AutoE").GetValue<bool>())
+            if (E.IsReady())
                 AutoE();
 
             //Healing
