@@ -280,17 +280,33 @@ namespace HealAssistant
 
         private static void healdraw(EventArgs args)
         {
-            foreach (var hero in HeroManager.Allies)
+            if (Player.ChampionName == ChampName1 || Player.ChampionName == ChampName2 ||
+                Player.ChampionName == ChampName3 || Player.ChampionName == ChampName4 ||
+                Player.ChampionName == ChampName5 ||
+                Player.ChampionName == ChampName6 || Player.ChampionName == ChampName7)
             {
-                var pos = hero.HPBarPosition;
-                if (!hero.IsDead && !hero.IsMe && Config.Item("drawhp").GetValue<bool>() && hero.HealthPercent >
-                    Config.Item("allyhp." + hero.ChampionName).GetValue<Slider>().Value)
-                    Drawing.DrawText(pos.X + 40, pos.Y - 25, Color.LawnGreen, hero.HealthPercent.ToString("#.#") + "% HP");
-                if (!hero.IsDead && !hero.IsMe && Config.Item("drawhp").GetValue<bool>() && hero.HealthPercent <=
-                    Config.Item("allyhp." + hero.ChampionName).GetValue<Slider>().Value)
-                    Drawing.DrawText(pos.X + 40, pos.Y - 25, Color.Tomato, hero.HealthPercent.ToString("#.#") + "% HP");
-              }
-            
+                foreach (var hero in HeroManager.Allies)
+                {
+                    var pos = hero.HPBarPosition;
+                    if (!hero.IsDead && !hero.IsMe && Config.Item("drawhp").GetValue<bool>() && hero.HealthPercent >
+                        Config.Item("allyhp." + hero.ChampionName).GetValue<Slider>().Value)
+                        Drawing.DrawText(pos.X + 40, pos.Y - 25, Color.LawnGreen,
+                            hero.HealthPercent.ToString("#.#") + "% HP");
+                    if (!hero.IsDead && !hero.IsMe && Config.Item("drawhp").GetValue<bool>() && hero.HealthPercent <=
+                        Config.Item("allyhp." + hero.ChampionName).GetValue<Slider>().Value)
+                        Drawing.DrawText(pos.X + 40, pos.Y - 25, Color.Tomato,
+                            hero.HealthPercent.ToString("#.#") + "% HP");
+                }
+            }
+            else if (Config.Item("drawhp").GetValue<bool>())
+                foreach (var hero in HeroManager.Allies)
+                {
+                    var pos = hero.HPBarPosition;
+                    if (!hero.IsDead && !hero.IsMe && Config.Item("drawhp").GetValue<bool>())
+                        Drawing.DrawText(pos.X + 40, pos.Y - 25, Color.LawnGreen,
+                            hero.HealthPercent.ToString("#.#") + "% HP");
+
+                }
         }
 
         private static void CheckSpells()
