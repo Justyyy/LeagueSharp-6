@@ -33,15 +33,15 @@ namespace MLGSORAKA
 
             Notifications.AddNotification("420 SORAKA Loaded!", 1000);
 
-            Q = new Spell(SpellSlot.Q, 970);
+            Q = new Spell(SpellSlot.Q, 900);
             Q2 = new Spell(SpellSlot.Q, 970);
             W = new Spell(SpellSlot.W, 550);
             E = new Spell(SpellSlot.E, 925);
             R = new Spell(SpellSlot.R);
 
 
-            Q.SetSkillshot(0.5f, 300, 1800, false, SkillshotType.SkillshotCircle);
-            Q2.SetSkillshot(0.5f, 150, 1800, false, SkillshotType.SkillshotCircle);
+            Q.SetSkillshot(0.5f, 280, Qdelay(), false, SkillshotType.SkillshotCircle);
+
             E.SetSkillshot(0.25f, 70f, 1750, false, SkillshotType.SkillshotCircle);
 
 
@@ -52,9 +52,16 @@ namespace MLGSORAKA
             var healing = Config.AddSubMenu(new Menu("Healing Manager", "Healing Manager"));
             var combo = Config.AddSubMenu(new Menu("Combo Settings", "Combo Settings"));
             var harass = Config.AddSubMenu(new Menu("Harass Settings", "Harass Settings"));
-            var laneclear = Config.AddSubMenu(new Menu("Laneclear Settings", "Laneclear Settings"));
             var misc = Config.AddSubMenu(new Menu("Misc Settings", "Misc Settings"));
             var drawing = Config.AddSubMenu(new Menu("Draw Settings", "Draw Settings"));
+
+
+                var laneclear = Config.AddSubMenu(new Menu("Laneclear Settings", "Laneclear Settings"));
+
+                laneclear.AddItem(new MenuItem("laneq", "Use Q").SetValue(false));
+                laneclear.AddItem(new MenuItem("killq", "Use Q on >= Amount of Minions").SetValue(new Slider(2, 10, 0)));
+                laneclear.AddItem(new MenuItem("lanemana", "Mana Percentage").SetValue(new Slider(75, 100, 0)));
+            
 
             //Advanced Settings //[E] Settings
 
@@ -103,13 +110,6 @@ namespace MLGSORAKA
             harass.AddItem(new MenuItem("HarassE", "Use E").SetValue(true));
             harass.AddItem(new MenuItem("harassmana", "Mana Percentage").SetValue(new Slider(30, 100, 0)));
 
-
-            laneclear.AddItem(new MenuItem("laneq", "Use Q").SetValue(false));
-            laneclear.AddItem(new MenuItem("killq", "Use Q on >= Amount of Minions").SetValue(new Slider(2, 10, 0)));
-            laneclear.AddItem(new MenuItem("lanemana", "Mana Percentage").SetValue(new Slider(75, 100, 0)));
-
-
-
             foreach (var hero in HeroManager.Allies)
             {
                 healing.SubMenu("[R Settings]")
@@ -125,6 +125,10 @@ namespace MLGSORAKA
                             new Slider(20, 100, 0)));
             }
 
+            if (Player.Name == "ScienceARK") //Yes this is my summoner name pls no reportos to rito
+            {
+                Config.AddItem(new MenuItem("debugq", "Debug Q prediction").SetValue(true));
+            }
 
 
             //ITEMS
@@ -168,7 +172,6 @@ namespace MLGSORAKA
             drawing.SubMenu("Misc Drawings")
                .AddItem(new MenuItem("drawhp", "Draw HP % above allies").SetValue(true));
 
-
             Config.AddItem(new MenuItem("PewPew", "            Prediction Settings"));
 
             Config.AddItem(new MenuItem("hitchanceQ", "[Q] Hitchance").SetValue(new StringList
@@ -206,6 +209,28 @@ namespace MLGSORAKA
             Orbwalking.BeforeAttack += Orbwalking_BeforeAttack;
         }
 
+        private static float Qdelay()
+        {
+            var target = TargetSelector.GetTarget(Q.Range + 300, TargetSelector.DamageType.Magical);
+            double qdelay = 1800;
+
+            if (target.IsValidTarget(Q.Range) && Player.Distance(target.Position) >= 150 && Player.Distance(target) <= 500)
+            {
+                qdelay = 1000;
+                qdelay += - 0.7*Player.Distance(target.Position);
+                return (float) qdelay;
+            }
+            if (target.IsValidTarget(Q.Range) && Player.Distance(target) >= 500)
+            {
+                qdelay = 1000;
+                qdelay += -0.7 * Player.Distance(target.Position);
+                return (float)qdelay;
+            }
+
+            else return 1800;
+
+
+        }
         private static void Mikaels(EventArgs args)
         {
             var mikael = ItemData.Mikaels_Crucible.GetItem();
@@ -367,7 +392,19 @@ namespace MLGSORAKA
                     Config.Item("allyhp." + hero.ChampionName).GetValue<Slider>().Value)
                     Drawing.DrawText(pos.X + 40, pos.Y - 25, Color.Tomato, hero.HealthPercent.ToString("#.#") + "% HP");
               }
-            
+
+
+
+
+            if (Config.Item("debugq").GetValue<bool>())
+            {
+                var posz = Drawing.WorldToScreen(Player.Position);
+                Drawing.DrawText(posz.X + 80, posz.Y - 25, Color.MediumPurple, Qdelay().ToString() + " QDelay Value");
+                var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
+                Render.Circle.DrawCircle(Q.GetPrediction(target).CastPosition, 280, Color.Aqua, 0);
+                Render.Circle.DrawCircle(Q.GetPrediction(target).CastPosition, 100, Color.CadetBlue, 0);
+            }
+
 
         }
         private static void Game_OnGameUpdate(EventArgs args)
@@ -385,7 +422,7 @@ namespace MLGSORAKA
                 if (hero.Position.CountEnemiesInRange(800) >= 1 &&
                     Config.Item("allyr." + hero.ChampionName).GetValue<Slider>().Value >= hero.HealthPercent
                     && Config.Item("allybr." + hero.ChampionName).GetValue<bool>() &&
-                    Config.Item("ronhp").GetValue<bool>() && !hero.IsDead && R.IsReady())
+                    Config.Item("ronhp").GetValue<bool>() && !hero.IsDead && R.IsReady() && !GetHealTarget().IsRecalling())
                 {
                     R.Cast(hero);
                 }
@@ -397,7 +434,7 @@ namespace MLGSORAKA
                 Config.Item("allyhp." + GetHealTarget().ChampionName).GetValue<Slider>().Value &&
                 Config.Item("wonhp").GetValue<bool>() &&
                 Config.Item("allywhitelist." + GetHealTarget().ChampionName).GetValue<bool>() &&
-                Player.HealthPercent >= Config.Item("playerhp").GetValue<Slider>().Value &&
+                Player.HealthPercent >= Config.Item("playerhp").GetValue<Slider>().Value && !GetHealTarget().IsRecalling() &&
                 !GetHealTarget().InFountain())
             {
                 W.Cast(GetHealTarget());
@@ -493,7 +530,7 @@ namespace MLGSORAKA
 
             if (Q.IsReady() && Config.Item("HarassQ").GetValue<bool>() &&
                 Q.GetPrediction(target).Hitchance >= PredictionQ("hitchanceQ") && Player.ManaPercent >= harassmana)
-                Q.Cast(target);
+                Q.Cast(Q.GetPrediction(target).CastPosition);
 
             if (E.IsReady() && Config.Item("HarassE").GetValue<bool>() &&
                 E.GetPrediction(target).Hitchance >= PredictionE("hitchanceE") && Player.ManaPercent >= harassmana)
@@ -508,7 +545,7 @@ namespace MLGSORAKA
 
             if (Q.IsReady() && Config.Item("UseQ").GetValue<bool>() &&
                 Q.GetPrediction(target).Hitchance >= PredictionQ("hitchanceQ"))
-                Q.Cast(target);
+                Q.Cast(Q.GetPrediction(target).CastPosition);
 
             if (E.IsReady() && Config.Item("UseE").GetValue<bool>() &&
                 E.GetPrediction(target).Hitchance >= PredictionE("hitchanceE"))
