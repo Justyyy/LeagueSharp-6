@@ -125,7 +125,7 @@ namespace MLGSORAKA
                             new Slider(20, 100, 0)));
             }
 
-                misc.AddItem(new MenuItem("debugq", "Debug Q prediction").SetValue(true));
+                misc.AddItem(new MenuItem("debugq", "Debug Q prediction").SetValue(false));
             
 
 
@@ -215,7 +215,7 @@ namespace MLGSORAKA
             if (target.IsValidTarget(Q.Range) && Player.Distance(target.Position) >= 150 && Player.Distance(target) <= 500)
             {
                 qdelay = 1000;
-                qdelay += - 0.7*Player.Distance(target.Position);
+                qdelay += - 0.5*Player.Distance(target.Position);
                 return (float) qdelay;
             }
             if (target.IsValidTarget(Q.Range) && Player.Distance(target) >= 500)
