@@ -125,10 +125,8 @@ namespace MLGSORAKA
                             new Slider(20, 100, 0)));
             }
 
-            if (Player.Name == "ScienceARK") //Yes this is my summoner name pls no reportos to rito
-            {
-                Config.AddItem(new MenuItem("debugq", "Debug Q prediction").SetValue(true));
-            }
+                misc.AddItem(new MenuItem("debugq", "Debug Q prediction").SetValue(true));
+            
 
 
             //ITEMS
