@@ -122,7 +122,7 @@ namespace MLGSORAKA
                 healing.SubMenu("[R Settings]")
                     .AddItem(
                         new MenuItem("allyr." + hero.ChampionName, hero.ChampionName + " Health %").SetValue(
-                            new Slider(20, 100, 0)));
+                            new Slider(25, 100, 0)));
             }
 
                 misc.AddItem(new MenuItem("debugq", "Debug Q prediction").SetValue(false));
@@ -417,12 +417,12 @@ namespace MLGSORAKA
             //Healing
             foreach (var hero in HeroManager.Allies)
             {
-                if (hero.Position.CountEnemiesInRange(800) >= 1 &&
+                if (hero.Position.CountEnemiesInRange(1000) >= 1 &&
                     Config.Item("allyr." + hero.ChampionName).GetValue<Slider>().Value >= hero.HealthPercent
                     && Config.Item("allybr." + hero.ChampionName).GetValue<bool>() &&
                     Config.Item("ronhp").GetValue<bool>() && !hero.IsDead && R.IsReady() && !GetHealTarget().IsRecalling())
                 {
-                    R.Cast(hero);
+                    R.Cast();
                 }
             }
 
