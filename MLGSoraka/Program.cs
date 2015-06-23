@@ -420,7 +420,7 @@ namespace MLGSORAKA
                 if (hero.Position.CountEnemiesInRange(1000) >= 1 &&
                     Config.Item("allyr." + hero.ChampionName).GetValue<Slider>().Value >= hero.HealthPercent
                     && Config.Item("allybr." + hero.ChampionName).GetValue<bool>() &&
-                    Config.Item("ronhp").GetValue<bool>() && !hero.IsDead && R.IsReady() && !GetHealTarget().IsRecalling())
+                    Config.Item("ronhp").GetValue<bool>() && !hero.IsDead && R.IsReady() && !hero.IsRecalling())
                 {
                     R.Cast();
                 }
