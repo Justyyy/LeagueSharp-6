@@ -4,6 +4,7 @@ using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Runtime.Remoting.Channels;
 using LeagueSharp;
+using ItemData = LeagueSharp.Common.Data.ItemData;
 using LeagueSharp.Common;
 using LeagueSharp.Common.Data;
 using SharpDX;
